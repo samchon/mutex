@@ -94,20 +94,46 @@ async function main(): Promise<void>
     // WRITE-LOCK
     await UniqueLock.lock(mutex, async () =>
     {
-        // ...
-        // DO SOMETHING
-        // ...
+        // mutex.lock() and mutex.unlock() would be automatically called
+        // even this closure throws an error
     });
 
     // READ-LOCK
     await SharedLock.lock(mutex, async () =>
     {
-        // ...
-        // DOM SOMETHING
-        // ...
+        // mutex.lock_shared() and mutex.unlock_shared() would be automatically called
+        // even this closure throws an error
     });
-    await mutex.unlock_shared();
 
     await connector.close();
+}
+```
+
+### SharedTimedMutex
+As you've seen, the `mutex-server` library is using the `SharedTimeMutex` class as a basic asset.
+
+The `SharedTimeMutex` class is come from another library `tstl` that what I've developed for a long time. If you want to know more about the `SharedTimeMutex`, visit the [API documents](https://tstl.dev/api/classes/std.sharedtimedmutex.html) or read below type definition. If you're interested in my another library `tstl`, visit [the repository](https://github.com/samchon/tstl).
+
+```typescript
+declare module "tstl"
+{
+    export class SharedTimedMutex
+    {
+        // WRITE LOCKS
+        public lock(): Promise<void>;
+        public try_lock(): Promise<boolean>;
+        public try_lock_for(ms: number): Promise<boolean>;
+        public try_lock_until(at: Date): Promise<boolean>;
+
+        public unlock(): Promise<void>;
+
+        // READ LOCKS
+        public lock_shared(): Promise<void>;
+        public try_lock_shared(): Promise<boolean>;
+        public try_lock_shared_for(ms: number): Promise<boolean>;
+        public try_lock_shared_until(at: Date): Promise<boolean>;
+
+        public unlock_shared(): Promise<void>;
+    }
 }
 ```
