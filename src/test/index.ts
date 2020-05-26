@@ -1,99 +1,43 @@
-const EXTENSION = __filename.substr(-2);
-if (EXTENSION === "js")
-    require("source-map-support").install();
+import { SharedTimedMutex } from "tstl/thread/SharedTimedMutex";
+import { UniqueLock } from "tstl/thread/UniqueLock";
+import { sleep_for } from "tstl/thread/global";
 
-import * as cli from "cli";
-import * as fs from "fs";
+import { MutexServer } from "../MutexServer";
+import { MutexConnector } from "../MutexConnector";
 
-interface ICommand
+const PORT = 44994;
+const SLEEP_TIME = 100;
+const REPEAT = 5;
+
+function sleep(mutex: SharedTimedMutex): Promise<void>
 {
-    target?: string;
-    exclude?: string;
-}
-interface IModule
-{
-    [key: string]: () => Promise<void>;
-}
-
-async function measure(job: () => Promise<void>): Promise<number>
-{
-    let time: number = Date.now();
-    await job();
-    return Date.now() - time;
-}
-
-async function iterate(command: ICommand, path: string): Promise<void>
-{
-    let fileList: string[] = await fs.promises.readdir(path);
-    for (let file of fileList)
-    {
-        let currentPath: string = `${path}/${file}`;
-        let stats: fs.Stats = await fs.promises.lstat(currentPath);
-
-        if (stats.isDirectory() === true && file !== "internal")
-        {
-            await iterate(command, currentPath);
-            continue;
-        }
-        else if (file.substr(-3) !== `.${EXTENSION}` || currentPath === `${__dirname}/index.${EXTENSION}`)
-            continue;
-
-        let external: IModule = await import(currentPath.substr(0, currentPath.length - 3));
-        for (let key in external)
-        {
-            // WHETHER TESTING TARGET OR NOT
-            if (key.substr(0, 5) !== "test_")
-                continue;
-            if (command.exclude && command.exclude === key.substr(5))
-                continue;
-            if (command.target && command.target !== key.substr(5))
-                continue;
-
-            // PRINT TITLE & ELAPSED TIME
-            process.stdout.write("  - " + key);
-
-            let time: number = await measure(() => external[key]());
-            console.log(`: ${time} ms`);
-        }
-    }
+    return UniqueLock.lock(mutex, () => sleep_for(SLEEP_TIME));
 }
 
 async function main(): Promise<void>
 {
-    //----
-    // DO TEST
-    //----
-    console.log("==========================================================");
-    console.log(" Test Automation Program");
-    console.log("==========================================================");
+    // PREPARE SERVER AND CLIENT
+    let server: MutexServer = new MutexServer();
+    await server.open(PORT);
 
-    let command: ICommand = cli.parse();
-    if (process.argv[2] && process.argv[2][0] !== '-')
-        command.target = process.argv[2];
+    let connector: MutexConnector = new MutexConnector();
+    await connector.connect(`http://127.0.0.1:${PORT}`);
 
-    let time: number = await measure(() => iterate(command, __dirname));
+    // TEST MUTEX WITH SLEEP
+    let mutex: SharedTimedMutex = connector.getMutex("something");
+    let time: number = Date.now();
+    let joiners: Promise<void>[] = [];
 
-    //----
-    // TRACE BENCHMARK
-    //----
-    // ELAPSED TIME
-    console.log("----------------------------------------------------------");
-    console.log("Success");
-    console.log(`  - elapsed time: ${time} ms`);
+    for (let i: number = 0 ; i < REPEAT; ++i)
+        joiners.push( sleep(mutex) );
 
-    // MEMORY USAGE
-    let memory: NodeJS.MemoryUsage = process.memoryUsage();
-    for (let property in memory)
-    {
-        let amount: number = memory[property as keyof NodeJS.MemoryUsage] / 10**6;
-        console.log(`  - ${property}: ${amount} MB`);
-    }
-    console.log("----------------------------------------------------------\n");
-}
-main().catch(e =>
-{
-    process.stdout.write("\n");
-    console.log(e);
+    await Promise.all(joiners);
     
-    process.exit(1);
-});
+    if (Date.now() - time < SLEEP_TIME * REPEAT)
+        throw new Error("Error on RemoteMutex~: UniqueLock doesn't work exactly.");
+
+    // CLOSE CONNECTION
+    await connector.close();
+    await server.close();
+}
+main();

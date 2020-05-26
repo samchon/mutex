@@ -1,13 +1,13 @@
 {
-  "name": "@samchon/template",
+  "name": "mutex-server",
   "version": "0.0.0",
-  "description": "Template Project for TypeScript Projects",
+  "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "scripts": {
     "build": "npm run compile",
-    "compile": "tsc",
-    "dev": "tsc --watch",
+    "compile": "rm -rf lib && tsc",
+    "dev": "rm -rf lib && tsc --watch",
     "test": "node lib/test",
     "test:ts": "ts-node src/test"
   },
@@ -16,8 +16,13 @@
     "url": "https://github.com/samchon/typescript-template"
   },
   "keywords": [
-    "typescript",
-    "template"
+    "mutex",
+    "server",
+    "remote",
+    "critical",
+    "section",
+    "lock",
+    "thread"
   ],
   "author": {
     "name": "Jeongho Nam",
@@ -36,5 +41,9 @@
     "source-map-support": "^0.5.16",
     "ts-node": "^8.8.2",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "tgrid": "^0.4.3",
+    "tstl": "^2.4.6"
   }
 }
