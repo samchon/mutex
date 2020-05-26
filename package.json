@@ -1,0 +1,40 @@
+{
+  "name": "@samchon/template",
+  "version": "0.0.0",
+  "description": "Template Project for TypeScript Projects",
+  "main": "lib/index.js",
+  "typings": "./index.d.ts",
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "tsc",
+    "dev": "tsc --watch",
+    "test": "node lib/test",
+    "test:ts": "ts-node src/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samchon/typescript-template"
+  },
+  "keywords": [
+    "typescript",
+    "template"
+  ],
+  "author": {
+    "name": "Jeongho Nam",
+    "email": "samchon@samchon.org",
+    "url": "http://samchon.org"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samchon/typescript-template/issues"
+  },
+  "homepage": "https://github.com/samchon/typescript-template#readme",
+  "devDependencies": {
+    "@types/cli": "^0.11.19",
+    "@types/node": "^13.11.1",
+    "cli": "^1.0.1",
+    "source-map-support": "^0.5.16",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
+  }
+}

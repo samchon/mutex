@@ -1,0 +1,12 @@
+# PROJECT FILES
+/.git/
+/.github/
+/src/
+
+# CONFIGURATIONS
+package-lock.json
+tsconfig.json
+*.*ignore
+
+# SPECIAL FILES
+*.log
