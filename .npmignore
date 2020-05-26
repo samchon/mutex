@@ -1,6 +1,8 @@
 # PROJECT FILES
 /.git/
 /.github/
+/.vscode/
+/node_modules/
 /src/
 
 # CONFIGURATIONS
@@ -9,4 +11,5 @@ tsconfig.json
 *.*ignore
 
 # SPECIAL FILES
+/lib/test/
 *.log
