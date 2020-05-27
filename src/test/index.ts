@@ -1,15 +1,15 @@
-import { SharedTimedMutex } from "tstl/thread/SharedTimedMutex";
 import { UniqueLock } from "tstl/thread/UniqueLock";
 import { sleep_for } from "tstl/thread/global";
 
 import { MutexServer } from "../MutexServer";
 import { MutexConnector } from "../MutexConnector";
+import { RemoteMutex } from "../remote/RemoteMutex";
 
 const PORT = 44994;
 const SLEEP_TIME = 100;
 const REPEAT = 5;
 
-function sleep(mutex: SharedTimedMutex): Promise<void>
+function sleep(mutex: RemoteMutex): Promise<void>
 {
     return UniqueLock.lock(mutex, () => sleep_for(SLEEP_TIME));
 }
@@ -24,7 +24,7 @@ async function main(): Promise<void>
     await connector.connect(`http://127.0.0.1:${PORT}`);
 
     // TEST MUTEX WITH SLEEP
-    let mutex: SharedTimedMutex = connector.getMutex("something");
+    let mutex: RemoteMutex = await connector.getMutex("something");
     let time: number = Date.now();
     let joiners: Promise<void>[] = [];
 

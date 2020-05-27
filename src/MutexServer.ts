@@ -1,12 +1,28 @@
 import { WebServer } from "tgrid/protocols/web/WebServer";
-import { MutexProvider } from "./internal/MutexProvider";
+import { Provider } from "./providers/Provider";
 
 export class MutexServer
 {
-    private server_: WebServer<MutexProvider> = new WebServer();
-    private provider_: MutexProvider = new MutexProvider();
+    /**
+     * @hidden
+     */
+    private server_: WebServer<Provider>;
 
-    public async open(port: number = MutexServer.PORT): Promise<void>
+    /**
+     * @hidden
+     */
+    private provider_: Provider;
+
+    /* -----------------------------------------------------------
+        CONSTRUCTORS
+    ----------------------------------------------------------- */
+    public constructor()
+    {
+        this.server_ = new WebServer();
+        this.provider_ = new Provider();
+    }
+
+    public async open(port: number): Promise<void>
     {
         await this.server_.open(port, acceptor => acceptor.accept(this.provider_));
     }
@@ -15,8 +31,4 @@ export class MutexServer
     {
         await this.server_.close();
     }
-}
-export namespace MutexServer
-{
-    export const PORT = 37111;
 }

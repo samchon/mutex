@@ -1,12 +1,36 @@
-import { Driver } from "tgrid/components/Driver";
-import { SharedTimedMutex } from "tstl/thread/SharedTimedMutex";
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
+import { Driver } from "tgrid/components/Driver";
+import { Provider } from "./providers/Provider";
 
-import { MutexProvider } from "./internal/MutexProvider";
+import { RemoteBarrier } from "./remote/RemoteBarrier";
+import { RemoteConditionVariable } from "./remote/RemoteConditionVariable";
+import { RemoteLatch } from "./remote/RemoteLatch";
+import { RemoteMutex } from "./remote/RemoteMutex";
+import { RemoteSemaphore } from "./remote/RemoteSemaphore";
 
 export class MutexConnector
 {
-    private connector_: WebConnector<MutexProvider> = new WebConnector();
+    /**
+     * @hidden
+     */
+    private connector_: WebConnector<Provider>;
+
+    /**
+     * @hidden
+     */
+    private controller_: Driver<Provider>;
+
+    /* -----------------------------------------------------------
+        CONSTRUCTORS
+    ----------------------------------------------------------- */
+    /**
+     * Default Constructor
+     */
+    public constructor()
+    {
+        this.connector_ = new WebConnector();
+        this.controller_ = this.connector_.getDriver();
+    }
 
     public async connect(url: string): Promise<void>
     {
@@ -18,24 +42,44 @@ export class MutexConnector
         await this.connector_.close();
     }
 
-    public getMutex(name: string): SharedTimedMutex
+    /* -----------------------------------------------------------
+        ACCESSORS
+    ----------------------------------------------------------- */
+    public get url(): string | undefined
     {
-        let controller: Driver<MutexProvider> = this.connector_.getDriver();
+        return this.connector_.url;
+    }
 
-        return <SharedTimedMutex>{
-            // WRITE
-            lock: () => controller.lock(name),
-            try_lock: () => controller.try_lock(name),
-            try_lock_for: ms => controller.try_lock_for(name, ms),
-            try_lock_until: at => controller.try_lock_until(name, at),
-            unlock: () => controller.unlock(name),
+    public get state(): WebConnector.State
+    {
+        return this.connector_.state;
+    }
 
-            // READ
-            lock_shared: () => controller.lock_shared(name),
-            try_lock_shared: () => controller.try_lock_shared(name),
-            try_lock_shared_for: ms => controller.try_lock_shared_for(name, ms),
-            try_lock_shared_until: at => controller.try_lock_shared_until(name, at),
-            unlock_shared: () => controller.unlock_shared(name),
-        };
+    /* -----------------------------------------------------------
+        THREAD COMPONENTS
+    ----------------------------------------------------------- */
+    public getBarriers(name: string, count: number): Promise<RemoteBarrier>
+    {
+        return RemoteBarrier.create(this.controller_.barriers, name, count);
+    }
+
+    public getConditionVariable(name: string): Promise<RemoteConditionVariable>
+    {
+        return RemoteConditionVariable.create(this.controller_.condition_variables, name);
+    }
+
+    public getLatch(name: string, count: number): Promise<RemoteLatch>
+    {
+        return RemoteLatch.create(this.controller_.latches, name, count);
+    }
+
+    public getMutex(name: string): Promise<RemoteMutex>
+    {
+        return RemoteMutex.create(this.controller_.mutexes, name);
+    }
+
+    public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>
+    {
+        return RemoteSemaphore.create(this.controller_.semaphores, name, count);
     }
 }

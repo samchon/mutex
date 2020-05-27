@@ -36,8 +36,7 @@ async function main(): Promise<void>
 Using the mutex server is also easy too. However, be careful when using the remote mutex. If you forget unlocking the remote-mutex, other clients will be suffered by your mistake.
 
 ```typescript
-import { MutexConnector } from "mutex-server";
-import { SharedTimedMutex } from "tstl";
+import { MutexConnector, RemoteMutex } from "mutex-server";
 
 async function main(): Promise<void>
 {
@@ -49,7 +48,7 @@ async function main(): Promise<void>
     // USE MUTEX
     //----
     // GET NAMED MUTEX
-    let mutex: SharedTimedMutex = connector.getMutex("someName");
+    let mutex: RemoteMutex = connector.getMutex("someName");
 
     // WRITE-LOCK
     await mutex.lock();
@@ -73,11 +72,11 @@ async function main(): Promise<void>
 }
 ```
 
-If you are aware of mistake to forget realilng the locks, therefore you want to use the remote mutex more safely, you can use those `UniqueLock` and `SharedLock` features instead of calling methods of the `SharedTimedMutex` directly:
+If you are aware of mistake to forget realilng the locks, therefore you want to use the remote mutex more safely, you can use those `UniqueLock` and `SharedLock` features instead of calling methods of the `RemoteMutex` directly:
 
 ```typescript
-import { MutexConnector } from "mutex-server";
-import { SharedTimedMutex, UniqueLock, SharedLock } from "tstl";
+import { MutexConnector, RemoteMutex } from "mutex-server";
+import { UniqueLock, SharedLock } from "tstl";
 
 async function main(): Promise<void>
 {
@@ -89,7 +88,7 @@ async function main(): Promise<void>
     // USE MUTEX
     //----
     // GET NAMED MUTEX
-    let mutex: SharedTimedMutex = connector.getMutex("someName");
+    let mutex: RemoteMutex = connector.getMutex("someName");
 
     // WRITE-LOCK
     await UniqueLock.lock(mutex, async () =>
@@ -106,34 +105,5 @@ async function main(): Promise<void>
     });
 
     await connector.close();
-}
-```
-
-### SharedTimedMutex
-As you've seen, the `mutex-server` library is using the `SharedTimeMutex` class as a basic asset.
-
-The `SharedTimeMutex` class is come from another library `tstl` that what I've developed for a long time. If you want to know more about the `SharedTimeMutex`, visit the [API documents](https://tstl.dev/api/classes/std.sharedtimedmutex.html) or read below type definition. If you're interested in my another library `tstl`, visit [the repository](https://github.com/samchon/tstl).
-
-```typescript
-declare module "tstl"
-{
-    export class SharedTimedMutex
-    {
-        // WRITE LOCKS
-        public lock(): Promise<void>;
-        public try_lock(): Promise<boolean>;
-        public try_lock_for(ms: number): Promise<boolean>;
-        public try_lock_until(at: Date): Promise<boolean>;
-
-        public unlock(): Promise<void>;
-
-        // READ LOCKS
-        public lock_shared(): Promise<void>;
-        public try_lock_shared(): Promise<boolean>;
-        public try_lock_shared_for(ms: number): Promise<boolean>;
-        public try_lock_shared_until(at: Date): Promise<boolean>;
-
-        public unlock_shared(): Promise<void>;
-    }
 }
 ```
