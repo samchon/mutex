@@ -1,5 +1,5 @@
 import { Driver } from "tgrid/components/Driver";
-import { BarrierProvider } from "../providers/BarrierProvider";
+import { BarrierProvider } from "../server/BarrierProvider";
 
 export class RemoteBarrier
 {

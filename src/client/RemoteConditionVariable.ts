@@ -1,5 +1,5 @@
 import { Driver } from "tgrid/components/Driver";
-import { ConditionVariableProvider } from "../providers/ConditionVariableProvider";
+import { ConditionVariableProvider } from "../server/ConditionVariableProvider";
 
 export class RemoteConditionVariable
 {

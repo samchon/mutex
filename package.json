@@ -46,7 +46,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "tgrid": "^0.4.3",
+    "tgrid": "^0.5.0-dev.20200531",
     "tstl": "^2.4.7"
   }
 }

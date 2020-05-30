@@ -1,5 +1,5 @@
 import { Driver } from "tgrid/components/Driver";
-import { MutexProvider } from "../providers/MutexProvider";
+import { MutexProvider } from "../server/MutexProvider";
 
 export class RemoteMutex
 {

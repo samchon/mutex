@@ -3,11 +3,17 @@ import { sleep_for } from "tstl/thread/global";
 
 import { MutexServer } from "../MutexServer";
 import { MutexConnector } from "../MutexConnector";
-import { RemoteMutex } from "../remote/RemoteMutex";
+import { RemoteMutex } from "../client/RemoteMutex";
 
 const PORT = 44994;
 const SLEEP_TIME = 100;
 const REPEAT = 5;
+const TOKEN = "ABCDEFG";
+
+interface IToken
+{
+    token: string;
+}
 
 function sleep(mutex: RemoteMutex): Promise<void>
 {
@@ -17,11 +23,11 @@ function sleep(mutex: RemoteMutex): Promise<void>
 async function main(): Promise<void>
 {
     // PREPARE SERVER AND CLIENT
-    let server: MutexServer = new MutexServer();
-    await server.open(PORT);
+    let server: MutexServer<IToken> = new MutexServer();
+    await server.open(PORT, info => info.headers.token === TOKEN);
 
-    let connector: MutexConnector = new MutexConnector();
-    await connector.connect(`http://127.0.0.1:${PORT}`);
+    let connector: MutexConnector<IToken> = new MutexConnector();
+    await connector.connect(`http://127.0.0.1:${PORT}`, { token: TOKEN });
 
     // TEST MUTEX WITH SLEEP
     let mutex: RemoteMutex = await connector.getMutex("something");

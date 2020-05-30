@@ -1,5 +1,8 @@
 import { Driver } from "tgrid/components/Driver";
-import { SemaphoreProvider } from "../providers/SemaphoreProvider";
+import { SemaphoreProvider } from "../server/SemaphoreProvider";
+
+import { ITimedLockable } from "tstl/internal/thread/ITimedLockable";
+import { Semaphore } from "tstl/thread/Semaphore";
 
 export class RemoteSemaphore
 {
@@ -70,5 +73,13 @@ export class RemoteSemaphore
     public release(count: number = 1): Promise<void>
     {
         return this.controller_.release(this.name_, count);
+    }
+}
+
+export namespace RemoteSemaphore
+{
+    export function get_lockable(semaphore: RemoteSemaphore): ITimedLockable
+    {
+        return Semaphore.get_lockable(semaphore);
     }
 }

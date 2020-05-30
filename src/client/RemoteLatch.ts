@@ -1,5 +1,5 @@
 import { Driver } from "tgrid/components/Driver";
-import { LatchProvider } from "../providers/LatchProvider";
+import { LatchProvider } from "../server/LatchProvider";
 
 export class RemoteLatch
 {
