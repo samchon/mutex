@@ -1,6 +1,16 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { Driver } from "tgrid/components/Driver";
 import { MutexProvider } from "../server/MutexProvider";
 
+/**
+ * Remote Mutex.
+ * 
+ * @author Jeongho Nam
+ */
 export class RemoteMutex
 {
     /**

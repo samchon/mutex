@@ -1,9 +1,19 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { Driver } from "tgrid/components/Driver";
 import { SemaphoreProvider } from "../server/SemaphoreProvider";
 
 import { ITimedLockable } from "tstl/internal/thread/ITimedLockable";
 import { Semaphore } from "tstl/thread/Semaphore";
 
+/**
+ * Remote Semaphore.
+ * 
+ * @author Jeongho Nam
+ */
 export class RemoteSemaphore
 {
     /**

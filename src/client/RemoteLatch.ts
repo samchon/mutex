@@ -1,6 +1,16 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { Driver } from "tgrid/components/Driver";
 import { LatchProvider } from "../server/LatchProvider";
 
+/**
+ * Remote Latch.
+ * 
+ * @author Jeongho Nam
+ */
 export class RemoteLatch
 {
     /**

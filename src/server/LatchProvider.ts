@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { Latch } from "tstl/thread/Latch";
 
+/**
+ * @hidden
+ */
 export class LatchProvider
 {
     private dict_: HashMap<string, Latch>;

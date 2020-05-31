@@ -1,9 +1,17 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { BarrierProvider } from "./BarrierProvider";
 import { ConditionVariableProvider } from "./ConditionVariableProvider";
 import { LatchProvider } from "./LatchProvider";
 import { MutexProvider } from "./MutexProvider";
 import { SemaphoreProvider } from "./SemaphoreProvider";
 
+/**
+ * @hidden
+ */
 export class Provider
 {
     public readonly barriers: BarrierProvider = new BarrierProvider();

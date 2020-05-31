@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { SharedTimedMutex } from "tstl/thread/SharedTimedMutex";
 
+/**
+ * @hidden
+ */
 export class MutexProvider
 {
     private dict_: HashMap<string, SharedTimedMutex>;

@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { ConditionVariable } from "tstl/thread/ConditionVariable";
 
+/**
+ * @hidden
+ */
 export class ConditionVariableProvider
 {
     private dict_: HashMap<string, ConditionVariable>;

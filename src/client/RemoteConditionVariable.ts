@@ -1,6 +1,16 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { Driver } from "tgrid/components/Driver";
 import { ConditionVariableProvider } from "../server/ConditionVariableProvider";
 
+/**
+ * Remote ConditionVariable.
+ * 
+ * @author Jeongho Nam
+ */
 export class RemoteConditionVariable
 {
     /**

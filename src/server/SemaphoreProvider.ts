@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { Semaphore } from "tstl/thread/Semaphore";
 
+/**
+ * @hidden
+ */
 export class SemaphoreProvider
 {
     private dict_: HashMap<string, Semaphore>;

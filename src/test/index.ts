@@ -1,49 +1,107 @@
-import { UniqueLock } from "tstl/thread/UniqueLock";
-import { sleep_for } from "tstl/thread/global";
+import * as fs from "fs";
 
+import { IHeaders } from "./internal/IHeaders";
 import { MutexServer } from "../MutexServer";
 import { MutexConnector } from "../MutexConnector";
-import { RemoteMutex } from "../client/RemoteMutex";
+
+const EXTENSION = __filename.substr(-2);
+if (EXTENSION === "js")
+    require("source-map-support").install();
 
 const PORT = 44994;
-const SLEEP_TIME = 100;
-const REPEAT = 5;
-const TOKEN = "ABCDEFG";
+const URL = `ws://127.0.0.1:${PORT}`;
+const HEADERS = { password: "some_password" };
 
-interface IToken
+interface IModule
 {
-    token: string;
+    [key: string]: (connector: MutexConnector<IHeaders>, headers: IHeaders) => Promise<void>;
 }
 
-function sleep(mutex: RemoteMutex): Promise<void>
+async function measure(job: () => Promise<void>): Promise<number>
 {
-    return UniqueLock.lock(mutex, () => sleep_for(SLEEP_TIME));
+    let time: number = Date.now();
+    await job();
+    return Date.now() - time;
+}
+
+async function iterate(connector: MutexConnector<IHeaders>, headers: IHeaders, path: string): Promise<void>
+{
+    let fileList: string[] = await fs.promises.readdir(path);
+    for (let file of fileList)
+    {
+        let currentPath: string = `${path}/${file}`;
+        let stats: fs.Stats = await fs.promises.lstat(currentPath);
+
+        if (stats.isDirectory() === true && file !== "internal")
+        {
+            await iterate(connector, headers, currentPath);
+            continue;
+        }
+        else if (file.substr(-3) !== `.${EXTENSION}` || currentPath === `${__dirname}/index.${EXTENSION}`)
+            continue;
+
+        let external: IModule = await import(currentPath.substr(0, currentPath.length - 3));
+        for (let key in external)
+        {
+            if (key.substr(0, 5) !== "test_")
+                continue;
+            else if (key.substr(5) === process.argv[2])
+                continue;
+
+            process.stdout.write(`  - ${key}`);
+            let time: number = await measure(() => external[key](connector, headers));
+            console.log(`: ${time} ms`);
+        }
+    }
 }
 
 async function main(): Promise<void>
 {
-    // PREPARE SERVER AND CLIENT
-    let server: MutexServer<IToken> = new MutexServer();
-    await server.open(PORT, info => info.headers.token === TOKEN);
+    //----
+    // PREPARE ASSETS
+    //----
+    // PRINT TITLE
+    console.log("==========================================================");
+    console.log(" Mutex Server - Test Automation Program ");
+    console.log("==========================================================");
 
-    let connector: MutexConnector<IToken> = new MutexConnector();
-    await connector.connect(`http://127.0.0.1:${PORT}`, { token: TOKEN });
+    // OPEN SERVER
+    let server: MutexServer<IHeaders> = new MutexServer();
+    await server.open(PORT, info => info.headers.password === HEADERS.password );
 
-    // TEST MUTEX WITH SLEEP
-    let mutex: RemoteMutex = await connector.getMutex("something");
-    let time: number = Date.now();
-    let joiners: Promise<void>[] = [];
+    // CONNECT TO THE SERVER
+    let connector: MutexConnector<IHeaders> = new MutexConnector();
+    await connector.connect(URL, HEADERS);
 
-    for (let i: number = 0 ; i < REPEAT; ++i)
-        joiners.push( sleep(mutex) );
+    //----
+    // TEST AUTOMATION
+    //----
+    // DO TEST WITH ELAPSED TIME
+    let time: number = await measure(() => iterate(connector, HEADERS, __dirname));
 
-    await Promise.all(joiners);
-    
-    if (Date.now() - time < SLEEP_TIME * REPEAT)
-        throw new Error("Error on RemoteMutex~: UniqueLock doesn't work exactly.");
+    // PRINT ELAPSED TIME
+    console.log("----------------------------------------------------------");
+    console.log("Success");
+    console.log(`  - elapsed time: ${time} ms`);
 
-    // CLOSE CONNECTION
+    // MEMORY USAGE
+    let memory: NodeJS.MemoryUsage = process.memoryUsage();
+    for (let property in memory)
+    {
+        let amount: number = memory[property as keyof NodeJS.MemoryUsage] / 10**6;
+        console.log(`  - ${property}: ${amount} MB`);
+    }
+    console.log("----------------------------------------------------------\n");
+
+    //----
+    // TERMINATE
+    //----
     await connector.close();
     await server.close();
 }
-main();
+main().catch(exp => 
+{
+    process.stdout.write("\n");
+    console.log(exp);
+    process.exit(-1);
+});

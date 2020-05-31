@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { Barrier } from "tstl/thread/Barrier";
 
+/**
+ * @hidden
+ */
 export class BarrierProvider
 {
     private dict_: HashMap<string, Barrier>;

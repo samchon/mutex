@@ -1,3 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
 import { Provider } from "./server/Provider";
@@ -43,10 +48,10 @@ export class MutexConnector<Headers extends object>
      * 
      * Try connection to the remote `mutex-server` with its *address* and waiting for the server
      * to accept the trial through the *headers*. If the `mutex-server` rejects your connection,
-     * then exception would be thrown (in *Promise.catch()*).
+     * then exception would be thrown.
      * 
      * After the connection and your business (using remote critical sections) has been 
-     * completed, please don't forget to closing the connection in time to prevent wast of the 
+     * completed, please don't forget closing the connection in time to prevent waste of the 
      * server resource.
      * 
      * @param url URL address to connect.

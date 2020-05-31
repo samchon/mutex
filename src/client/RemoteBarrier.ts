@@ -1,6 +1,16 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 import { Driver } from "tgrid/components/Driver";
 import { BarrierProvider } from "../server/BarrierProvider";
 
+/**
+ * Remote Barrier.
+ * 
+ * @author Jeongho Nam
+ */
 export class RemoteBarrier
 {
     /**
