@@ -24,7 +24,7 @@ export class MutexConnector<Headers extends object>
     /**
      * @hidden
      */
-    private connector_: WebConnector<Provider>;
+    private connector_: WebConnector<Headers, null>;
 
     /**
      * @hidden
@@ -39,7 +39,7 @@ export class MutexConnector<Headers extends object>
      */
     public constructor()
     {
-        this.connector_ = new WebConnector();
+        this.connector_ = new WebConnector(null);
         this.controller_ = this.connector_.getDriver();
     }
 

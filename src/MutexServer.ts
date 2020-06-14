@@ -17,7 +17,7 @@ export class MutexServer<Headers extends object>
     /**
      * @hidden
      */
-    private server_: WebServer<Provider>;
+    private server_: WebServer<Headers, Provider>;
 
     /**
      * @hidden
@@ -73,7 +73,7 @@ export class MutexServer<Headers extends object>
      */
     public open(port: number, predicator: MutexServer.Predicator<Headers>): Promise<void>
     {
-        return this.server_.open<Headers>(port, async acceptor => 
+        return this.server_.open(port, async acceptor => 
         {
             let info: MutexServer.ConnectionInfo<Headers> = {
                 ip: acceptor.ip,
