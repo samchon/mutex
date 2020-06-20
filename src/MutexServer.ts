@@ -9,7 +9,7 @@ import { Provider } from "./server/Provider";
 /**
  * The Mutex Server.
  * 
- * @typeParam Headers Type of the *headers* who is containing the activation info.
+ * @type Headers Type of the *headers* who is containing the activation info.
  * @author Jeongho Nam - https://github.com/samchon
  */
 export class MutexServer<Headers extends object>
@@ -133,7 +133,7 @@ export namespace MutexServer
     /**
      * The predicator function type.
      * 
-     * @typeParam Headers Type of the *headers*.
+     * @type Headers Type of the *headers*.
      */
     export interface Predicator<Headers extends object>
     {
@@ -147,7 +147,7 @@ export namespace MutexServer
     /**
      * Connection information with a client.
      * 
-     * @typeParam Headers Type of the *headers*.
+     * @type Headers Type of the *headers*.
      */
     export interface ConnectionInfo<Headers extends object>
     {

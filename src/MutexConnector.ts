@@ -16,7 +16,7 @@ import { RemoteSemaphore } from "./client/RemoteSemaphore";
 /**
  * Mutex server connector for client.
  * 
- * @typeParam Headers Type of the *headers* who containing the activation info.
+ * @type Headers Type of the *headers* who containing the activation info.
  * @author Jeongho Nam - https://github.com/samchon
  */
 export class MutexConnector<Headers extends object>
