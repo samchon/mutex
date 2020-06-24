@@ -1,3 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module ms
+ */
+//-----------------------------------------------------------
 export * from "./RemoteBarrier";
 export * from "./RemoteConditionVariable";
 export * from "./RemoteLatch";

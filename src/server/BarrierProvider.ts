@@ -50,4 +50,14 @@ export class BarrierProvider
     {
         return this.dict_.get(name).wait();
     }
+
+    public wait_for(name: string, ms: number): Promise<boolean>
+    {
+        return this.dict_.get(name).wait_for(ms);
+    }
+
+    public wait_until(name: string, at: Date): Promise<boolean>
+    {
+        return this.dict_.get(name).wait_until(at);
+    }
 }
