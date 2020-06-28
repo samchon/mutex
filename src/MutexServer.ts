@@ -9,15 +9,15 @@ import { Provider } from "./server/Provider";
 /**
  * The Mutex Server.
  * 
- * @type Headers Type of the *headers* who is containing the activation info.
+ * @type Header Type of the *header* who is containing the activation info.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexServer<Headers extends object>
+export class MutexServer<Header extends object>
 {
     /**
      * @hidden
      */
-    private server_: WebServer<Headers, Provider>;
+    private server_: WebServer<Header, Provider>;
 
     /**
      * @hidden
@@ -71,14 +71,14 @@ export class MutexServer<Headers extends object>
      * @param port Port number to listen.
      * @param predicator A predicator function determining whether to accept the client's connection or not.
      */
-    public open(port: number, predicator: MutexServer.Predicator<Headers>): Promise<void>
+    public open(port: number, predicator: MutexServer.Predicator<Header>): Promise<void>
     {
         return this.server_.open(port, async acceptor => 
         {
-            let info: MutexServer.ConnectionInfo<Headers> = {
+            let info: MutexServer.ConnectionInfo<Header> = {
                 ip: acceptor.ip,
                 path: acceptor.path,
-                headers: acceptor.headers
+                header: acceptor.headers
             };
             if (await predicator(info) === true)
                 await acceptor.accept(this.provider_);
@@ -147,9 +147,9 @@ export namespace MutexServer
     /**
      * Connection information with a client.
      * 
-     * @type Headers Type of the *headers*.
+     * @type Header Type of the *header*.
      */
-    export interface ConnectionInfo<Headers extends object>
+    export interface ConnectionInfo<Header extends object>
     {
         /**
          * IP address of the client.
@@ -162,8 +162,8 @@ export namespace MutexServer
         path: string;
 
         /**
-         * Headers who containing information about the activation.
+         * Header containing additional information like activation.
          */
-        headers: Headers;
+        header: Header;
     }
 }

@@ -16,15 +16,15 @@ import { RemoteSemaphore } from "./client/RemoteSemaphore";
 /**
  * Mutex server connector for client.
  * 
- * @type Headers Type of the *headers* who containing the activation info.
+ * @type Header Type of the *header* who containing the activation info.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexConnector<Headers extends object>
+export class MutexConnector<Header extends object>
 {
     /**
      * @hidden
      */
-    private connector_: WebConnector<Headers, null>;
+    private connector_: WebConnector<Header, null>;
 
     /**
      * @hidden
@@ -35,11 +35,13 @@ export class MutexConnector<Headers extends object>
         CONSTRUCTORS
     ----------------------------------------------------------- */
     /**
-     * Default Constructor.
+     * Initializer Constructor.
+     * 
+     * @param header Additional data for the activation.
      */
-    public constructor()
+    public constructor(header: Header)
     {
-        this.connector_ = new WebConnector(null);
+        this.connector_ = new WebConnector(header, null);
         this.controller_ = this.connector_.getDriver();
     }
 
@@ -57,9 +59,9 @@ export class MutexConnector<Headers extends object>
      * @param url URL address to connect.
      * @param headers Additional data for the activation.
      */
-    public connect(url: string, headers: Headers): Promise<void>
+    public connect(url: string): Promise<void>
     {
-        return this.connector_.connect(url, headers);
+        return this.connector_.connect(url);
     }
 
     /**
@@ -89,6 +91,11 @@ export class MutexConnector<Headers extends object>
     public get state(): WebConnector.State
     {
         return this.connector_.state;
+    }
+
+    public get header(): Header
+    {
+        return this.connector_.header;
     }
 
     /* -----------------------------------------------------------

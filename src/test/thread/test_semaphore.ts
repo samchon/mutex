@@ -1,7 +1,7 @@
-import { ITimedLockable } from "tstl/internal/thread/ITimedLockable";
+import { ITimedLockable } from "tstl/base/thread/ITimedLockable";
 import { sleep_for } from "tstl/thread/global";
 
-import { IHeaders } from "../internal/IHeaders";
+import { IActivation } from "../internal/IActivation";
 import { MutexConnector } from "../../MutexConnector";
 import { RemoteSemaphore } from "../../client/RemoteSemaphore";
 
@@ -9,7 +9,7 @@ import { Validator } from "../internal/Validator";
 
 const SIZE = 8;
 
-export async function test_semaphores(connector: MutexConnector<IHeaders>): Promise<void>
+export async function test_semaphores(connector: MutexConnector<IActivation>): Promise<void>
 {
     //----
     // TEST MUTEX FEATURES

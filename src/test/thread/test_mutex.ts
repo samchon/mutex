@@ -1,7 +1,7 @@
 import { Pair } from "tstl/utility/Pair";
 import { sleep_for } from "tstl/thread/global";
 
-import { IHeaders } from "../internal/IHeaders";
+import { IActivation } from "../internal/IActivation";
 import { MutexConnector } from "../../MutexConnector";
 import { RemoteMutex } from "../../client/RemoteMutex";
 import { Validator } from "../internal/Validator";
@@ -15,7 +15,7 @@ const enum Status
 }
 const MAGNIFIER: number = 3;
 
-export async function test_mutex(connector: MutexConnector<IHeaders>): Promise<void>
+export async function test_mutex(connector: MutexConnector<IActivation>): Promise<void>
 {
     let mutex: RemoteMutex = await connector.getMutex("remote_mutex");
 

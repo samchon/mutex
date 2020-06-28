@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-import { IHeaders } from "./internal/IHeaders";
+import { IActivation as IActivation } from "./internal/IActivation";
 import { MutexServer } from "../MutexServer";
 import { MutexConnector } from "../MutexConnector";
 
@@ -10,11 +10,11 @@ if (EXTENSION === "js")
 
 const PORT = 44994;
 const URL = `ws://127.0.0.1:${PORT}`;
-const HEADERS = { password: "some_password" };
+const HEADER = { password: "some_password" };
 
 interface IModule
 {
-    [key: string]: (connector: MutexConnector<IHeaders>, headers: IHeaders) => Promise<void>;
+    [key: string]: (connector: MutexConnector<IActivation>, headers: IActivation) => Promise<void>;
 }
 
 async function measure(job: () => Promise<void>): Promise<number>
@@ -24,7 +24,7 @@ async function measure(job: () => Promise<void>): Promise<number>
     return Date.now() - time;
 }
 
-async function iterate(connector: MutexConnector<IHeaders>, headers: IHeaders, path: string): Promise<void>
+async function iterate(connector: MutexConnector<IActivation>, headers: IActivation, path: string): Promise<void>
 {
     let fileList: string[] = await fs.promises.readdir(path);
     for (let file of fileList)
@@ -66,18 +66,18 @@ async function main(): Promise<void>
     console.log("==========================================================");
 
     // OPEN SERVER
-    let server: MutexServer<IHeaders> = new MutexServer();
-    await server.open(PORT, info => info.headers.password === HEADERS.password );
+    let server: MutexServer<IActivation> = new MutexServer();
+    await server.open(PORT, info => info.header.password === HEADER.password );
 
     // CONNECT TO THE SERVER
-    let connector: MutexConnector<IHeaders> = new MutexConnector();
-    await connector.connect(URL, HEADERS);
+    let connector: MutexConnector<IActivation> = new MutexConnector(HEADER);
+    await connector.connect(URL);
 
     //----
     // TEST AUTOMATION
     //----
     // DO TEST WITH ELAPSED TIME
-    let time: number = await measure(() => iterate(connector, HEADERS, __dirname));
+    let time: number = await measure(() => iterate(connector, HEADER, __dirname));
 
     // PRINT ELAPSED TIME
     console.log("----------------------------------------------------------");

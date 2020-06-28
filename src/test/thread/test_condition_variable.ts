@@ -1,13 +1,13 @@
 import { sleep_for } from "tstl/thread/global";
 
-import { IHeaders } from "../internal/IHeaders";
+import { IActivation } from "../internal/IActivation";
 import { MutexConnector } from "../../MutexConnector";
 import { RemoteConditionVariable } from "../../client/RemoteConditionVariable";
 
 const SLEEP_TIME: number = 100;
 const WAIT_COUNT: number = 10;
 
-export async function test_condition_variables(connector: MutexConnector<IHeaders>): Promise<void>
+export async function test_condition_variables(connector: MutexConnector<IActivation>): Promise<void>
 {
     let cv: RemoteConditionVariable = await connector.getConditionVariable("remote_condition_variable");
     let wait_count: number = 0;
