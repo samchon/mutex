@@ -1,3 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module mutex
+ */
+//-----------------------------------------------------------
 import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
 
 import { HashMap } from "tstl/container/HashMap";
@@ -7,14 +12,14 @@ import { sleep_for } from "tstl/thread/global";
 
 import { AccessType } from "tstl/internal/thread/AccessType";
 import { LockType } from "tstl/internal/thread/LockType";
-import { Disolver } from "./internal/Disolver";
+import { Joiner } from "./internal/Joiner";
 
 /**
- * @hidden
+ * @internal
  */
 export class ServerMutex
 {
-    private acceptors_: HashMap<WebAcceptor<any, any>, IAggregate>;
+    private acceptors_: HashMap<WebAcceptor<any, any>, List<IResolver>>;
     private queue_: List<IResolver>;
 
     private writing_: number;
@@ -32,49 +37,29 @@ export class ServerMutex
         this.reading_ = 0;
     }
 
-    private _Current_access_type(): AccessType | null
-    {
-        return this.queue_.empty()
-            ? null
-            : this.queue_.front().accessType;
-    }
-
-    private _Aggregate(resolver: IResolver): IAggregate
+    private _Reserve(resolver: IResolver): void
     {
         // FIND OR EMPLACE
-        let it: HashMap.Iterator<WebAcceptor<any, any>, IAggregate> = this.acceptors_.find(resolver.acceptor);
+        let it: HashMap.Iterator<WebAcceptor<any, any>, List<IResolver>> = this.acceptors_.find(resolver.acceptor);
         if (it.equals(this.acceptors_.end()) === true)
-            it = this.acceptors_.emplace(resolver.acceptor, 
-            {
-                reading: 0, 
-                writing: 0, 
-                read: 0, 
-                wrote: 0 
-            }).first;
+            it = this.acceptors_.emplace(resolver.acceptor, new List()).first;
 
-        // COUNTING
-        if (resolver.accessType === AccessType.READ)
-        {
-            ++it.second.reading;
-            if (resolver.handler === null)
-                ++it.second.read;
-        }
-        else
-        {
-            ++it.second.writing;
-            if (resolver.handler === null)
-                ++it.second.wrote;
-        }
-        
-        // RETURNS
-        resolver.aggregate = it.second;
-        return it.second;
+        // INSERT NEW ITEM
+        it.second.push_back(resolver);
+    }
+
+    private _Get_acceptor_resolvers(acceptor: WebAcceptor<any, any>): List<IResolver> | null
+    {
+        let it: HashMap.Iterator<WebAcceptor<any, any>, List<IResolver>> = this.acceptors_.find(acceptor);
+        return (it.equals(this.acceptors_.end()) === false)
+            ? it.second
+            : null;
     }
 
     /* ---------------------------------------------------------
         WRITE LOCK
     --------------------------------------------------------- */
-    public lock(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<void>
+    public lock(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<void>
     {
         return new Promise(resolve =>
         {
@@ -88,12 +73,11 @@ export class ServerMutex
                 lockType: LockType.HOLD,
                 
                 acceptor: acceptor,
-                aggregate: undefined!,
                 disolver: disolver,
             });
 
             // RESERVE FOR DISOLVER
-            this._Aggregate(it.value);
+            this._Reserve(it.value);
             disolver.value = () => this._Destruct_write(it);
 
             // RETURNS OR WAIT
@@ -102,13 +86,13 @@ export class ServerMutex
         });
     }
 
-    public async try_lock(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<boolean>
+    public async try_lock(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
     {
+        // LOCKABLE ?
         if (this.writing_ !== 0 || this.reading_ !== 0)
             return false;
 
         // CONSTRUCT RESOLVER
-        ++this.writing_;
         let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(),
         {
             handler: null,
@@ -116,19 +100,19 @@ export class ServerMutex
             lockType: LockType.KNOCK,
 
             acceptor: acceptor,
-            aggregate: undefined!,
             disolver: disolver,
         });
 
         // RESERVE FOR DISCONNECTION
-        this._Aggregate(it.value);
+        this._Reserve(it.value);
         disolver.value = () => this._Destruct_write(it);
 
         // RETURNS
+        ++this.writing_;
         return true;
     }
 
-    public try_lock_for(acceptor: WebAcceptor<any, any>, disolver: Disolver, ms: number): Promise<boolean>
+    public try_lock_for(ms: number, acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
     {
         return new Promise<boolean>(resolve =>
         {
@@ -140,14 +124,12 @@ export class ServerMutex
                     : resolve,
                 lockType: LockType.KNOCK,
                 acceptor: acceptor,
-
                 accessType: AccessType.WRITE,
-                aggregate: undefined!,
                 disolver: disolver
             });
 
             // RESERVE FOR DISCONNECTION
-            this._Aggregate(it.value);
+            this._Reserve(it.value);
             disolver.value = () => this._Destruct_write(it);
 
             // RETURNS OR WAIT UNTIL TIMEOUT
@@ -166,35 +148,40 @@ export class ServerMutex
         });
     }
 
-    public async try_lock_until(acceptor: WebAcceptor<any, any>, disolver: Disolver, at: Date): Promise<boolean>
+    public async unlock(acceptor: WebAcceptor<any, any>): Promise<void>
     {
-        let now: Date = new Date();
-        let ms: number = at.getTime() - now.getTime();
-
-        return await this.try_lock_for(acceptor, disolver, ms);
-    }
-
-    public async unlock(): Promise<void>
-    {
-        if (this._Current_access_type() !== AccessType.WRITE)
+        //----
+        // VALIDATION
+        //----
+        // IN GLOBAL AREA
+        if (this.queue_.empty() === true || this.queue_.front().accessType !== AccessType.WRITE)
             throw new InvalidArgument(`Error on RemoteMutex.unlock(): this mutex is free on the unique lock.`);
 
-        // DECREASE COUNTS
-        let top: IResolver = this.queue_.front();
-        --top.aggregate.writing;
-        --top.aggregate.wrote;
-
-        --this.writing_;
-
+        // IN LOCAL AREA
+        let local: List<IResolver> | null = this._Get_acceptor_resolvers(acceptor);
+        if (local === null || local.empty() === true || local.front().accessType !== AccessType.WRITE)
+            throw new InvalidArgument("Error on RemoteMutex.unlock(): you're free on the unique lock.");
+        
+        //----
         // RELEASE
+        //----
+        // ERASE FROM LOCAL
+        let top: IResolver = local.front();
+        top.disolver.source().erase(top.disolver);
+        local.pop_front();
+        
+        // ERASE FROM GLOBAL
+        --this.writing_;
         this.queue_.pop_front();
+        
+        // DO RELEASE
         this._Release();
     }
 
     /* ---------------------------------------------------------
         READ LOCK
     --------------------------------------------------------- */
-    public lock_shared(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<void>
+    public lock_shared(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<void>
     {
         return new Promise<void>(resolve =>
         {
@@ -208,12 +195,11 @@ export class ServerMutex
                 lockType: LockType.HOLD,
 
                 acceptor: acceptor,
-                aggregate: undefined!,
                 disolver: disolver
             });
 
             // RESERVE FOR DISCONNECTION
-            this._Aggregate(it.value);
+            this._Reserve(it.value);
             disolver.value = () => this._Destruct_read(it);
 
             // RETURNS OR WAIT
@@ -223,7 +209,7 @@ export class ServerMutex
         });
     }
 
-    public async try_lock_shared(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<boolean>
+    public async try_lock_shared(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
     {
         if (this.writing_ !== 0)
             return false;
@@ -234,14 +220,12 @@ export class ServerMutex
             handler: null,
             accessType: AccessType.READ,
             lockType: LockType.KNOCK,
-
             acceptor: acceptor,
-            aggregate: undefined!,
             disolver: disolver
         });
 
         // RESERVE FOR DISCONNECTION
-        this._Aggregate(it.value);
+        this._Reserve(it.value);
         disolver.value = () => this._Destruct_read(it);
 
         // RETURNS
@@ -249,7 +233,7 @@ export class ServerMutex
         return true;
     }
 
-    public try_lock_shared_for(acceptor: WebAcceptor<any, any>, disolver: Disolver, ms: number): Promise<boolean>
+    public try_lock_shared_for(ms: number, acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
     {
         return new Promise<boolean>(resolve =>
         {
@@ -263,12 +247,11 @@ export class ServerMutex
                 lockType: LockType.KNOCK,
 
                 acceptor: acceptor,
-                aggregate: undefined!,
                 disolver: disolver
             });
 
             // RESERVE FOR DISCONNECTION
-            this._Aggregate(it.value);
+            this._Reserve(it.value);
             disolver.value = () => this._Destruct_read(it);
             
             // RETURNS OR WAIT UNTIL TIMEOUT
@@ -287,28 +270,33 @@ export class ServerMutex
         });
     }
 
-    public async try_lock_shared_until(acceptor: WebAcceptor<any, any>, disolver: Disolver, at: Date): Promise<boolean>
+    public async unlock_shared(acceptor: WebAcceptor<any, any>): Promise<void>
     {
-        let now: Date = new Date();
-        let ms: number = at.getTime() - now.getTime();
-
-        return await this.try_lock_shared_for(acceptor, disolver, ms);
-    }
-
-    public async unlock_shared(): Promise<void>
-    {
-        if (this._Current_access_type() !== AccessType.READ)
+        //----
+        // VALIDATION
+        //----
+        // IN GLOBAL AREA
+        if (this.queue_.empty() === true || this.queue_.front().accessType !== AccessType.READ)
             throw new InvalidArgument(`Error on RemoteMutex.unlock_shared(): this mutex is free on the shared lock.`);
 
-        // DECREASE COUNTS
-        let top: IResolver = this.queue_.front();
-        --top.aggregate.reading;
-        --top.aggregate.read;
+        // IN LOCAL AREA
+        let local: List<IResolver> | null = this._Get_acceptor_resolvers(acceptor);
+        if (local === null || local.empty() === true || local.front().accessType !== AccessType.WRITE)
+            throw new InvalidArgument("Error on RemoteMutex.unlock_shared(): you're free on the shared lock.");
 
-        --this.reading_;
-
+        //----
         // RELEASE
+        //----
+        // ERASE FROM LOCAL
+        let top: IResolver = local.front();
+        top.disolver.source().erase(top.disolver);
+        local.pop_front();
+        
+        // ERASE FROM GLOBAL
+        --this.reading_;
         this.queue_.pop_front();
+
+        // DO RELEASE
         this._Release();
     }
 
@@ -317,8 +305,11 @@ export class ServerMutex
     --------------------------------------------------------- */
     private _Release(): void
     {
+        if (this.queue_.empty() === true)
+            return;
+        
         // STEP TO THE NEXT LOCKS
-        let current: AccessType = this._Current_access_type()!;
+        let current: AccessType = this.queue_.front().accessType;
 
         for (let resolver of this.queue_)
         {
@@ -374,29 +365,40 @@ export class ServerMutex
 
     private async _Destruct_write(it: List.Iterator<IResolver>): Promise<void>
     {
-        if (it.value.handler === null && it.value.aggregate.wrote !== 0)
-            await this.unlock();
+        // CHECK ALIVE
+        if (it.prev().next().equals(it) === false)
+            return;
+
+        // DESTRUCT
+        if (it.value.handler === null)
+            await this.unlock(it.value.acceptor);
         else
+        {
             this._Cancel(it);
+            it.value.disolver.source().erase(it.value.disolver);
+        }
     }
 
     private async _Destruct_read(it: List.Iterator<IResolver>): Promise<void>
     {
-        if (it.value.handler === null && it.value.aggregate.read !== 0)
-            await this.unlock_shared();
+        // CHECK ALIVE
+        if (it.prev().next().equals(it) === false)
+            return;
+
+        // DESTRUCT
+        if (it.value.handler === null)
+            await this.unlock_shared(it.value.acceptor);
         else
+        {
             this._Cancel(it);
+            it.value.disolver.source().erase(it.value.disolver);
+        }
     }
 }
 
-interface IAggregate
-{
-    reading: number;
-    writing: number;
-    read: number;
-    wrote: number;
-}
-
+/**
+ * @internal
+ */
 interface IResolver
 {
     // THREAD HANDLER
@@ -404,8 +406,7 @@ interface IResolver
     accessType: AccessType; // read or write
     lockType: LockType; // void or boolean
 
-    // DISCONNECTION HANDLERS
-    acceptor: WebAcceptor<any, any>; // connection with client
-    aggregate: IAggregate;
-    disolver: Disolver;
+    // DISCONNECTION HANDLER
+    acceptor: WebAcceptor<any, any>;
+    disolver: List.Iterator<Joiner>;
 }

@@ -1,11 +1,12 @@
 /**
  * @packageDocumentation
- * @module ms
+ * @module mutex
  */
 //-----------------------------------------------------------
 import { ISharedTimedLockable } from "tstl/base/thread/ISharedTimedLockable";
+
 import { Driver } from "tgrid/components/Driver";
-import { MutexProvider } from "../server/MutexProvider";
+import { MutexesProvider } from "../server/providers/MutexesProvider";
 
 /**
  * Remote Mutex.
@@ -17,7 +18,7 @@ export class RemoteMutex implements ISharedTimedLockable
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<MutexProvider>;
+    private controller_: Driver.Promisive<MutexesProvider>;
 
     /**
      * @hidden
@@ -30,7 +31,7 @@ export class RemoteMutex implements ISharedTimedLockable
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<MutexProvider>, name: string)
+    private constructor(controller: Driver.Promisive<MutexesProvider>, name: string)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -41,7 +42,7 @@ export class RemoteMutex implements ISharedTimedLockable
      */
     public static async create
         (
-            controller: Driver.Promisive<MutexProvider>, 
+            controller: Driver.Promisive<MutexesProvider>, 
             name: string
         ): Promise<RemoteMutex>
     {
@@ -136,9 +137,10 @@ export class RemoteMutex implements ISharedTimedLockable
      * @param at The maximum time point to wait.
      * @return Whether succeeded to monopoly the mutex or not.
      */
-    public try_lock_until(at: Date): Promise<boolean>
+    public async try_lock_until(at: Date): Promise<boolean>
     {
-        return this.controller_.try_lock_until(this.name_, at);
+        let ms: number = at.getTime() - Date.now();
+        return await this.try_lock_for(ms);
     }
 
     /**
@@ -252,9 +254,10 @@ export class RemoteMutex implements ISharedTimedLockable
      * @param at The maximum time point to wait.
      * @return Whether succeeded to share the mutex or not.
      */
-    public try_lock_shared_until(at: Date): Promise<boolean>
+    public async try_lock_shared_until(at: Date): Promise<boolean>
     {
-        return this.controller_.try_lock_shared_until(this.name_, at);
+        let ms: number = at.getTime() - Date.now();
+        return await this.try_lock_shared_for(ms);
     }
 
     /**

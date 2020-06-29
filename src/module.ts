@@ -3,7 +3,7 @@
  * @module mutex
  */
 //-----------------------------------------------------------
-import * as mutex from "./module";
+export * from "./MutexServer";
+export * from "./MutexConnector";
 
-export default mutex;
-export * from "./module";
+export * from "./client/index";

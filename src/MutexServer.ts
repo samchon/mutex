@@ -1,11 +1,12 @@
 /**
  * @packageDocumentation
- * @module ms
+ * @module mutex
  */
 //-----------------------------------------------------------
 import { WebServer } from "tgrid/protocols/web/WebServer";
-import { Provider } from "./server/Provider";
+import { ProviderGroup } from "./server/providers/ProviderGroup";
 
+import { GlobalGroup } from "./server/global/GlobalGroup";
 /**
  * The Mutex Server.
  * 
@@ -17,12 +18,12 @@ export class MutexServer<Header extends object>
     /**
      * @hidden
      */
-    private server_: WebServer<Header, Provider>;
+    private server_: WebServer<Header, ProviderGroup>;
 
     /**
      * @hidden
      */
-    private provider_: Provider;
+    private components_: GlobalGroup;
 
     /* -----------------------------------------------------------
         CONSTRUCTORS
@@ -47,7 +48,7 @@ export class MutexServer<Header extends object>
     public constructor(key?: string, cert?: string)
     {
         this.server_ = new WebServer(key!, cert!);
-        this.provider_ = new Provider();
+        this.components_ = new GlobalGroup();
     }
 
     /**
@@ -81,7 +82,12 @@ export class MutexServer<Header extends object>
                 header: acceptor.headers
             };
             if (await predicator(info) === true)
-                await acceptor.accept(this.provider_);
+            {
+                let group: ProviderGroup = new ProviderGroup(this.components_, acceptor);
+
+                await acceptor.accept(group);
+                acceptor.join().then(() => group.destructor());
+            }
             else // @todo: detailed reason
                 await acceptor.reject();
         });

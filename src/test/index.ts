@@ -1,6 +1,8 @@
 import * as fs from "fs";
 
-import { IActivation as IActivation } from "./internal/IActivation";
+import { IActivation } from "./internal/IActivation";
+import { ConnectionFactory } from "./internal/ConnectionFactory";
+
 import { MutexServer } from "../MutexServer";
 import { MutexConnector } from "../MutexConnector";
 
@@ -14,7 +16,7 @@ const HEADER = { password: "some_password" };
 
 interface IModule
 {
-    [key: string]: (connector: MutexConnector<IActivation>, headers: IActivation) => Promise<void>;
+    [key: string]: (factory: ConnectionFactory) => Promise<void>;
 }
 
 async function measure(job: () => Promise<void>): Promise<number>
@@ -24,7 +26,7 @@ async function measure(job: () => Promise<void>): Promise<number>
     return Date.now() - time;
 }
 
-async function iterate(connector: MutexConnector<IActivation>, headers: IActivation, path: string): Promise<void>
+async function iterate(factory: ConnectionFactory, path: string): Promise<void>
 {
     let fileList: string[] = await fs.promises.readdir(path);
     for (let file of fileList)
@@ -34,7 +36,7 @@ async function iterate(connector: MutexConnector<IActivation>, headers: IActivat
 
         if (stats.isDirectory() === true && file !== "internal")
         {
-            await iterate(connector, headers, currentPath);
+            await iterate(factory, currentPath);
             continue;
         }
         else if (file.substr(-3) !== `.${EXTENSION}` || currentPath === `${__dirname}/index.${EXTENSION}`)
@@ -49,7 +51,7 @@ async function iterate(connector: MutexConnector<IActivation>, headers: IActivat
                 continue;
 
             process.stdout.write(`  - ${key}`);
-            let time: number = await measure(() => external[key](connector, headers));
+            let time: number = await measure(() => external[key](factory));
             console.log(`: ${time} ms`);
         }
     }
@@ -69,15 +71,20 @@ async function main(): Promise<void>
     let server: MutexServer<IActivation> = new MutexServer();
     await server.open(PORT, info => info.header.password === HEADER.password );
 
-    // CONNECT TO THE SERVER
-    let connector: MutexConnector<IActivation> = new MutexConnector(HEADER);
-    await connector.connect(URL);
+    // CONNECTION-FACTORY TO THE SERVER
+    let factory: ConnectionFactory = async () =>
+    {
+        let connector: MutexConnector<IActivation> = new MutexConnector(HEADER);
+        await connector.connect(URL);
+
+        return connector;
+    };
 
     //----
     // TEST AUTOMATION
     //----
     // DO TEST WITH ELAPSED TIME
-    let time: number = await measure(() => iterate(connector, HEADER, __dirname));
+    let time: number = await measure(() => iterate(factory, __dirname));
 
     // PRINT ELAPSED TIME
     console.log("----------------------------------------------------------");
@@ -96,7 +103,6 @@ async function main(): Promise<void>
     //----
     // TERMINATE
     //----
-    await connector.close();
     await server.close();
 }
 main().catch(exp => 

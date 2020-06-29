@@ -1,17 +1,13 @@
 /**
  * @packageDocumentation
- * @module ms
+ * @module mutex
  */
 //-----------------------------------------------------------
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { Provider } from "./server/Provider";
+import { ProviderGroup } from "./server/providers/ProviderGroup";
 
-import { RemoteBarrier } from "./client/RemoteBarrier";
-import { RemoteConditionVariable } from "./client/RemoteConditionVariable";
-import { RemoteLatch } from "./client/RemoteLatch";
 import { RemoteMutex } from "./client/RemoteMutex";
-import { RemoteSemaphore } from "./client/RemoteSemaphore";
 
 /**
  * Mutex server connector for client.
@@ -29,7 +25,7 @@ export class MutexConnector<Header extends object>
     /**
      * @hidden
      */
-    private controller_: Driver<Provider>;
+    private controller_: Driver<ProviderGroup>;
 
     /* -----------------------------------------------------------
         CONSTRUCTORS
@@ -93,6 +89,9 @@ export class MutexConnector<Header extends object>
         return this.connector_.state;
     }
 
+    /**
+     * Get header.
+     */
     public get header(): Header
     {
         return this.connector_.header;
@@ -102,41 +101,6 @@ export class MutexConnector<Header extends object>
         THREAD COMPONENTS
     ----------------------------------------------------------- */
     /**
-     * Get remote barrier.
-     * 
-     * @param name An identifier name to be created or search for.
-     * @param count Downward counter of the target barrier, if newly created.
-     * @return A {@link RemoteBarrier} object.
-     */
-    public getBarrier(name: string, count: number): Promise<RemoteBarrier>
-    {
-        return RemoteBarrier.create(this.controller_.barriers, name, count);
-    }
-
-    /**
-     * Get remote condition variable.
-     * 
-     * @param name An identifier name to be created or search for.
-     * @return A {@link RemoteConditionVariable} object.
-     */
-    public getConditionVariable(name: string): Promise<RemoteConditionVariable>
-    {
-        return RemoteConditionVariable.create(this.controller_.condition_variables, name);
-    }
-
-    /**
-     * Get remote latch.
-     * 
-     * @param name An identifier name to be created or search for.
-     * @param count Downward counter of the target latch, if newly created.
-     * @return A {@link RemoteLatch} object.
-     */
-    public getLatch(name: string, count: number): Promise<RemoteLatch>
-    {
-        return RemoteLatch.create(this.controller_.latches, name, count);
-    }
-
-    /**
      * Get remote mutex.
      * 
      * @param name An identifier name to be created or search for.
@@ -145,17 +109,5 @@ export class MutexConnector<Header extends object>
     public getMutex(name: string): Promise<RemoteMutex>
     {
         return RemoteMutex.create(this.controller_.mutexes, name);
-    }
-
-    /**
-     * Get remote semaphore.
-     * 
-     * @param name An identifier name to be created or search for.
-     * @param count Downward counter of the target semaphore, if newly created.
-     * @return A {@link RemoteSemaphore} object.
-     */
-    public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>
-    {
-        return RemoteSemaphore.create(this.controller_.semaphores, name, count);
     }
 }
