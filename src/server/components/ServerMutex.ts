@@ -3,11 +3,11 @@
  * @module mutex
  */
 //-----------------------------------------------------------
-import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
+import { SolidComponent } from "./SolidComponent";
 
-import { HashMap } from "tstl/container/HashMap";
-import { List } from "tstl/container/List";
 import { InvalidArgument } from "tstl/exception/InvalidArgument";
+import { List } from "tstl/container/List";
+import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
 import { sleep_for } from "tstl/thread/global";
 
 import { AccessType } from "tstl/internal/thread/AccessType";
@@ -17,44 +17,10 @@ import { Joiner } from "./internal/Joiner";
 /**
  * @internal
  */
-export class ServerMutex
+export class ServerMutex extends SolidComponent<IResolver>
 {
-    private acceptors_: HashMap<WebAcceptor<any, any>, List<IResolver>>;
-    private queue_: List<IResolver>;
-
-    private writing_: number;
-    private reading_: number;
-
-    /* ---------------------------------------------------------
-        CONSTRUCTORS
-    --------------------------------------------------------- */
-    public constructor()
-    {
-        this.acceptors_ = new HashMap();
-        this.queue_ = new List();
-
-        this.writing_ = 0;
-        this.reading_ = 0;
-    }
-
-    private _Reserve(resolver: IResolver): void
-    {
-        // FIND OR EMPLACE
-        let it: HashMap.Iterator<WebAcceptor<any, any>, List<IResolver>> = this.acceptors_.find(resolver.acceptor);
-        if (it.equals(this.acceptors_.end()) === true)
-            it = this.acceptors_.emplace(resolver.acceptor, new List()).first;
-
-        // INSERT NEW ITEM
-        it.second.push_back(resolver);
-    }
-
-    private _Get_acceptor_resolvers(acceptor: WebAcceptor<any, any>): List<IResolver> | null
-    {
-        let it: HashMap.Iterator<WebAcceptor<any, any>, List<IResolver>> = this.acceptors_.find(acceptor);
-        return (it.equals(this.acceptors_.end()) === false)
-            ? it.second
-            : null;
-    }
+    private writing_: number = 0;
+    private reading_: number = 0;
 
     /* ---------------------------------------------------------
         WRITE LOCK
@@ -64,8 +30,7 @@ export class ServerMutex
         return new Promise(resolve =>
         {
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(), 
-            {
+            let it: List.Iterator<IResolver> = this._Insert_resolver({
                 handler: (this.writing_++ === 0 && this.reading_ === 0)
                     ? null
                     : resolve,
@@ -76,9 +41,8 @@ export class ServerMutex
                 disolver: disolver,
             });
 
-            // RESERVE FOR DISOLVER
-            this._Reserve(it.value);
-            disolver.value = () => this._Destruct_write(it);
+            // DISCONNECTION HANDLER
+            disolver.value = () => this._Handle_disconnection_write(it);
 
             // RETURNS OR WAIT
             if (it.value.handler === null)
@@ -103,9 +67,8 @@ export class ServerMutex
             disolver: disolver,
         });
 
-        // RESERVE FOR DISCONNECTION
-        this._Reserve(it.value);
-        disolver.value = () => this._Destruct_write(it);
+        // DISCONNECTION HANDLER
+        disolver.value = () => this._Handle_disconnection_write(it);
 
         // RETURNS
         ++this.writing_;
@@ -128,9 +91,8 @@ export class ServerMutex
                 disolver: disolver
             });
 
-            // RESERVE FOR DISCONNECTION
-            this._Reserve(it.value);
-            disolver.value = () => this._Destruct_write(it);
+            // DISCONNECTION HANDLER
+            disolver.value = () => this._Handle_disconnection_write(it);
 
             // RETURNS OR WAIT UNTIL TIMEOUT
             if (it.value.handler === null)
@@ -158,7 +120,7 @@ export class ServerMutex
             throw new InvalidArgument(`Error on RemoteMutex.unlock(): this mutex is free on the unique lock.`);
 
         // IN LOCAL AREA
-        let local: List<IResolver> | null = this._Get_acceptor_resolvers(acceptor);
+        let local: List<IResolver> | null = this._Get_local_queue(acceptor);
         if (local === null || local.empty() === true || local.front().accessType !== AccessType.WRITE)
             throw new InvalidArgument("Error on RemoteMutex.unlock(): you're free on the unique lock.");
         
@@ -168,6 +130,7 @@ export class ServerMutex
         // ERASE FROM LOCAL
         let top: IResolver = local.front();
         top.disolver.source().erase(top.disolver);
+        top.disolver.value = undefined;
         local.pop_front();
         
         // ERASE FROM GLOBAL
@@ -198,9 +161,8 @@ export class ServerMutex
                 disolver: disolver
             });
 
-            // RESERVE FOR DISCONNECTION
-            this._Reserve(it.value);
-            disolver.value = () => this._Destruct_read(it);
+            // DISCONNECTION HANDLER
+            disolver.value = () => this._Handle_disconnection_read(it);
 
             // RETURNS OR WAIT
             ++this.reading_;
@@ -224,9 +186,8 @@ export class ServerMutex
             disolver: disolver
         });
 
-        // RESERVE FOR DISCONNECTION
-        this._Reserve(it.value);
-        disolver.value = () => this._Destruct_read(it);
+        // DISCONNECTION HANDLER
+        disolver.value = () => this._Handle_disconnection_read(it);
 
         // RETURNS
         ++this.reading_;
@@ -250,9 +211,8 @@ export class ServerMutex
                 disolver: disolver
             });
 
-            // RESERVE FOR DISCONNECTION
-            this._Reserve(it.value);
-            disolver.value = () => this._Destruct_read(it);
+            // DISCONNECTION HANDLER
+            disolver.value = () => this._Handle_disconnection_read(it);
             
             // RETURNS OR WAIT UNTIL TIMEOUT
             ++this.reading_;
@@ -280,8 +240,8 @@ export class ServerMutex
             throw new InvalidArgument(`Error on RemoteMutex.unlock_shared(): this mutex is free on the shared lock.`);
 
         // IN LOCAL AREA
-        let local: List<IResolver> | null = this._Get_acceptor_resolvers(acceptor);
-        if (local === null || local.empty() === true || local.front().accessType !== AccessType.WRITE)
+        let local: List<IResolver> | null = this._Get_local_queue(acceptor);
+        if (local === null || local.empty() === true || local.front().accessType !== AccessType.READ)
             throw new InvalidArgument("Error on RemoteMutex.unlock_shared(): you're free on the shared lock.");
 
         //----
@@ -289,6 +249,7 @@ export class ServerMutex
         //----
         // ERASE FROM LOCAL
         let top: IResolver = local.front();
+        top.disolver.value = undefined;
         top.disolver.source().erase(top.disolver);
         local.pop_front();
         
@@ -363,7 +324,7 @@ export class ServerMutex
         handler(false);
     }
 
-    private async _Destruct_write(it: List.Iterator<IResolver>): Promise<void>
+    private async _Handle_disconnection_write(it: List.Iterator<IResolver>): Promise<void>
     {
         // CHECK ALIVE
         if (it.prev().next().equals(it) === false)
@@ -379,7 +340,7 @@ export class ServerMutex
         }
     }
 
-    private async _Destruct_read(it: List.Iterator<IResolver>): Promise<void>
+    private async _Handle_disconnection_read(it: List.Iterator<IResolver>): Promise<void>
     {
         // CHECK ALIVE
         if (it.prev().next().equals(it) === false)

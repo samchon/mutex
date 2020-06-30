@@ -4,9 +4,9 @@
  */
 //-----------------------------------------------------------
 import { WebServer } from "tgrid/protocols/web/WebServer";
-import { ProviderGroup } from "./server/providers/ProviderGroup";
+import { ProviderGroup } from "./server/ProviderGroup";
 
-import { GlobalGroup } from "./server/global/GlobalGroup";
+import { GlobalGroup } from "./server/GlobalGroup";
 /**
  * The Mutex Server.
  * 
@@ -79,7 +79,7 @@ export class MutexServer<Header extends object>
             let info: MutexServer.ConnectionInfo<Header> = {
                 ip: acceptor.ip,
                 path: acceptor.path,
-                header: acceptor.headers
+                header: acceptor.header
             };
             if (await predicator(info) === true)
             {
@@ -139,15 +139,15 @@ export namespace MutexServer
     /**
      * The predicator function type.
      * 
-     * @type Headers Type of the *headers*.
+     * @type Header Type of the *header*.
      */
-    export interface Predicator<Headers extends object>
+    export interface Predicator<Header extends object>
     {
         /**
          * @param info The information about connection with a client.
          * @return Whether to accept the connection or not.
          */
-        (info: ConnectionInfo<Headers>): boolean | Promise<boolean>;
+        (info: ConnectionInfo<Header>): boolean | Promise<boolean>;
     }
 
     /**

@@ -5,9 +5,13 @@
 //-----------------------------------------------------------
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { ProviderGroup } from "./server/providers/ProviderGroup";
+import { ProviderGroup } from "./server/ProviderGroup";
 
+import { RemoteBarrier } from "./client/RemoteBarrier";
+import { RemoteConditionVariable } from "./client/RemoteConditionVariable";
+import { RemoteLatch } from "./client/RemoteLatch";
 import { RemoteMutex } from "./client/RemoteMutex";
+import { RemoteSemaphore } from "./client/RemoteSemaphore";
 
 /**
  * Mutex server connector for client.
@@ -45,7 +49,7 @@ export class MutexConnector<Header extends object>
      * Connect to a remote `mutex-server`.
      * 
      * Try connection to the remote `mutex-server` with its *address* and waiting for the server
-     * to accept the trial through the *headers*. If the `mutex-server` rejects your connection,
+     * to accept the trial through the *header*. If the `mutex-server` rejects your connection,
      * then exception would be thrown.
      * 
      * After the connection and your business (using remote critical sections) has been 
@@ -53,7 +57,6 @@ export class MutexConnector<Header extends object>
      * server resource.
      * 
      * @param url URL address to connect.
-     * @param headers Additional data for the activation.
      */
     public connect(url: string): Promise<void>
     {
@@ -84,7 +87,7 @@ export class MutexConnector<Header extends object>
     /**
      * Get connection state.
      */
-    public get state(): WebConnector.State
+    public get state(): MutexConnector.State
     {
         return this.connector_.state;
     }
@@ -101,6 +104,41 @@ export class MutexConnector<Header extends object>
         THREAD COMPONENTS
     ----------------------------------------------------------- */
     /**
+     * Get remote barrier.
+     * 
+     * @param name An identifier name to be created or search for.
+     * @param count Downward counter of the target barrier, if newly created.
+     * @return A {@link RemoteBarrier} object.
+     */
+    public getBarrier(name: string, count: number): Promise<RemoteBarrier>
+    {
+        return RemoteBarrier.create(this.controller_.barriers, name, count);
+    }
+
+    /**
+     * Get remote condition variable.
+     * 
+     * @param name An identifier name to be created or search for.
+     * @return A {@link RemoteConditionVariable} object.
+     */
+    public getConditionVariable(name: string): Promise<RemoteConditionVariable>
+    {
+        return RemoteConditionVariable.create(this.controller_.condition_variables, name);
+    }
+
+    /**
+     * Get remote latch.
+     * 
+     * @param name An identifier name to be created or search for.
+     * @param count Downward counter of the target latch, if newly created.
+     * @return A {@link RemoteLatch} object.
+     */
+    public getLatch(name: string, count: number): Promise<RemoteLatch>
+    {
+        return RemoteLatch.create(this.controller_.latches, name, count);
+    }
+
+    /**
      * Get remote mutex.
      * 
      * @param name An identifier name to be created or search for.
@@ -110,4 +148,21 @@ export class MutexConnector<Header extends object>
     {
         return RemoteMutex.create(this.controller_.mutexes, name);
     }
+
+    /**
+     * Get remote semaphore.
+     * 
+     * @param name An identifier name to be created or search for.
+     * @param count Downward counter of the target semaphore, if newly created.
+     * @return A {@link RemoteSemaphore} object.
+     */
+    public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>
+    {
+        return RemoteSemaphore.create(this.controller_.semaphores, name, count);
+    }
+}
+
+export namespace MutexConnector
+{
+    export import State = WebConnector.State;
 }

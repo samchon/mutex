@@ -16,7 +16,7 @@ const HEADER = { password: "some_password" };
 
 interface IModule
 {
-    [key: string]: (factory: ConnectionFactory) => Promise<void>;
+    [key: string]: (factory: ConnectionFactory, server: MutexServer<IActivation>) => Promise<void>;
 }
 
 async function measure(job: () => Promise<void>): Promise<number>
@@ -26,7 +26,7 @@ async function measure(job: () => Promise<void>): Promise<number>
     return Date.now() - time;
 }
 
-async function iterate(factory: ConnectionFactory, path: string): Promise<void>
+async function iterate(factory: ConnectionFactory, server: MutexServer<IActivation>, path: string): Promise<void>
 {
     let fileList: string[] = await fs.promises.readdir(path);
     for (let file of fileList)
@@ -36,7 +36,7 @@ async function iterate(factory: ConnectionFactory, path: string): Promise<void>
 
         if (stats.isDirectory() === true && file !== "internal")
         {
-            await iterate(factory, currentPath);
+            await iterate(factory, server, currentPath);
             continue;
         }
         else if (file.substr(-3) !== `.${EXTENSION}` || currentPath === `${__dirname}/index.${EXTENSION}`)
@@ -47,11 +47,11 @@ async function iterate(factory: ConnectionFactory, path: string): Promise<void>
         {
             if (key.substr(0, 5) !== "test_")
                 continue;
-            else if (key.substr(5) === process.argv[2])
+            else if (process.argv[2] && key.indexOf(process.argv[2]) === -1)
                 continue;
 
             process.stdout.write(`  - ${key}`);
-            let time: number = await measure(() => external[key](factory));
+            let time: number = await measure(() => external[key](factory, server));
             console.log(`: ${time} ms`);
         }
     }
@@ -72,11 +72,18 @@ async function main(): Promise<void>
     await server.open(PORT, info => info.header.password === HEADER.password );
 
     // CONNECTION-FACTORY TO THE SERVER
+    let sequence: number = 0;
+    let connectorList: MutexConnector<IActivation>[] = [];
+
     let factory: ConnectionFactory = async () =>
     {
-        let connector: MutexConnector<IActivation> = new MutexConnector(HEADER);
+        let connector: MutexConnector<IActivation> = new MutexConnector({
+            uid: ++sequence,
+            ...HEADER
+        });
         await connector.connect(URL);
 
+        connectorList.push(connector);
         return connector;
     };
 
@@ -84,7 +91,7 @@ async function main(): Promise<void>
     // TEST AUTOMATION
     //----
     // DO TEST WITH ELAPSED TIME
-    let time: number = await measure(() => iterate(factory, __dirname));
+    let time: number = await measure(() => iterate(factory, server, __dirname));
 
     // PRINT ELAPSED TIME
     console.log("----------------------------------------------------------");
@@ -103,6 +110,10 @@ async function main(): Promise<void>
     //----
     // TERMINATE
     //----
+    for (let connector of connectorList)
+        if (connector.state === MutexConnector.State.OPEN)
+            await connector.close();
+
     await server.close();
 }
 main().catch(exp => 

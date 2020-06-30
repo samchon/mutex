@@ -11,7 +11,7 @@ import { MutexesProvider } from "../server/providers/MutexesProvider";
 /**
  * Remote Mutex.
  * 
- * @author Jeongho Nam
+ * @author Jeongho Nam - https://github.com/samchon
  */
 export class RemoteMutex implements ISharedTimedLockable
 {
@@ -46,7 +46,7 @@ export class RemoteMutex implements ISharedTimedLockable
             name: string
         ): Promise<RemoteMutex>
     {
-        await controller.emplace(name);
+        await controller.emplace(name, undefined);
         return new RemoteMutex(controller, name);
     }
 

@@ -6,4 +6,4 @@
 /**
  * @internal
  */
-export type Joiner = (() => Promise<void>) | undefined;
+export type Joiner = (() => void) | (() => Promise<void>) | undefined;
