@@ -15,11 +15,13 @@ import { LockType } from "tstl/internal/thread/LockType";
 /**
  * @internal
  */
-export abstract class SolidComponent<Resolver extends SolidComponent.IResolver>
+export abstract class SolidComponent<
+        Resolver extends SolidComponent.Resolver<Resolver, Aggregate>, 
+        Aggregate extends Record<string, number>>
     implements IComponent
 {
     protected queue_: List<Resolver>;
-    protected local_queue_: HashMap<WebAcceptor<any, any>, List<Resolver>>;
+    protected local_areas_: HashMap<WebAcceptor<any, any>, SolidComponent.LocalArea<Resolver, Aggregate>>;
 
     private acceptors_: HashSet<WebAcceptor<any, any>> = new HashSet();
 
@@ -29,7 +31,7 @@ export abstract class SolidComponent<Resolver extends SolidComponent.IResolver>
     public constructor()
     {
         this.queue_ = new List();
-        this.local_queue_ = new HashMap();
+        this.local_areas_ = new HashMap();
     }
 
     public _Insert_acceptor(acceptor: WebAcceptor<any, any>): void
@@ -52,50 +54,73 @@ export abstract class SolidComponent<Resolver extends SolidComponent.IResolver>
         // LOCAL QUEUE
         //----
         // FIND OR EMPLACE
-        let it: HashMap.Iterator<WebAcceptor<any, any>, List<Resolver>> = this.local_queue_.find(resolver.acceptor);
-        if (it.equals(this.local_queue_.end()) === true)
-            it = this.local_queue_.emplace(resolver.acceptor, new List()).first;
+        let mit: HashMap.Iterator<WebAcceptor<any, any>, SolidComponent.LocalArea<Resolver, Aggregate>> = this.local_areas_.find(resolver.acceptor);
+        if (mit.equals(this.local_areas_.end()) === true)
+            mit = this.local_areas_.emplace(resolver.acceptor, {
+                queue: new List(),
+                aggregate: resolver.aggregate
+            }).first;
+        else
+        {
+            for (let key in resolver.aggregate)
+                (mit.second.aggregate as Record<string, number>)[key] += resolver.aggregate[key];
+            resolver.aggregate = mit.second.aggregate;
+        }
 
         // INSERT NEW ITEM
-        it.second.push_back(resolver);
+        let lit: List.Iterator<Resolver> = mit.second.queue.insert(mit.second.queue.end(), resolver);
 
         //----
         // GLOBAL QUEUE
         //----
-        return this.queue_.insert(this.queue_.end(), resolver)
+        let ret: List.Iterator<Resolver> = this.queue_.insert(this.queue_.end(), resolver);
+        resolver.iterator = ret;
+        resolver.destructor = () =>
+        {
+            resolver.handler = null;
+            resolver.disolver.value = undefined;
+
+            if (resolver.disolver.erased_ !== true)
+                resolver.disolver.source().erase(resolver.disolver);
+            return mit.second.queue.erase(lit);
+        };
+        return ret;
     }
 
-    protected _Get_local_queue(acceptor: WebAcceptor<any, any>): List<Resolver> | null
+    protected _Get_local_area(acceptor: WebAcceptor<any, any>): SolidComponent.LocalArea<Resolver, Aggregate> | null
     {
-        let it: HashMap.Iterator<WebAcceptor<any, any>, List<Resolver>> = this.local_queue_.find(acceptor);
-        return (it.equals(this.local_queue_.end()) === false)
+        let it: HashMap.Iterator<WebAcceptor<any, any>, SolidComponent.LocalArea<Resolver, Aggregate>> = this.local_areas_.find(acceptor);
+        return (it.equals(this.local_areas_.end()) === false)
             ? it.second
             : null;
-    }
-
-    /* ---------------------------------------------------------
-        DISCONNECTION HANDLERS
-    --------------------------------------------------------- */
-    protected _Discard_resolver(resolver: Resolver): void
-    {
-        resolver.handler = null;
-        resolver.disolver.value = undefined;
-
-        if (resolver.disolver.erased_ !== true)
-            resolver.disolver.source().erase(resolver.disolver);
     }
 }
 
 export namespace SolidComponent
 {
-    export interface IResolver
+    export interface Resolver<
+            T extends Resolver<T, AggregateT>, 
+            AggregateT extends Record<string, number>>
     {
         // THREAD HANDLER
         handler: Function | null;
         lockType: LockType;
 
-        // DISCONNECTION HANDLER
+        // ASSET FFOR CLIENT
         acceptor: WebAcceptor<any, any>;
+        aggregate: AggregateT;
         disolver: Disolver;
+
+        // FOR DESTRUCTION
+        destructor?: () => List.Iterator<T>;
+        iterator?: List.Iterator<T>;
     }
+
+    export type LocalArea<
+            ResolverT extends Resolver<ResolverT, AggregateT>, 
+            AggregateT extends Record<string, number>> =
+    {
+        queue: List<ResolverT>;
+        aggregate: AggregateT;
+    };
 }

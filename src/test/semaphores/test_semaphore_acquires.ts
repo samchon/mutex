@@ -9,13 +9,13 @@ import { sleep_for } from "tstl/thread/global";
 
 const SIZE = 8;
 
-export async function test_semaphores_acquires(factory: ConnectionFactory): Promise<void>
+export async function test_semaphore_acquires(factory: ConnectionFactory): Promise<void>
 {
     //----
     // TEST MUTEX FEATURES
     //----
     let connector: MutexConnector<IActivation> = await factory();
-    let mutex: RemoteSemaphore = await connector.getSemaphore("test_semaphores_acquires_binary", 1);
+    let mutex: RemoteSemaphore = await connector.getSemaphore("test_semaphore_acquires_binary", 1);
     let wrapper: ITimedLockable = RemoteSemaphore.get_lockable(mutex);
 
     await Validator.lock(wrapper);
@@ -24,7 +24,7 @@ export async function test_semaphores_acquires(factory: ConnectionFactory): Prom
     //----
     // TEST SPECIAL FEATURES OF SEMAPHORE
     //----
-    let semaphore: RemoteSemaphore = await connector.getSemaphore("test_semaphores_acquires_counting", SIZE);
+    let semaphore: RemoteSemaphore = await connector.getSemaphore("test_semaphore_acquires_counting", SIZE);
 
     await _Test_semaphore(semaphore);
     await _Test_timed_semaphore(semaphore);
@@ -41,9 +41,9 @@ async function _Test_semaphore(s: RemoteSemaphore): Promise<void>
         ++acquired_count;
     }
     if (acquired_count !== await s.max())
-        throw new Error(`Bug on Semaphore.lock()`);
+        throw new Error(`Bug on Semaphore.acquire()`);
     else if (await s.try_acquire() === true)
-        throw new Error(`Bug on Semaphore.try_lock()`);
+        throw new Error(`Bug on Semaphore.try_acquire()`);
 
     // LOCK 4 TIMES AGAIN -> THEY SHOULD BE HOLD
     for (let i: number = 0; i < await s.max(); ++i)
@@ -52,13 +52,13 @@ async function _Test_semaphore(s: RemoteSemaphore): Promise<void>
             ++acquired_count;
         });
     if (acquired_count !== await s.max())
-        throw new Error(`Bug on Semaphore.lock() when Semaphore is full`);
+        throw new Error(`Bug on Semaphore.acquire() when Semaphore is full`);
 
     // DO UNLOCK
     await s.release(await s.max());
 
     if (acquired_count !== 2 * await s.max())
-        throw new Error(`Bug on Semaphore.unlock()`);
+        throw new Error(`Bug on Semaphore.release()`);
 
     // RELEASE UNRESOLVED LOCKS
     await sleep_for(0);

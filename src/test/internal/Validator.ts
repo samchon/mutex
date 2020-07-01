@@ -7,23 +7,23 @@ import { sleep_for } from "tstl/thread/global";
 
 export namespace Validator
 {
-    const SLEEP_TIME: number = 50;
-    const READ_COUNT: number = 10;
+    const SLEEP_TIME = 50;
+    const READ_COUNT = 10;
 
     /* ---------------------------------------------------------
         WRITE LOCK
     --------------------------------------------------------- */
     export async function lock(mutex: ILockable): Promise<void>
     {
-        let start: number = new Date().getTime();
+        let start: number = Date.now();
 
         // LOCK FOR A SECOND
-        mutex.lock();
+        await mutex.lock();
         sleep_for(SLEEP_TIME).then(() => mutex.unlock());
 
         // TRY LOCK AGAIN
         await mutex.lock();
-        let elapsed: number = new Date().getTime() - start;
+        let elapsed: number = Date.now() - start;
         await mutex.unlock();
 
         if (elapsed < SLEEP_TIME * .95)
@@ -32,7 +32,7 @@ export namespace Validator
 
     export async function try_lock(mtx: ITimedLockable, name: string = mtx.constructor.name): Promise<void>
     {
-        let start: number = new Date().getTime();
+        let start: number = Date.now();
 
         // DO LOCK
         let ret: boolean = await mtx.try_lock_for(SLEEP_TIME);
@@ -41,7 +41,7 @@ export namespace Validator
 
         // TRY LOCK AGAIN
         ret = await mtx.try_lock_for(SLEEP_TIME);
-        let elapsed: number = new Date().getTime() - start;
+        let elapsed: number = Date.now() - start;
 
         if (ret === true)
             throw new Error(`Bug on ${name}.try_lock_for(): it does not return exact value`);
@@ -56,9 +56,6 @@ export namespace Validator
     --------------------------------------------------------- */
     export async function lock_shared(mtx: ILockable & ISharedLockable): Promise<void>
     {
-        // TEST WRITING LOCK & UNLOCK
-        await lock(mtx);
-
         //----
         // READ SIMULTANEOUSLY
         //----
@@ -75,7 +72,7 @@ export namespace Validator
         //----
         // READ FIRST, WRITE LATER
         //----
-        let start_time: number = new Date().getTime();
+        let start_time: number = Date.now();
         sleep_for(SLEEP_TIME).then(() =>
         {
             // SLEEP FOR A SECOND AND UNLOCK ALL READINGS
@@ -87,24 +84,22 @@ export namespace Validator
         await mtx.lock();
 
         // VALIDATE ELAPSED TIME
-        let elapsed_time: number = new Date().getTime() - start_time;
+        let elapsed_time: number = Date.now() - start_time;
         if (elapsed_time < SLEEP_TIME * .95)
             throw new Error(`Bug on ${mtx.constructor.name}.lock(): it does not block writing while reading.`);
 
         //----
         // WRITE FIRST, READ LATER
         //----
-        start_time = new Date().getTime();
-        sleep_for(SLEEP_TIME).then(() => 
-        {
-            // SLEEP FOR A SECOND AND UNLOCK WRITINGS
-            mtx.unlock();
-        });
+        start_time = Date.now();
+
+        // SLEEP FOR A SECOND AND UNLOCK WRITINGS
+        sleep_for(SLEEP_TIME).then(() => mtx.unlock());
         for (let i: number = 0; i < READ_COUNT; ++i)
             await mtx.lock_shared();
 
         // VALIDATE ELAPSED TIME
-        elapsed_time = new Date().getTime() - start_time;
+        elapsed_time = Date.now() - start_time;
         if (elapsed_time < SLEEP_TIME * .95)
             throw new Error(`Bug on ${mtx.constructor.name}.lock_shared(): it does not block reading while writing.`);
 
@@ -115,14 +110,14 @@ export namespace Validator
 
     export async function try_lock_shared(mtx: ITimedLockable & ISharedTimedLockable): Promise<void>
     {
-        let start_time: number;
-        let elapsed_time: number;
+        let start: number;
+        let elapsed: number;
         let flag: boolean;
 
         //----
         // READ SIMULTANEOUSLY
         //----
-        start_time = new Date().getTime();
+        start = Date.now();
 
         // READ LOCK; 10 TIMES
         for (let i: number = 0; i < READ_COUNT; ++i)
@@ -133,21 +128,21 @@ export namespace Validator
         }
 
         // VALIDATE ELAPSED TIME
-        elapsed_time = new Date().getTime() - start_time;
-        if (elapsed_time >= SLEEP_TIME)
+        elapsed = Date.now() - start;
+        if (elapsed >= SLEEP_TIME)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_shared_for(): it does not support simultaneous lock.`);
 
         //----
         // WRITE LOCK
         //----
         // TRY WRITE LOCK ON READING
-        start_time = new Date().getTime();
+        start = Date.now();
         flag = await mtx.try_lock_for(SLEEP_TIME);
-        elapsed_time = new Date().getTime() - start_time;
+        elapsed = Date.now() - start;
 
         if (flag === true)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_for(): it does not return exact value while reading.`);
-        else if (elapsed_time < SLEEP_TIME * .95)
+        else if (elapsed < SLEEP_TIME * .95)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_for(): it does not block while reading.`);
 
         // TRY WRITE LOCK AFTER READING
@@ -156,47 +151,44 @@ export namespace Validator
             for (let i: number = 0; i < READ_COUNT; ++i)
                 mtx.unlock_shared();
         });
-        start_time = new Date().getTime();
-        flag = await mtx.try_lock_for(SLEEP_TIME);
-        elapsed_time = new Date().getTime() - start_time;
+        start = Date.now();
+        flag = await mtx.try_lock_for(SLEEP_TIME * 1.5);
+        elapsed = Date.now() - start;
 
         if (flag === false)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_for(): it does not return exact value while reading.`);
-        else if (elapsed_time < SLEEP_TIME * .95)
+        else if (elapsed < SLEEP_TIME * .95)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_for(): it does not work in exact time.`);
 
         //----
         // READ LOCK
         //----
         // READ LOCK ON WRITING
-        start_time = new Date().getTime();
+        start = Date.now();
         for (let i: number = 0; i < READ_COUNT; ++i)
         {
             flag = await mtx.try_lock_shared_for(SLEEP_TIME);
             if (flag === true)
                 throw new Error(`Bug on ${mtx.constructor.name}.try_lock_shared_for(): it does not return exact value while writing.`);
         }
-        elapsed_time = new Date().getTime() - start_time;
+        elapsed = Date.now() - start;
 
-        if (elapsed_time < SLEEP_TIME * READ_COUNT * .95)
+        if (elapsed < SLEEP_TIME * READ_COUNT * .95)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_shared_for(): it does not work in exact time.`);
         
         // READ LOCK AFTER WRITING
-        start_time = new Date().getTime();
-        sleep_for(SLEEP_TIME).then(() =>
-        {
-            mtx.unlock();
-        });
+        start = Date.now();
+        sleep_for(SLEEP_TIME).then(() => mtx.unlock());
 
         for (let i: number = 0; i < READ_COUNT; ++i)
         {
-            flag = await mtx.try_lock_shared_for(SLEEP_TIME);
+            flag = await mtx.try_lock_shared_for(SLEEP_TIME * 1.5);
             if (flag === false)
                 throw new Error(`Bug on ${mtx.constructor.name}.try_lock_shared_for(): it does not return exact value after writing.`);
         }
-        elapsed_time = new Date().getTime() - start_time;
+        elapsed = Date.now() - start;
 
-        if (elapsed_time < SLEEP_TIME * .95 || elapsed_time >= SLEEP_TIME * 5.0)
+        if (elapsed < SLEEP_TIME * .95 || elapsed >= SLEEP_TIME * 5.0)
             throw new Error(`Bug on ${mtx.constructor.name}.try_lock_shared_for(): it does not work in exact time.`);
 
         // RELEASE READING LOCK FOR THE NEXT STEP

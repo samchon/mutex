@@ -16,7 +16,8 @@ async function test_disconnection(factory: ConnectionFactory, index: number): Pr
             throw new Error("Error on RemoteMutex.try_lock_for(): disconnected clients do not return their acquisitions.");
     }
     else
-        mutex.try_lock_for(SLEEP * COUNT * 20).catch(() => {});
+        mutex.try_lock_for(SLEEP * COUNT * 20)
+            .catch(() => {});
 
     await sleep_for(SLEEP * index);
     await connector.close();
@@ -31,5 +32,5 @@ export async function test_mutex_disconnections(factory: ConnectionFactory): Pro
     await Promise.all(promises);
 }
 
-const COUNT = 25;
+const COUNT = 4;
 const SLEEP = 10;

@@ -5,7 +5,9 @@
 [![Downloads](https://img.shields.io/npm/dm/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Build Status](https://github.com/samchon/mutex-server/workflows/build/badge.svg)](https://github.com/samchon/mutex-server/actions?query=workflow%3Abuild)
 
-The `mutex-server` is an npm module that can be used for building a mutex server. When you need to controll a critical section on the entire system level, like distributed processing system using network communications, this `mutex-server` can be a good solution.
+Virtual critical section in the network levle.
+
+The `mutex-server` is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using network communications, this `mutex-server` can be a good solution.
 
 
 
@@ -13,7 +15,7 @@ The `mutex-server` is an npm module that can be used for building a mutex server
 ## 2. Features
 ### 2.1. Server Side
 ```typescript
-export class MutexServer<Headers extends object>
+export class MutexServer<Header extends object>
 {
     public state: MutexServer.State;
 
@@ -23,22 +25,22 @@ export class MutexServer<Headers extends object>
     public open
         (
             port: number, 
-            predicator: MutexServer.Predicator<Headers>
+            predicator: MutexServer.Predicator<Header>
         ): Promise<void>;
     public close(): Promise<void>;
 }
 export namespace MutexServer
 {
-    export interface Predicator<Headers extends object>
+    export interface Predicator<Header extends object>
     {
-        (info: ConnectionInfo<Headers>): boolean | Promise<boolean>;
+        (info: ConnectionInfo<Header>): boolean | Promise<boolean>;
     }
 
-    export interface ConnectionInfo<Headers extends object>
+    export interface ConnectionInfo<Header extends object>
     {
         ip: string;
         path: string;
-        headers: Headers;
+        header: Header;
     }
 }
 ```
@@ -46,33 +48,21 @@ export namespace MutexServer
 ### 2.2. Client Side
 #### 2.2.1. `MutexConnector`
 ```typescript
-export class MutexConnector<Headers extends object>
+export class MutexConnector<Header extends object>
 {
     public url?: string;
     public state: MutexConnector.State;
 
-    public constructor();
-    public connect(url: string, headers: Headers): Promise<void>;
+    public constructor(header: Header);
+    public connect(url: string): Promise<void>;
     public close(): Promise<void>;
 
-    public getBarrier(name: string, count: number): Promise<RemoteBarrier>;
     public getConditionVariable(name: string): Promise<RemoteConditionVariable>;
-    public getLatch(name: string, count: number): Promise<RemoteLatch>;
     public getMutex(name: string): Promise<RemoteMutex>;
     public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>;
-}
-```
 
-
-
-#### 2.2.1. `RemoteBarrier`
-```typescript
-export class RemoteBarrier
-{
-    public arrive(n: number = 1): Promise<void>;
-    public arrive_and_drop(): Promise<void>;
-    public arrive_and_wait(): Promise<void>;
-    public wait(): Promise<void>;
+    public getBarrier(name: string, count: number): Promise<RemoteBarrier>;
+    public getLatch(name: string, count: number): Promise<RemoteLatch>;
 }
 ```
 
@@ -84,26 +74,17 @@ export class RemoteConditionVariable
     public wait_for(ms: number): Promise<boolean>;
     public wait_until(at: Date): Promise<boolean>;
 
+    public wait(predicator: Predicator): Promise<void>;
+    public wait_for(ms: number, predicator: Predicator): Promise<boolean>;
+    public wait_until(at: Date, predicator: Predicator): Promise<boolean>;
+
     public notify_one(): Promise<void>;
     public notify_all(): Promise<void>;
 }
+type Predicator = () => void | Promise<void>;
 ```
 
-#### 2.2.3. `RemoteLatch`
-```typescript
-export class RemoteLatch
-{
-    public count_down(n: number = 1): Promise<void>;
-    public arrive_and_wait(): Promise<void>;
-
-    public wait(): Promise<void>;
-    public try_wait(): Promise<boolean>;
-    public wait_for(ms: number): Promise<boolean>;
-    public wait_until(at: Date): Promise<boolean>;
-}
-```
-
-#### 2.2.4. `RemoteMutex`
+#### 2.2.3. `RemoteMutex`
 ```typescript
 export class RemoteMutex
 {
@@ -121,7 +102,7 @@ export class RemoteMutex
 }
 ```
 
-### 2.2.5. `RemoteSemahore`
+### 2.2.4. `RemoteSemahore`
 ```typescript
 export class RemoteSemaphore
 {
@@ -134,6 +115,33 @@ export class RemoteSemaphore
     public release(count: number = 1): Promise<void>;
 }
 ```
+
+#### 2.2.5. `RemoteBarrier`
+```typescript
+export class RemoteBarrier
+{
+    public arrive(n: number = 1): Promise<void>;
+    public arrive_and_drop(): Promise<void>;
+    public arrive_and_wait(): Promise<void>;
+    public wait(): Promise<void>;
+}
+```
+
+#### 2.2.6. `RemoteLatch`
+```typescript
+export class RemoteLatch
+{
+    public count_down(n: number = 1): Promise<void>;
+    public arrive_and_wait(): Promise<void>;
+
+    public wait(): Promise<void>;
+    public try_wait(): Promise<boolean>;
+    public wait_for(ms: number): Promise<boolean>;
+    public wait_until(at: Date): Promise<boolean>;
+}
+```
+
+
 
 
 
@@ -154,7 +162,7 @@ import { IActivation } from "./IActivation";
 async function main(): Promise<void>
 {
     let server: MutexServer<IActivation> = new MutexServer();
-    await server.open(44114, info => info.headers.password === "qweqwe123!");
+    await server.open(44114, info => info.header.password === "qweqwe123!");
 }
 ```
 
@@ -171,8 +179,9 @@ import { IActivation } from "./IActivation";
 async function main(): Promise<void>
 {
     // CONNECT TO THE SERVER
-    let connector: MutexConnector = new MutexConnector();
-    await connector.connect("http://127.0.0.1:44114", { password: "qweqwe123!" });
+    let header: IActivation = { password: "qweqwe123!" };
+    let connector: MutexConnector<IActivation> = new MutexConnector(header);
+    await connector.connect("http://127.0.0.1:44114");
 
     //----
     // USE MUTEX
@@ -211,7 +220,8 @@ import { UniqueLock, SharedLock } from "tstl";
 async function main(): Promise<void>
 {
     // CONNECT TO THE SERVER
-    let connector: MutexConnector = new MutexConnector();
+    let header: IActivation = { password: "qweqwe123!" };
+    let connector: MutexConnector<IActivation> = new MutexConnector(header);
     await connector.connect("http://127.0.0.1:44114");
 
     //----

@@ -15,7 +15,7 @@ import { Joiner } from "./internal/Joiner";
 /**
  * @internal
  */
-export class ServerConditionVariable extends SolidComponent<IResolver>
+export class ServerConditionVariable extends SolidComponent<Resolver, {}>
 {
     /* ---------------------------------------------------------
         WAITORS
@@ -25,16 +25,17 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
         return new Promise(resolve =>
         {
             // ENROLL TO THE RESOLVERS
-            let it: List.Iterator<IResolver> = this._Insert_resolver({
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
                 handler: resolve,
                 lockType: LockType.HOLD,
 
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => { this._Cancel_wait(it) };
+            disolver.value = () => this._Cancel_wait(it);
         });
     }
 
@@ -43,16 +44,17 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
         return new Promise(resolve =>
         {
             // ENROLL TO THE RESOLVERS
-            let it: List.Iterator<IResolver> = this._Insert_resolver({
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
                 handler: resolve,
                 lockType: LockType.KNOCK,
 
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => { this._Cancel_wait(it) };
+            disolver.value = () => this._Cancel_wait(it);
 
             // TIME EXPIRATION HANDLER
             sleep_for(ms).then(() =>
@@ -62,12 +64,12 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
         });
     }
 
-    private _Cancel_wait(it: List.Iterator<IResolver>): boolean
+    private _Cancel_wait(it: List.Iterator<Resolver>): boolean
     {
         if (it.value.handler === null)
             return false;
 
-        this._Discard_resolver(it.value);
+        it.value.destructor!();
         this.queue_.erase(it);
 
         return true;
@@ -82,7 +84,7 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
             return;
 
         // POP THE FIRST ITEM
-        let it: List.Iterator<IResolver> = this.queue_.begin();
+        let it: List.Iterator<Resolver> = this.queue_.begin();
         this.queue_.erase(it);
 
         // DO RESOLVE
@@ -95,27 +97,27 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
             return;
 
         // COPY RESOLVERS
-        let ordinaryResolvers: IResolver[] = [ ...this.queue_ ];
-        let copiedResolvers: IResolver[] = ordinaryResolvers.map(resolver => ({ ...resolver }));
+        let ordinaryResolvers: Resolver[] = [ ...this.queue_ ];
+        let copiedResolvers: Resolver[] = ordinaryResolvers.map(resolver => ({ ...resolver }));
 
         // CLEAR OLD ITEMS
         this.queue_.clear();
         for (let resolver of ordinaryResolvers)
-            this._Discard_resolver(resolver);
+            resolver.destructor!();
 
         // DO NOTIFY
         for (let resolver of copiedResolvers)
             this._Notify(resolver, false);
     }
 
-    private _Notify(resolver: IResolver, discard: boolean): void
+    private _Notify(resolver: Resolver, discard: boolean): void
     {
         // RESERVE HANDLER
         let handler = resolver.handler!;
 
         // DISCARD FOR SEQUENCE
         if (discard === true)
-            this._Discard_resolver(resolver);
+            resolver.destructor!();
         
         // CALL HANDLER
         if (resolver.lockType === LockType.HOLD)
@@ -128,4 +130,4 @@ export class ServerConditionVariable extends SolidComponent<IResolver>
 /**
  * @internal
  */
-type IResolver = SolidComponent.IResolver;
+type Resolver = SolidComponent.Resolver<Resolver, {}>;

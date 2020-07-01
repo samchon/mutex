@@ -9,15 +9,16 @@ import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
 
 import { List } from "tstl/container/List";
 import { OutOfRange } from "tstl/exception/OutOfRange";
+import { Pair } from "tstl/utility/Pair";
 import { sleep_for } from "tstl/thread/global";
 
+import { Disolver } from "./internal/Disolver";
 import { LockType } from "tstl/internal/thread/LockType";
-import { Joiner } from "./internal/Joiner";
 
 /**
  * @internal
  */
-export class ServerSemaphore extends SolidComponent<IResolver>
+export class ServerSemaphore extends SolidComponent<Resolver, Aggregate>
 {
     private max_: number;
     private acquiring_: number;
@@ -29,8 +30,8 @@ export class ServerSemaphore extends SolidComponent<IResolver>
     {
         super();
 
-        this.acquiring_ = 0;
         this.max_ = max;
+        this.acquiring_ = 0;
     }
 
     public max(): number
@@ -41,18 +42,21 @@ export class ServerSemaphore extends SolidComponent<IResolver>
     /* ---------------------------------------------------------
         ACQUIRANCES
     --------------------------------------------------------- */
-    public acquire(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<void>
+    public acquire(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<void>
     {
         return new Promise<void>(resolve =>
         {
-            // ENROLL TO THE RESOLVERS
-            let it: List.Iterator<IResolver> = this._Insert_resolver({
-                handler: this.acquiring_ < this.max_
-                    ? null
-                    : resolve,
+            let success: boolean = this.acquiring_ < this.max_;
+
+            // CONSTRUCT RESOLVER
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
+                handler: success ? null : resolve,
                 lockType: LockType.HOLD,
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: { 
+                    acquring: success ? 1 : 0 
+                }
             });
 
             // DISCONNECTION HANDLER
@@ -67,40 +71,44 @@ export class ServerSemaphore extends SolidComponent<IResolver>
         });
     }
 
-    public async try_acquire(acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
+    public async try_acquire(acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<boolean>
     {
         // ACQUIRABLE ?
         if (this.acquiring_ >= this.max_)
             return false;
 
         // CONSTRUCT RESOLVER
-        let it: List.Iterator<IResolver> = this._Insert_resolver({
+        let it: List.Iterator<Resolver> = this._Insert_resolver({
             handler: null,
             lockType: LockType.HOLD,
             acceptor: acceptor,
-            disolver: disolver
+            disolver: disolver,
+            aggregate: {
+                acquring: 1
+            }
         });
-
-        // DISCONNECTION HANDLER
-        disolver.value = () => this._Handle_disconnection(it);
-
-        // RETURNS
         ++this.acquiring_;
+
+        // RETURNS WITH DISCONNECTION HANDLER
+        disolver.value = () => this._Handle_disconnection(it);
         return true;
     }
 
-    public async try_acquire_for(ms: number, acceptor: WebAcceptor<any, any>, disolver: List.Iterator<Joiner>): Promise<boolean>
+    public async try_acquire_for(ms: number, acceptor: WebAcceptor<any, any>, disolver: Disolver): Promise<boolean>
     {
         return new Promise<boolean>(resolve =>
         {
+            let success: boolean = this.acquiring_ < this.max_;
+
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this._Insert_resolver({
-                handler: this.acquiring_ < this.max_
-                    ? null
-                    : resolve,
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
+                handler: success ? null : resolve,
                 lockType: LockType.KNOCK,
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: {
+                    acquring: success ? 1 : 0
+                }
             });
 
             // DISCONNECTION HANDLER
@@ -115,7 +123,7 @@ export class ServerSemaphore extends SolidComponent<IResolver>
             else 
                 sleep_for(ms).then(() =>
                 {
-                    let success: boolean = it.value.handler === null;
+                    let success: boolean = (it.value.handler === null);
                     if (success === false)
                         this._Cancel(it);
 
@@ -124,18 +132,13 @@ export class ServerSemaphore extends SolidComponent<IResolver>
         });
     }
 
-    private _Cancel(it: List.Iterator<IResolver>): void
+    private _Cancel(it: List.Iterator<Resolver>): void
     {
         // POP THE LISTENER
         let handler: Function = it.value.handler!;
         
         this.queue_.erase(it);
-        this._Discard_resolver(it.value);
-
-        // RELEASE IF LASTEST RESOLVER
-        let prev: List.Iterator<IResolver> = it.prev();
-        if (prev.equals(this.queue_.end()) === false && prev.value.handler !== null)
-            this._Release(1);
+        it.value.destructor!();
         
         // RETURNS FAILURE
         handler(false);
@@ -144,7 +147,7 @@ export class ServerSemaphore extends SolidComponent<IResolver>
     /* ---------------------------------------------------------
         RELEASE
     --------------------------------------------------------- */
-    public async release(n: number): Promise<void>
+    public async release(n: number, acceptor: WebAcceptor<any, any>): Promise<void>
     {
         //----
         // VALIDATION
@@ -158,54 +161,69 @@ export class ServerSemaphore extends SolidComponent<IResolver>
             throw new OutOfRange(`Error on RemoteSemaphore.release(): parametric n is greater than acquiring -> (n = ${n}, acquiring = ${this.acquiring_}).`);
 
         // IN LOCAL AREA
-        
+        let local: SolidComponent.LocalArea<Resolver, Aggregate> | null = this._Get_local_area(acceptor);
+        if (local === null || local.queue.empty() === true)
+            throw new OutOfRange("Error on RemoteSemaphore.release(): you're free on the acquirance.");
+        else if (local.aggregate.acquring < n)
+            throw new OutOfRange(`Error onRemoteSemaphore.release(): parametric n is greater than what you've been acquiring -> (n = ${n}, acquiring = ${local.aggregate.acquring}).`);
+
         //----
         // RELEASE
         //----
+        // ERASE FROM QUEUES
         this.acquiring_ -= n;
-        this._Release(n);
-    }
+        local.aggregate.acquring -= n;
 
-    private _Release(n: number): void
-    {
-        for (let it = this.queue_.begin(); !it.equals(this.queue_.end()); it = it.next())
+        let count: number = 0;
+        for (let it = local.queue.begin(); it.equals(local.queue.end()) === false; )
         {
-            // POP HANDLER
-            let handler = it.value.handler;
-            
-            this.queue_.erase(it);
-            this._Discard_resolver(it.value);
+            this.queue_.erase(it.value.iterator!);
+            it = it.value.destructor!();
 
-            if (handler === null)
-                continue;
-
-            if (it.value.lockType === LockType.HOLD)
-                handler();
-            else
-                handler(true);
-
-            // BREAK CONDITION
-            if (++this.acquiring_ >= this.max_ || --n === 0)
+            if (++count === n)
                 break;
         }
+
+        // RESERVE HANDLERS
+        let pairList: Pair<Function, LockType>[] = [];
+
+        for (let resolver of this.queue_)
+            if (resolver.handler !== null)
+            {
+                pairList.push(new Pair(resolver.handler!, resolver.lockType));
+                resolver.handler = null;    
+
+                ++resolver.aggregate.acquring;
+                if (++this.acquiring_ === this.max_)
+                    break;
+            }
+        
+        // CALL HANDLERS
+        for (let pair of pairList)
+            if (pair.second === LockType.HOLD)
+                pair.first();
+            else
+                pair.first(true);
     }
 
-    private async _Handle_disconnection(it: List.Iterator<IResolver>): Promise<void>
+    private async _Handle_disconnection(it: List.Iterator<Resolver>): Promise<void>
     {
         if (it.prev().next().equals(it) === false)
             return;
 
         if (it.value.handler === null)
-            await this.release(1);
+            await this.release(1, it.value.acceptor);
         else
-        {
             this._Cancel(it);
-            it.value.disolver.source().erase(it.value.disolver);
-        }
     }
 }
 
 /**
  * @internal
  */
-type IResolver = SolidComponent.IResolver;
+type Resolver = SolidComponent.Resolver<Resolver, Aggregate>;
+
+/**
+ * @internal
+ */
+type Aggregate = Record<"acquring", number>;

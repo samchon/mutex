@@ -1,6 +1,6 @@
 {
   "name": "mutex-server",
-  "version": "0.2.0-dev.20200630",
+  "version": "0.2.0-dev.20200701",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "./index.d.ts",

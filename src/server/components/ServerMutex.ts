@@ -5,22 +5,43 @@
 //-----------------------------------------------------------
 import { SolidComponent } from "./SolidComponent";
 
-import { InvalidArgument } from "tstl/exception/InvalidArgument";
 import { List } from "tstl/container/List";
+import { OutOfRange } from "tstl/exception/OutOfRange";
+import { Pair } from "tstl/utility/Pair";
 import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
 import { sleep_for } from "tstl/thread/global";
 
 import { AccessType } from "tstl/internal/thread/AccessType";
 import { LockType } from "tstl/internal/thread/LockType";
+import { Disolver } from "./internal/Disolver";
 import { Joiner } from "./internal/Joiner";
 
 /**
  * @internal
  */
-export class ServerMutex extends SolidComponent<IResolver>
+export class ServerMutex extends SolidComponent<Resolver, {}>
 {
-    private writing_: number = 0;
-    private reading_: number = 0;
+    private writing_: number;
+    private reading_: number;
+
+    /* ---------------------------------------------------------
+        CONSTRUCTORS
+    --------------------------------------------------------- */
+    public constructor()
+    {
+        super();
+
+        this.writing_ = 0;
+        this.reading_ = 0;
+    }
+
+    protected _Insert_resolver(resolver: Resolver): List.Iterator<Resolver>
+    {
+        let it: List.Iterator<Resolver> = super._Insert_resolver(resolver);
+        resolver.iterator = it;
+
+        return it;
+    }
 
     /* ---------------------------------------------------------
         WRITE LOCK
@@ -30,7 +51,7 @@ export class ServerMutex extends SolidComponent<IResolver>
         return new Promise(resolve =>
         {
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this._Insert_resolver({
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
                 handler: (this.writing_++ === 0 && this.reading_ === 0)
                     ? null
                     : resolve,
@@ -39,10 +60,11 @@ export class ServerMutex extends SolidComponent<IResolver>
                 
                 acceptor: acceptor,
                 disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => this._Handle_disconnection_write(it);
+            disolver.value = () => this._Handle_disconnection(it);
 
             // RETURNS OR WAIT
             if (it.value.handler === null)
@@ -57,7 +79,7 @@ export class ServerMutex extends SolidComponent<IResolver>
             return false;
 
         // CONSTRUCT RESOLVER
-        let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(),
+        let it: List.Iterator<Resolver> = this._Insert_resolver(
         {
             handler: null,
             accessType: AccessType.WRITE,
@@ -65,10 +87,11 @@ export class ServerMutex extends SolidComponent<IResolver>
 
             acceptor: acceptor,
             disolver: disolver,
+            aggregate: {}
         });
 
         // DISCONNECTION HANDLER
-        disolver.value = () => this._Handle_disconnection_write(it);
+        disolver.value = () => this._Handle_disconnection(it);
 
         // RETURNS
         ++this.writing_;
@@ -80,19 +103,21 @@ export class ServerMutex extends SolidComponent<IResolver>
         return new Promise<boolean>(resolve =>
         {
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(), 
+            let it: List.Iterator<Resolver> = this._Insert_resolver(
             {
                 handler: (this.writing_++ === 0 && this.reading_ === 0)
                     ? null
                     : resolve,
-                lockType: LockType.KNOCK,
-                acceptor: acceptor,
                 accessType: AccessType.WRITE,
-                disolver: disolver
+                lockType: LockType.KNOCK,
+
+                acceptor: acceptor,
+                disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => this._Handle_disconnection_write(it);
+            disolver.value = () => this._Handle_disconnection(it);
 
             // RETURNS OR WAIT UNTIL TIMEOUT
             if (it.value.handler === null)
@@ -117,27 +142,24 @@ export class ServerMutex extends SolidComponent<IResolver>
         //----
         // IN GLOBAL AREA
         if (this.queue_.empty() === true || this.queue_.front().accessType !== AccessType.WRITE)
-            throw new InvalidArgument(`Error on RemoteMutex.unlock(): this mutex is free on the unique lock.`);
+            throw new OutOfRange(`Error on RemoteMutex.unlock(): this mutex is free on the unique lock.`);
 
         // IN LOCAL AREA
-        let local: List<IResolver> | null = this._Get_local_queue(acceptor);
-        if (local === null || local.empty() === true || local.front().accessType !== AccessType.WRITE)
-            throw new InvalidArgument("Error on RemoteMutex.unlock(): you're free on the unique lock.");
-        
+        let local: SolidComponent.LocalArea<Resolver, {}> | null = this._Get_local_area(acceptor);
+        if (local === null || local.queue.empty() === true || this.queue_.front() !== local.queue.front())
+            throw new OutOfRange("Error on RemoteMutex.unlock(): you're free on the unique lock.");            
+
         //----
         // RELEASE
         //----
-        // ERASE FROM LOCAL
-        let top: IResolver = local.front();
-        top.disolver.source().erase(top.disolver);
-        top.disolver.value = undefined;
-        local.pop_front();
-        
-        // ERASE FROM GLOBAL
-        --this.writing_;
-        this.queue_.pop_front();
+        // DESTRUCT TOP RESOLVER
+        let top: Resolver = local.queue.front();
+
+        this.queue_.erase(top.iterator!);
+        top.destructor!();
         
         // DO RELEASE
+        --this.writing_;
         this._Release();
     }
 
@@ -149,8 +171,7 @@ export class ServerMutex extends SolidComponent<IResolver>
         return new Promise<void>(resolve =>
         {
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(),
-            {
+            let it: List.Iterator<Resolver> = this._Insert_resolver({
                 handler: (this.writing_ === 0)
                     ? null
                     : resolve,
@@ -158,11 +179,12 @@ export class ServerMutex extends SolidComponent<IResolver>
                 lockType: LockType.HOLD,
 
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => this._Handle_disconnection_read(it);
+            disolver.value = () => this._Handle_disconnection(it);
 
             // RETURNS OR WAIT
             ++this.reading_;
@@ -177,17 +199,18 @@ export class ServerMutex extends SolidComponent<IResolver>
             return false;
         
         // CONSTRUCT RESOLVER
-        let it = this.queue_.insert(this.queue_.end(),
-        {
+        let it = this._Insert_resolver({
             handler: null,
             accessType: AccessType.READ,
             lockType: LockType.KNOCK,
+
             acceptor: acceptor,
-            disolver: disolver
+            disolver: disolver,
+            aggregate: {}
         });
 
         // DISCONNECTION HANDLER
-        disolver.value = () => this._Handle_disconnection_read(it);
+        disolver.value = () => this._Handle_disconnection(it);
 
         // RETURNS
         ++this.reading_;
@@ -199,7 +222,7 @@ export class ServerMutex extends SolidComponent<IResolver>
         return new Promise<boolean>(resolve =>
         {
             // CONSTRUCT RESOLVER
-            let it: List.Iterator<IResolver> = this.queue_.insert(this.queue_.end(),
+            let it: List.Iterator<Resolver> = this._Insert_resolver(
             {
                 handler: (this.writing_ === 0)
                     ? null
@@ -208,11 +231,12 @@ export class ServerMutex extends SolidComponent<IResolver>
                 lockType: LockType.KNOCK,
 
                 acceptor: acceptor,
-                disolver: disolver
+                disolver: disolver,
+                aggregate: {}
             });
 
             // DISCONNECTION HANDLER
-            disolver.value = () => this._Handle_disconnection_read(it);
+            disolver.value = () => this._Handle_disconnection(it);
             
             // RETURNS OR WAIT UNTIL TIMEOUT
             ++this.reading_;
@@ -237,27 +261,24 @@ export class ServerMutex extends SolidComponent<IResolver>
         //----
         // IN GLOBAL AREA
         if (this.queue_.empty() === true || this.queue_.front().accessType !== AccessType.READ)
-            throw new InvalidArgument(`Error on RemoteMutex.unlock_shared(): this mutex is free on the shared lock.`);
+            throw new OutOfRange(`Error on RemoteMutex.unlock_shared(): this mutex is free on the shared lock.`);
 
         // IN LOCAL AREA
-        let local: List<IResolver> | null = this._Get_local_queue(acceptor);
-        if (local === null || local.empty() === true || local.front().accessType !== AccessType.READ)
-            throw new InvalidArgument("Error on RemoteMutex.unlock_shared(): you're free on the shared lock.");
+        let local: SolidComponent.LocalArea<Resolver, {}> | null = this._Get_local_area(acceptor);
+        if (local === null || local.queue.empty() === true || local.queue.front().accessType !== AccessType.READ)
+            throw new OutOfRange("Error on RemoteMutex.unlock_shared(): you're free on the shared lock.");
 
         //----
         // RELEASE
         //----
-        // ERASE FROM LOCAL
-        let top: IResolver = local.front();
-        top.disolver.value = undefined;
-        top.disolver.source().erase(top.disolver);
-        local.pop_front();
-        
-        // ERASE FROM GLOBAL
-        --this.reading_;
-        this.queue_.pop_front();
+        // DESTRUCT THE RESOLVER
+        let top: Resolver = local.queue.front();
 
+        this.queue_.erase(top.iterator!);
+        top.destructor!();
+        
         // DO RELEASE
+        --this.reading_;
         this._Release();
     }
 
@@ -269,54 +290,46 @@ export class ServerMutex extends SolidComponent<IResolver>
         if (this.queue_.empty() === true)
             return;
         
-        // STEP TO THE NEXT LOCKS
-        let current: AccessType = this.queue_.front().accessType;
+        // GATHER THE NEXT STEPS
+        let currentType: AccessType = this.queue_.front().accessType;
+        let pairList: Pair<Function, LockType>[] = [];
 
         for (let resolver of this.queue_)
         {
-            // DIFFERENT ACCESS TYPE COMES?
-            if (resolver.accessType !== current)
+            // STOP WHEN DIFFERENT ACCESS TYPE COMES
+            if (resolver.accessType !== currentType)
                 break;
 
-            // NOT RESOLVED YET?
-            if (resolver.handler !== null)
+            // RESERVE HANDLER
+            else if (resolver.handler !== null)
             {
-                // CLEAR FIRST
-                let handler: Function | null = resolver.handler;
+                pairList.push(new Pair(resolver.handler, resolver.lockType));
                 resolver.handler = null;
-
-                // CALL LATER
-                if (resolver.lockType === LockType.HOLD)
-                    handler();
-                else
-                    handler(true);
             }
-            
+
             // STOP AFTER WRITE LOCK
             if (resolver.accessType === AccessType.WRITE)
                 break;
         }
+
+        // CALL THE HANDLERS
+        for (let pair of pairList)
+            if (pair.second === LockType.HOLD)
+                pair.first();
+            else
+                pair.first(true);
     }
 
-    private _Cancel(it: List.Iterator<IResolver>): void
+    private _Cancel(it: List.Iterator<Resolver>): void
     {
-        //----
-        // POP THE RELEASE
-        //----
-        // DO RASE
-        this.queue_.erase(it);
-
-        // EXTRACT HANDLER TO AVOID THE `this._Release()`
+        // POP HANDLER & DESTRUCT
         let handler: Function = it.value.handler!;
-        it.value.handler = null;
 
-        //----
-        // POST-PROCESS
-        //----
-        // CHECK THE PREVIOUS RESOLVER
-        let prev: List.Iterator<IResolver> = it.prev();
+        this.queue_.erase(it);
+        it.value.destructor!();
 
-        // RELEASE IF IT IS THE LASTEST RESOLVER
+        // CHECK THE PREVIOUS HANDLER
+        let prev: List.Iterator<Resolver> = it.prev();
         if (prev.equals(this.queue_.end()) === false && prev.value.handler === null)
             this._Release();
         
@@ -324,35 +337,33 @@ export class ServerMutex extends SolidComponent<IResolver>
         handler(false);
     }
 
-    private async _Handle_disconnection_write(it: List.Iterator<IResolver>): Promise<void>
+    private async _Handle_disconnection(it: List.Iterator<Resolver>): Promise<void>
     {
         // CHECK ALIVE
-        if (it.prev().next().equals(it) === false)
+        if ((<any>it as Disolver).erased_ === true)
             return;
 
-        // DESTRUCT
-        if (it.value.handler === null)
-            await this.unlock(it.value.acceptor);
-        else
+        //----
+        // ROLLBACK ACTION
+        //----
+        else if (it.value.handler === null)
         {
-            this._Cancel(it);
-            it.value.disolver.source().erase(it.value.disolver);
+            // SUCCEEDED TO GET LOCK
+            if (it.value.accessType === AccessType.WRITE)
+                await this.unlock(it.value.acceptor);
+            else
+                await this.unlock_shared(it.value.acceptor);
         }
-    }
-
-    private async _Handle_disconnection_read(it: List.Iterator<IResolver>): Promise<void>
-    {
-        // CHECK ALIVE
-        if (it.prev().next().equals(it) === false)
-            return;
-
-        // DESTRUCT
-        if (it.value.handler === null)
-            await this.unlock_shared(it.value.acceptor);
         else
         {
+            // HAD BEEN WAITING
+            if (it.value.accessType === AccessType.WRITE)
+                --this.writing_;
+            else
+                --this.reading_;
+
+            // CANCEL THE LOCK
             this._Cancel(it);
-            it.value.disolver.source().erase(it.value.disolver);
         }
     }
 }
@@ -360,14 +371,7 @@ export class ServerMutex extends SolidComponent<IResolver>
 /**
  * @internal
  */
-interface IResolver
+interface Resolver extends SolidComponent.Resolver<Resolver, {}>
 {
-    // THREAD HANDLER
-    handler: Function | null;
-    accessType: AccessType; // read or write
-    lockType: LockType; // void or boolean
-
-    // DISCONNECTION HANDLER
-    acceptor: WebAcceptor<any, any>;
-    disolver: List.Iterator<Joiner>;
+    accessType: AccessType;
 }
