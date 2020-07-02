@@ -1,9 +1,9 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
-import * as mutex from "./module";
+import * as msv from "./module";
 
-export default mutex;
+export default msv;
 export * from "./module";

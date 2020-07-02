@@ -1,11 +1,11 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { ProviderGroup } from "./server/ProviderGroup";
+import { ProviderCapsule } from "./server/ProviderCapsule";
 
 import { RemoteBarrier } from "./client/RemoteBarrier";
 import { RemoteConditionVariable } from "./client/RemoteConditionVariable";
@@ -16,20 +16,21 @@ import { RemoteSemaphore } from "./client/RemoteSemaphore";
 /**
  * Mutex server connector for client.
  * 
- * @type Header Type of the *header* who containing the activation info.
+ * @template Header Type of the *header* containing initial data.
+ * @template Provider Type of additional features provided for the remote server.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexConnector<Header extends object>
+export class MutexConnector<Header, Provider extends object | null>
 {
     /**
      * @hidden
      */
-    private connector_: WebConnector<Header, null>;
+    private base_: WebConnector<Header, Provider>;
 
     /**
      * @hidden
      */
-    private controller_: Driver<ProviderGroup>;
+    private controller_: Driver<ProviderCapsule<any>>;
 
     /* -----------------------------------------------------------
         CONSTRUCTORS
@@ -37,40 +38,70 @@ export class MutexConnector<Header extends object>
     /**
      * Initializer Constructor.
      * 
-     * @param header Additional data for the activation.
+     * @param header Initial data.
+     * @param provider Additional feature provided for the remote server.
      */
-    public constructor(header: Header)
+    public constructor(header: Header, provider: Provider)
     {
-        this.connector_ = new WebConnector(header, null);
-        this.controller_ = this.connector_.getDriver();
+        this.base_ = new WebConnector(header, provider);
+        this.controller_ = this.base_.getDriver();
     }
 
     /**
      * Connect to a remote `mutex-server`.
      * 
      * Try connection to the remote `mutex-server` with its *address* and waiting for the server
-     * to accept the trial through the *header*. If the `mutex-server` rejects your connection,
-     * then exception would be thrown.
+     * to accept the trial. If the `mutex-server` accepts your connection, the function would be
+     * returned. Otherwise, the server rejects your connection, an exception would be thrown.
      * 
      * After the connection and your business (using remote critical sections) has been 
      * completed, please don't forget closing the connection in time to prevent waste of the 
      * server resource.
      * 
      * @param url URL address to connect.
+     * @throw WebError when server rejects your connection.
      */
     public connect(url: string): Promise<void>
     {
-        return this.connector_.connect(url);
+        return this.base_.connect(url);
     }
 
     /**
      * Close connection.
      * 
-     * Close connection with the remote `mutex-server`.
+     * Close connection from the remote `mutex-server`.
+     * 
+     * @throw DomainError when the connection is not online.
      */
     public async close(): Promise<void>
     {
-        await this.connector_.close();
+        await this.base_.close();
+    }
+
+    /**
+     * Join connection.
+     */
+    public join(): Promise<void>;
+
+    /**
+     * Join connection until timeout.
+     * 
+     * @param ms The maximum miliseconds for waiting.
+     * @return Whether succeeded to waiting in the given time.
+     */
+    public join(ms: number): Promise<boolean>;
+
+    /**
+     * Join connection until time expiration.
+     * 
+     * @param at The maximum time point to wait.
+     * @return Whether succeeded to waiting in the given time.
+     */
+    public join(at: Date): Promise<boolean>;
+
+    public join(param?: number | Date): Promise<void | boolean>
+    {
+        return this.base_.join(param! as Date);
     }
 
     /* -----------------------------------------------------------
@@ -81,7 +112,7 @@ export class MutexConnector<Header extends object>
      */
     public get url(): string | undefined
     {
-        return this.connector_.url;
+        return this.base_.url;
     }
 
     /**
@@ -89,7 +120,7 @@ export class MutexConnector<Header extends object>
      */
     public get state(): MutexConnector.State
     {
-        return this.connector_.state;
+        return this.base_.state;
     }
 
     /**
@@ -97,7 +128,32 @@ export class MutexConnector<Header extends object>
      */
     public get header(): Header
     {
-        return this.connector_.header;
+        return this.base_.header;
+    }
+
+    /**
+     * Get Driver for RFC (Remote Function Call).
+     * 
+     * If your target {@link MutexServer} provides additional features, you can utilize those 
+     * features through returned `Driver` object by this method. To use this method, you should 
+     * define the `Controller` template argument, a type of interface who is defining additional 
+     * features provided from the remote server. 
+     * 
+     * The returned object `Driver` makes to call remote functions, defined in the `Controller` 
+     * and provided by `Provider` in the remote server, possible. In other words, callling a 
+     * function in the `Driver<Controller>`, it means to call a matched function in the remote 
+     * server's `Provider` object.
+     * 
+     *   - `Controller`: Definition only
+     *   - `Driver`: Remote Function Call
+     * 
+     * @template Controller An interface for provided features (functions & objects) from the remote system (`Provider`).
+     * @template UseParametric Whether to convert type of function parameters to be compatible with their pritimive.
+     * @return A Driver for the RFC.
+     */
+    public getDriver<Controller extends object, UseParametric extends boolean = false>(): Driver.Promisive<Controller, UseParametric>
+    {
+        return this.controller_.provider as any;
     }
 
     /* -----------------------------------------------------------
@@ -106,63 +162,66 @@ export class MutexConnector<Header extends object>
     /**
      * Get remote barrier.
      * 
-     * @param name An identifier name to be created or search for.
+     * @param key An identifier name to be created or search for.
      * @param count Downward counter of the target barrier, if newly created.
      * @return A {@link RemoteBarrier} object.
      */
-    public getBarrier(name: string, count: number): Promise<RemoteBarrier>
+    public getBarrier(key: string, count: number): Promise<RemoteBarrier>
     {
-        return RemoteBarrier.create(this.controller_.barriers, name, count);
+        return RemoteBarrier.create(this.controller_.group.barriers, key, count);
     }
 
     /**
      * Get remote condition variable.
      * 
-     * @param name An identifier name to be created or search for.
+     * @param key An identifier name to be created or search for.
      * @return A {@link RemoteConditionVariable} object.
      */
-    public getConditionVariable(name: string): Promise<RemoteConditionVariable>
+    public getConditionVariable(key: string): Promise<RemoteConditionVariable>
     {
-        return RemoteConditionVariable.create(this.controller_.condition_variables, name);
+        return RemoteConditionVariable.create(this.controller_.group.condition_variables, key);
     }
 
     /**
      * Get remote latch.
      * 
-     * @param name An identifier name to be created or search for.
+     * @param identifier An identifier name to be created or search for.
      * @param count Downward counter of the target latch, if newly created.
      * @return A {@link RemoteLatch} object.
      */
-    public getLatch(name: string, count: number): Promise<RemoteLatch>
+    public getLatch(identifier: string, count: number): Promise<RemoteLatch>
     {
-        return RemoteLatch.create(this.controller_.latches, name, count);
+        return RemoteLatch.create(this.controller_.group.latches, identifier, count);
     }
 
     /**
      * Get remote mutex.
      * 
-     * @param name An identifier name to be created or search for.
+     * @param key An identifier name to be created or search for.
      * @return A {@link RemoteMutex} object.
      */
-    public getMutex(name: string): Promise<RemoteMutex>
+    public getMutex(key: string): Promise<RemoteMutex>
     {
-        return RemoteMutex.create(this.controller_.mutexes, name);
+        return RemoteMutex.create(this.controller_.group.mutexes, key);
     }
 
     /**
      * Get remote semaphore.
      * 
-     * @param name An identifier name to be created or search for.
+     * @param key An identifier name to be created or search for.
      * @param count Downward counter of the target semaphore, if newly created.
      * @return A {@link RemoteSemaphore} object.
      */
-    public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>
+    public getSemaphore(key: string, count: number): Promise<RemoteSemaphore>
     {
-        return RemoteSemaphore.create(this.controller_.semaphores, name, count);
+        return RemoteSemaphore.create(this.controller_.group.semaphores, key, count);
     }
 }
 
 export namespace MutexConnector
 {
+    /**
+     * Current state of the {@link MutexConnector}
+     */
     export import State = WebConnector.State;
 }

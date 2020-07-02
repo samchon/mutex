@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 import { SolidComponent } from "./SolidComponent";
@@ -208,10 +208,12 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate>
 
     private async _Handle_disconnection(it: List.Iterator<Resolver>): Promise<void>
     {
-        if (it.prev().next().equals(it) === false)
+        // CHECK ALIVE
+        if ((<any>it as Disolver).erased_ === true)
             return;
 
-        if (it.value.handler === null)
+        // ROLLBACK ACTION
+        else if (it.value.handler === null)
             await this.release(1, it.value.acceptor);
         else
             this._Cancel(it);

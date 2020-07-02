@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module ms
+ * @module msv
  */
 //-----------------------------------------------------------
-import type { Driver } from "tgrid/components/Driver";
-import type { ConditionVariablesProvider } from "../server/providers/ConditionVariablesProvider";
+import { Driver } from "tgrid/components/Driver";
+import { ConditionVariablesProvider } from "../server/providers/ConditionVariablesProvider";
 
 /**
  * Remote ConditionVariable.

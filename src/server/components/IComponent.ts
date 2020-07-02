@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";

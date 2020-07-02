@@ -8,7 +8,7 @@ import { sleep_for } from "tstl/thread/global";
 
 async function test(factory: ConnectionFactory): Promise<void>
 {
-    let connector: MutexConnector<IActivation> = await factory();
+    let connector: MutexConnector<IActivation, null> = await factory();
     let mutex: RemoteMutex = await connector.getMutex("test_destructors");
 
     await mutex.lock_shared();
@@ -18,7 +18,7 @@ async function test(factory: ConnectionFactory): Promise<void>
     await connector.close();
 }
 
-export async function test_destructors(factory: ConnectionFactory, server: MutexServer<IActivation>): Promise<void>
+export async function test_destructors(factory: ConnectionFactory, server: MutexServer<IActivation, null>): Promise<void>
 {
     let promises: Promise<void>[] = [];
     for (let i: number = 0; i < 4; ++i)

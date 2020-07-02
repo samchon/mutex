@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 export * from "./RemoteMutex";

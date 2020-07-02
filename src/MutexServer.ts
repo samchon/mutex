@@ -1,24 +1,28 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 import { WebServer } from "tgrid/protocols/web/WebServer";
-import { ProviderGroup } from "./server/ProviderGroup";
+import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
+import { Driver } from "tgrid/components/Driver";
 
+import { ProviderCapsule } from "./server/ProviderCapsule";
+import { ProviderGroup } from "./server/ProviderGroup";
 import { GlobalGroup } from "./server/GlobalGroup";
+
 /**
  * The Mutex Server.
  * 
- * @type Header Type of the *header* who is containing the activation info.
+ * @template Header Type of the *header* who is containing the activation info.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexServer<Header extends object>
+export class MutexServer<Header, Provider extends object | null>
 {
     /**
      * @hidden
      */
-    private server_: WebServer<Header, ProviderGroup>;
+    private server_: WebServer<Header, ProviderCapsule<Provider>>;
 
     /**
      * @hidden
@@ -70,26 +74,16 @@ export class MutexServer<Header extends object>
      * clients' connections by considering their {@link MutexServer.ConnectionInfo} data.
      * 
      * @param port Port number to listen.
-     * @param predicator A predicator function determining whether to accept the client's connection or not.
+     * @param handler A handler function determining whether to accept the client's connection or not.
      */
-    public open(port: number, predicator: MutexServer.Predicator<Header>): Promise<void>
+    public open(port: number, handler: (acceptor: MutexServer.Acceptor<Header, Provider>) => Promise<void>): Promise<void>
     {
-        return this.server_.open(port, async acceptor => 
+        return this.server_.open(port, async base => 
         {
-            let info: MutexServer.ConnectionInfo<Header> = {
-                ip: acceptor.ip,
-                path: acceptor.path,
-                header: acceptor.header
-            };
-            if (await predicator(info) === true)
-            {
-                let group: ProviderGroup = new ProviderGroup(this.components_, acceptor);
+            let group: ProviderGroup = new ProviderGroup(this.components_, base);
+            let acceptor: MutexServer.Acceptor<Header, Provider> = MutexServer.Acceptor.create(base, group);
 
-                await acceptor.accept(group);
-                acceptor.join().then(() => group.destructor());
-            }
-            else // @todo: detailed reason
-                await acceptor.reject();
+            await handler(acceptor);
         });
     }
 
@@ -129,47 +123,164 @@ export class MutexServer<Header extends object>
     }
 }
 
+/**
+ * 
+ */
 export namespace MutexServer
 {
     /**
-     * Current state of the `mutex-server`
+     * Current state of the {@link MutexServer}
      */
     export import State = WebServer.State;
 
     /**
-     * The predicator function type.
+     * MutexServer Acceptor.
      * 
-     * @type Header Type of the *header*.
+     * @template Header Type of the *header* containing initial data.
+     * @template Provider Type of additional features provided for the remote client.
+     * @author Jeongho Nam - https://github.com/samchon
      */
-    export interface Predicator<Header extends object>
+    export class Acceptor<Header, Provider extends object | null>
+        implements Pick<WebAcceptor<Header, Provider>, "getDriver">
     {
         /**
-         * @param info The information about connection with a client.
-         * @return Whether to accept the connection or not.
+         * @hidden
          */
-        (info: ConnectionInfo<Header>): boolean | Promise<boolean>;
+        private base_: WebAcceptor<Header, ProviderCapsule<Provider>>;
+
+        /**
+         * @hidden
+         */
+        private group_: ProviderGroup;
+
+        /* ----------------------------------------------------------------
+            CONSTRUCTORS
+        ---------------------------------------------------------------- */
+        /**
+         * @hidden
+         */
+        private constructor(base: WebAcceptor<Header, ProviderCapsule<Provider>>, group: ProviderGroup)
+        {
+            this.base_ = base;
+            this.group_ = group;
+        }
+
+        /**
+         * @internal
+         */
+        public static create<Header, Provider extends object | null>
+            (base: WebAcceptor<Header, ProviderCapsule<Provider>>, group: ProviderGroup)
+        {
+            return new Acceptor(base, group);
+        }
+
+        /**
+         * 
+         * @param code 
+         * @param reason 
+         */
+        public close(code?: number, reason?: string): Promise<void>
+        {
+            return this.base_.close(code, reason);
+        }
+
+        /**
+         * Join connection.
+         */
+        public join(): Promise<void>;
+
+        /**
+         * Join connection until timeout.
+         * 
+         * @param ms The maximum miliseconds for waiting.
+         * @return Whether succeeded to waiting in the given time.
+         */
+        public join(ms: number): Promise<boolean>;
+
+        /**
+         * Join connection until time expiration.
+         * 
+         * @param at The maximum time point to wait.
+         * @return Whether succeeded to waiting in the given time.
+         */
+        public join(at: Date): Promise<boolean>;
+
+        public join(param?: number | Date): Promise<void | boolean>
+        {
+            return this.base_.join(param! as Date);
+        }
+
+        /* ----------------------------------------------------------------
+            ACCESSORS
+        ---------------------------------------------------------------- */
+        /**
+         * 
+         */
+        public get ip(): string
+        {
+            return this.base_.ip;
+        }
+
+        /**
+         * 
+         */
+        public get path(): string
+        {
+            return this.base_.path;
+        }
+
+        /**
+         * 
+         */
+        public get header(): Header
+        {
+            return this.base_.header;
+        }
+
+        /**
+         * 
+         */
+        public get state()
+        {
+            return this.base_.state;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public getDriver<Controller extends object, UseParametric extends boolean = false>(): Driver<Controller, UseParametric>
+        {
+            return this.base_.getDriver();
+        }
+
+        /* ----------------------------------------------------------------
+            HANDSHAKES
+        ---------------------------------------------------------------- */
+        /**
+         * 
+         * @param provider 
+         */
+        public async accept(provider: Provider): Promise<void>
+        {
+            await this.base_.accept({ group: this.group_, provider: provider });
+            this.base_.join().then(() => this.group_.destructor());
+        }
+
+        /**
+         * 
+         * @param status 
+         * @param reason 
+         */
+        public reject(status?: number, reason?: string): Promise<void>
+        {
+            return this.base_.reject(status, reason);
+        }
     }
-
-    /**
-     * Connection information with a client.
-     * 
-     * @type Header Type of the *header*.
-     */
-    export interface ConnectionInfo<Header extends object>
+    export namespace Acceptor
     {
         /**
-         * IP address of the client.
+         * Current state of the {@link MutexServer.Acceptor}
          */
-        ip: string;
-
-        /**
-         * Connection path the client has used.
-         */
-        path: string;
-
-        /**
-         * Header containing additional information like activation.
-         */
-        header: Header;
+        export import State = WebAcceptor.State;
     }
 }

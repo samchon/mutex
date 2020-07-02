@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
-import type { Driver } from "tgrid/components/Driver";
-import type { BarriersProvider } from "../server/providers/BarriersProvider";
+import { Driver } from "tgrid/components/Driver";
+import { BarriersProvider } from "../server/providers/BarriersProvider";
 
 /**
  * Remote Barrier.

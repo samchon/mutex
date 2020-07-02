@@ -5,245 +5,131 @@
 [![Downloads](https://img.shields.io/npm/dm/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Build Status](https://github.com/samchon/mutex-server/workflows/build/badge.svg)](https://github.com/samchon/mutex-server/actions?query=workflow%3Abuild)
 
-Virtual critical section in the network levle.
+Critical sections in the network level.
 
-The `mutex-server` is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using network communications, this `mutex-server` can be a good solution.
+The `mutex-server` is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using the network communications, this `mutex-server` can be a good solution.
+
+Opens a `mutex-server` and let clients to connect to the `mutex-server`. When sharing network level critical sections through the `mutex-server`, you don't need to worry about any accident like sudden network disconnection by power outage. If a client has been disconnected, all of the locks had been acquired by the client would be automatically cancelled.
 
 
 
 
 ## 2. Features
-### 2.1. Server Side
-```typescript
-export class MutexServer<Header extends object>
-{
-    public state: MutexServer.State;
+### 2.1. Network
+To open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexServer.Acceptor`](https://mutex.dev/api/classes/msv.mutexserver.acceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class.
 
-    public constructor();
-    public constructor(key: string, cert: string);
+  - [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html)
+  - [`MutexServer.Acceptor`](https://mutex.dev/api/classes/msv.mutexserver.acceptor.html)
+  - [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html)
 
-    public open
-        (
-            port: number, 
-            predicator: MutexServer.Predicator<Header>
-        ): Promise<void>;
-    public close(): Promise<void>;
-}
-export namespace MutexServer
-{
-    export interface Predicator<Header extends object>
-    {
-        (info: ConnectionInfo<Header>): boolean | Promise<boolean>;
-    }
+### 2.2. Critical Section Components
+If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
 
-    export interface ConnectionInfo<Header extends object>
-    {
-        ip: string;
-        path: string;
-        header: Header;
-    }
-}
-```
+Also, [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html) can be a good solution for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
 
-### 2.2. Client Side
-#### 2.2.1. `MutexConnector`
-```typescript
-export class MutexConnector<Header extends object>
-{
-    public url?: string;
-    public state: MutexConnector.State;
-
-    public constructor(header: Header);
-    public connect(url: string): Promise<void>;
-    public close(): Promise<void>;
-
-    public getConditionVariable(name: string): Promise<RemoteConditionVariable>;
-    public getMutex(name: string): Promise<RemoteMutex>;
-    public getSemaphore(name: string, count: number): Promise<RemoteSemaphore>;
-
-    public getBarrier(name: string, count: number): Promise<RemoteBarrier>;
-    public getLatch(name: string, count: number): Promise<RemoteLatch>;
-}
-```
-
-#### 2.2.2. `RemoteConditionVariable`
-```typescript
-export class RemoteConditionVariable
-{
-    public wait(): Promise<void>;
-    public wait_for(ms: number): Promise<boolean>;
-    public wait_until(at: Date): Promise<boolean>;
-
-    public wait(predicator: Predicator): Promise<void>;
-    public wait_for(ms: number, predicator: Predicator): Promise<boolean>;
-    public wait_until(at: Date, predicator: Predicator): Promise<boolean>;
-
-    public notify_one(): Promise<void>;
-    public notify_all(): Promise<void>;
-}
-type Predicator = () => void | Promise<void>;
-```
-
-#### 2.2.3. `RemoteMutex`
-```typescript
-export class RemoteMutex
-{
-    public lock(): Promise<void>;
-    public try_lock(): Promise<boolean>;
-    public try_lock_for(ms: number): Promise<boolean>;
-    public try_lock_until(at: Date): Promise<boolean>;
-    public unlock(): Promise<void>;
-
-    public lock_shared(): Promise<void>;
-    public try_lock_shared(): Promise<boolean>;
-    public try_lock_shared_for(ms: number): Promise<boolean>;
-    public try_lock_shared_until(at: Date): Promise<boolean>;
-    public unlock_shared(): Promise<void>;
-}
-```
-
-### 2.2.4. `RemoteSemahore`
-```typescript
-export class RemoteSemaphore
-{
-    public max(): Promise<number>;
-
-    public acquire(): Promise<void>;
-    public try_acquire(): Promise<boolean>;
-    public try_acquire_for(ms: number): Promise<boolean>;
-    public try_acquire_until(at: Date): Promise<boolean>;
-    public release(count: number = 1): Promise<void>;
-}
-```
-
-#### 2.2.5. `RemoteBarrier`
-```typescript
-export class RemoteBarrier
-{
-    public arrive(n: number = 1): Promise<void>;
-    public arrive_and_drop(): Promise<void>;
-    public arrive_and_wait(): Promise<void>;
-    public wait(): Promise<void>;
-}
-```
-
-#### 2.2.6. `RemoteLatch`
-```typescript
-export class RemoteLatch
-{
-    public count_down(n: number = 1): Promise<void>;
-    public arrive_and_wait(): Promise<void>;
-
-    public wait(): Promise<void>;
-    public try_wait(): Promise<boolean>;
-    public wait_for(ms: number): Promise<boolean>;
-    public wait_until(at: Date): Promise<boolean>;
-}
-```
-
-
+  - Solid Components
+    - [`RemoteConditionVariable`](https://mutex.dev/api/classes/msv.remoteconditionvariable.html)
+    - [`RemoteMutex`](https://mutex.dev/api/classes/msv.remotemutex.html)
+    - [`RemoteSemaphore`](https://mutex.dev/api/classes/msv.remotesemaphore.html)
+  - Adaptor Components
+    - [`RemoteBarrier`](https://mutex.dev/api/classes/msv.remotebarrier.html)
+    - [`RemoteLatch`](https://mutex.dev/api/classes/msv.remotelatch.html)
+  - Safety Helpers
+    - [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html)
+    - [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html)
 
 
 
 
 ## 3. Usage
-### 3.1. Installation
-```bash
-npm install --save mutex-server
-```
+![mutex-server](https://user-images.githubusercontent.com/13158709/86332593-b285b200-bc85-11ea-8a2e-cbe30284d053.gif)
 
-### 3.2. Server
-Building a mutex server is very simple like below:
+Let's learn how to use the `mutex-server` through a sample project. I'll [open a server](https://mutex.dev/api/classes/msv.mutexserver.html#open) and let
+4 clients to [connect to the server](https://mutex.dev/api/classes/msv.mutexconnector.html#connect). After those 4 clients' connections, they'll monopoly a critical section through [`RemoteMutex.lock()`](https://mutex.dev/api/classes/msv.remotemutex.html#lock) method and start printing a line very slowly.
 
-```typescript
-import { MutexServer } from "mutex-server";
-import { IActivation } from "./IActivation";
+After printing has been completed, each client will act one of them randomly: [unlock the mutex](https://mutex.dev/api/classes/msv.remotemutex.html#unlock) or [close the connection](https://mutex.dev/api/classes/msv.mutexconnector.html#close) without the unlock. As you know and as I've mentioned, if a client has been disconnected without returning locks that it had been acquired, the `mutex-server` will automatically release them. 
 
-async function main(): Promise<void>
-{
-    let server: MutexServer<IActivation> = new MutexServer();
-    await server.open(44114, info => info.header.password === "qweqwe123!");
-}
-```
-
-
-
-
-### 3.3. Client
-Using the mutex server is also easy too. However, be careful when using the remote mutex. If you forget unlocking the remote-mutex, other clients will be suffered by your mistake.
+Therefore, two random actions would be confirmed to the same result: [`RemoteMutex.unlock()`](https://mutex.dev/api/classes/msv.remotemutex.html#unlock).
 
 ```typescript
-import { MutexConnector, RemoteMutex } from "mutex-server";
-import { IActivation } from "./IActivation";
+import msv from "mutex-server";
+import std from "tstl";
 
-async function main(): Promise<void>
+const PASSWORD = "qweqwe123!";
+const PORT = 37119;
+
+async function client(character: string): Promise<void>
 {
     // CONNECT TO THE SERVER
-    let header: IActivation = { password: "qweqwe123!" };
-    let connector: MutexConnector<IActivation> = new MutexConnector(header);
-    await connector.connect("http://127.0.0.1:44114");
-
-    //----
-    // USE MUTEX
-    //----
-    // GET NAMED MUTEX
-    let mutex: RemoteMutex = connector.getMutex("someName");
-
-    // WRITE-LOCK
+    let connector: msv.MutexConnector<string, null> = new msv.MutexConnector(PASSWORD, null);
+    await connector.connect(`ws://127.0.0.1:${PORT}`);
+    
+    // GET LOCK
+    let mutex: msv.RemoteMutex = await connector.getMutex("printer");
     await mutex.lock();
-    {
-        // ...
-        // DO SOMETHING
-        // ...
-    }
-    await mutex.unlock();
 
-    // READ-LOCK
-    await mutex.lock_shared();
+    // PRINTS A LINE VERY SLOWLY MONOPOLYING THE MUTEX
+    for (let i: number = 0; i < 20; ++i)
     {
-        // ...
-        // DOM SOMETHING
-        // ...
+        process.stdout.write(character);
+        await std.sleep_for(50);
     }
-    await mutex.unlock_shared();
+    process.stdout.write("\n");
 
-    await connector.close();
+    // ALTHOUGH THE CLIENT DOES NOT RELEASE THE LOCK
+    if (Math.random() < 0.5)
+        await mutex.unlock();
+    else // SERVER WILL UNLOCK IT AUTOMATICALLY AFTER THE DISCONNECTION
+        await connector.close();
 }
-```
-
-If you are aware of mistake to forget realilng the locks, therefore you want to use the remote mutex more safely, you can use those `UniqueLock` and `SharedLock` features instead of calling methods of the `RemoteMutex` directly:
-
-```typescript
-import { MutexConnector, RemoteMutex } from "mutex-server";
-import { UniqueLock, SharedLock } from "tstl";
 
 async function main(): Promise<void>
 {
-    // CONNECT TO THE SERVER
-    let header: IActivation = { password: "qweqwe123!" };
-    let connector: MutexConnector<IActivation> = new MutexConnector(header);
-    await connector.connect("http://127.0.0.1:44114");
-
-    //----
-    // USE MUTEX
-    //----
-    // GET NAMED MUTEX
-    let mutex: RemoteMutex = connector.getMutex("someName");
-
-    // WRITE-LOCK
-    await UniqueLock.lock(mutex, async () =>
+    // OPEN SERVER
+    let server: msv.MutexServer<string, null> = new msv.MutexServer();
+    await server.open(PORT, async acceptor =>
     {
-        // mutex.lock() and mutex.unlock() would be automatically called
-        // even this closure throws an error
+        if (acceptor.header === PASSWORD)
+            await acceptor.accept(null);
+        else
+            await acceptor.reject();
     });
 
-    // READ-LOCK
-    await SharedLock.lock(mutex, async () =>
+    // CREATE 10 CLIENTS LOCKING MUTEX
+    let promises: Promise<void>[] = [];
+    for (let i: number = 0; i < 4; ++i)
     {
-        // mutex.lock_shared() and mutex.unlock_shared() would be automatically called
-        // even this closure throws an error
-    });
+        let character: string = std.randint(0, 9).toString();
+        promises.push( client(character) );
+    }
 
-    await connector.close();
+    // WAIT THE CLIENTS TO BE DISCONNCTED AND CLOSE SERVER
+    await Promise.all(promises);
+    await server.close();
 }
+main();
 ```
+
+
+
+
+## 4. Appendix
+### 4.1. Repositories
+  - Github: https://github.com/samchon/mutex-server
+  - NPM: https://www.npmjs.com/package/mutex-server
+
+### 4.2. Documents
+  - API Docs: https://mutex.dev/api
+  - Guide Documents: *not yet, but would come in someday >o<*
+
+### 4.3. Dependencies
+#### 4.3.1. [TypeScript](https://github.com/microsoft/typescript)
+I've developed this `mutex-server` with the [TypeScript](https://github.com/microsoft/typescript).
+
+Also, I want all users of this `mutex-server` to use the [TypeScript](https://github.com/microsoft/typescript) too, for the safe development. As this `mutex-server` is designed to handling critical section in the network level, a tiny mistake like mis-typing can be a critical damage on the entire network system. It's the reason why I recommend you to use the [TypeScript](https://github.com/microsoft/typescript) when utilizing this `mutex-server`.
+
+#### 4.3.2. [TSTL](https://github.com/samchon/tstl)
+This `mutex-server` is an extension module for the [TSTL](https://github.com/samchon/tstl).
+
+#### 4.3.3. [TGrid](https://github.com/samchon/tgrid)
+The `mutex-server` has realized its remote, network level critical section, components by utilizing [RFC](https://github.com/samchon/tgrid#13-remote-function-call) (Remote Function Call) concepts invented by the [TGrid](https://github.com/samchon/tgrid).

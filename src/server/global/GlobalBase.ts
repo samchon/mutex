@@ -1,8 +1,16 @@
+/**
+ * @packageDocumentation
+ * @module msv
+ */
+//-----------------------------------------------------------
 import { HashMap } from "tstl/container/HashMap";
 import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
 
 import { IComponent } from "../components/IComponent";
 
+/**
+ * @internal
+ */
 export abstract class GlobalBase<ComponentT extends IComponent, Param, Ret>
 {
     private dict_: HashMap<string, ComponentT> = new HashMap();

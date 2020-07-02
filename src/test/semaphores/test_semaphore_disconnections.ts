@@ -10,7 +10,7 @@ const SLEEP = 50;
 
 async function acquire_and_disconnect(factory: ConnectionFactory, ms: number): Promise<void>
 {
-    let connector: MutexConnector<IActivation> = await factory();
+    let connector: MutexConnector<IActivation, null> = await factory();
     let semaphore: RemoteSemaphore = await connector.getSemaphore("test_semaphore_disconnections", 0);
 
     if (await semaphore.max() !== MAX)
@@ -23,7 +23,7 @@ async function acquire_and_disconnect(factory: ConnectionFactory, ms: number): P
 
 export async function test_semaphore_disconnections(factory: ConnectionFactory): Promise<void>
 {
-    let connector: MutexConnector<IActivation> = await factory();
+    let connector: MutexConnector<IActivation, null> = await factory();
     let semaphore: RemoteSemaphore = await connector.getSemaphore("test_semaphore_disconnections", MAX);
 
     for (let i: number = 0; i < MAX / 2; ++i)

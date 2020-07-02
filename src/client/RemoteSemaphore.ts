@@ -1,5 +1,10 @@
-import type { Driver } from "tgrid/components/Driver";
-import type { SemaphoresProvider } from "../server/providers/SemaphoresProvider";
+/**
+ * @packageDocumentation
+ * @module msv
+ */
+//-----------------------------------------------------------
+import { Driver } from "tgrid/components/Driver";
+import { SemaphoresProvider } from "../server/providers/SemaphoresProvider";
 import { Semaphore } from "tstl/thread/Semaphore";
 
 /**
@@ -63,18 +68,18 @@ export class RemoteSemaphore
         LOCKERS
     ----------------------------------------------------------- */
     /**
-	 * Acquire a section until be released.
-	 */
+     * Acquire a section until be released.
+     */
     public acquire(): Promise<void>
     {
         return this.controller_.acquire(this.name_);
     }
 
     /**
-	 * Try acquire a section.
-	 * 
-	 * @return Whether succeeded to acquire or not.
-	 */
+     * Try acquire a section.
+     * 
+     * @return Whether succeeded to acquire or not.
+     */
     public try_acquire(): Promise<boolean>
     {
         return this.controller_.try_acquire(this.name_);

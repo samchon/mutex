@@ -3,5 +3,5 @@ import { IActivation } from "./IActivation";
 
 export interface ConnectionFactory
 {
-    (): Promise<MutexConnector<IActivation>>;
+    (): Promise<MutexConnector<IActivation, null>>;
 }

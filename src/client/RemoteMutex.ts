@@ -1,10 +1,8 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
-import { ISharedTimedLockable } from "tstl/base/thread/ISharedTimedLockable";
-
 import { Driver } from "tgrid/components/Driver";
 import { MutexesProvider } from "../server/providers/MutexesProvider";
 
@@ -13,7 +11,7 @@ import { MutexesProvider } from "../server/providers/MutexesProvider";
  * 
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class RemoteMutex implements ISharedTimedLockable
+export class RemoteMutex
 {
     /**
      * @hidden

@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module ms
+ * @module msv
  */
 //-----------------------------------------------------------
-import type { Driver } from "tgrid/components/Driver";
-import type { LatchesProvider } from "../server/providers/LatchesProvider";
+import { Driver } from "tgrid/components/Driver";
+import { LatchesProvider } from "../server/providers/LatchesProvider";
 
 /**
  * Remote Latch.

@@ -14,7 +14,7 @@ export async function test_semaphore_acquires(factory: ConnectionFactory): Promi
     //----
     // TEST MUTEX FEATURES
     //----
-    let connector: MutexConnector<IActivation> = await factory();
+    let connector: MutexConnector<IActivation, null> = await factory();
     let mutex: RemoteSemaphore = await connector.getSemaphore("test_semaphore_acquires_binary", 1);
     let wrapper: ITimedLockable = RemoteSemaphore.get_lockable(mutex);
 

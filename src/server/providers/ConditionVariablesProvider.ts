@@ -1,6 +1,14 @@
+/**
+ * @packageDocumentation
+ * @module msv
+ */
+//-----------------------------------------------------------
 import { ProviderBase } from "./ProviderBase";
 import { GlobalConditionVariablaes } from "../global/GlobalConditionVariables";
 
+/**
+ * @internal
+ */
 export class ConditionVariablesProvider extends ProviderBase<GlobalConditionVariablaes, undefined, void>
 {
     public wait(name: string): Promise<void>

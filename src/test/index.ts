@@ -16,7 +16,7 @@ const HEADER = { password: "some_password" };
 
 interface IModule
 {
-    [key: string]: (factory: ConnectionFactory, server: MutexServer<IActivation>) => Promise<void>;
+    [key: string]: (factory: ConnectionFactory, server: MutexServer<IActivation, null>) => Promise<void>;
 }
 
 async function measure(job: () => Promise<void>): Promise<number>
@@ -26,7 +26,7 @@ async function measure(job: () => Promise<void>): Promise<number>
     return Date.now() - time;
 }
 
-async function iterate(factory: ConnectionFactory, server: MutexServer<IActivation>, path: string): Promise<void>
+async function iterate(factory: ConnectionFactory, server: MutexServer<IActivation, null>, path: string): Promise<void>
 {
     let fileList: string[] = await fs.promises.readdir(path);
     for (let file of fileList)
@@ -34,7 +34,7 @@ async function iterate(factory: ConnectionFactory, server: MutexServer<IActivati
         let currentPath: string = `${path}/${file}`;
         let stats: fs.Stats = await fs.promises.lstat(currentPath);
 
-        if (stats.isDirectory() === true && file !== "internal")
+        if (stats.isDirectory() === true && file !== "internal" && file !== "manual")
         {
             await iterate(factory, server, currentPath);
             continue;
@@ -68,19 +68,25 @@ async function main(): Promise<void>
     console.log("==========================================================");
 
     // OPEN SERVER
-    let server: MutexServer<IActivation> = new MutexServer();
-    await server.open(PORT, info => info.header.password === HEADER.password );
+    let server: MutexServer<IActivation, null> = new MutexServer();
+    await server.open(PORT, async acceptor => 
+    {
+        if (acceptor.header.password === HEADER.password)
+            await acceptor.accept(null);
+        else
+            await acceptor.reject();
+    });
 
     // CONNECTION-FACTORY TO THE SERVER
     let sequence: number = 0;
-    let connectorList: MutexConnector<IActivation>[] = [];
+    let connectorList: MutexConnector<IActivation, null>[] = [];
 
     let factory: ConnectionFactory = async () =>
     {
-        let connector: MutexConnector<IActivation> = new MutexConnector({
+        let connector: MutexConnector<IActivation, null> = new MutexConnector({
             uid: ++sequence,
             ...HEADER
-        });
+        }, null);
         await connector.connect(URL);
 
         connectorList.push(connector);

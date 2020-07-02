@@ -1,9 +1,9 @@
 {
   "name": "mutex-server",
-  "version": "0.2.0-dev.20200701",
+  "version": "0.2.0-dev.20200703",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
-  "typings": "./index.d.ts",
+  "typings": "lib/index.d.ts",
   "scripts": {
     "api": "typedoc src ../tstl/src --exclude \"**/+(test|benchmark)/**\" --excludeNotDocumented --plugin typedoc-plugin-external-module-name --plugin typedoc-plugin-exclude-references --out ../mutex-server@gh-pages/api",
     "build": "npm run compile",
@@ -18,15 +18,24 @@
   },
   "keywords": [
     "mutex",
+    "semaphore",
+    "condition",
+    "variable",
+    "latch",
+    "barrier",
     "write",
     "read",
+    "unique",
+    "shared",
     "lock",
+    "acquire",
     "server",
     "remote",
     "critical",
     "section",
     "thread",
-    "tstl"
+    "tstl",
+    "tgrid"
   ],
   "author": {
     "name": "Jeongho Nam",
@@ -50,7 +59,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "tgrid": "^0.6.1",
+    "tgrid": "^0.6.2",
     "tstl": "^2.4.10"
   }
 }

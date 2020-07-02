@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module mutex
+ * @module msv
  */
 //-----------------------------------------------------------
 import { List } from "tstl/container/List";
@@ -96,6 +96,9 @@ export abstract class SolidComponent<
     }
 }
 
+/**
+ * @internal
+ */
 export namespace SolidComponent
 {
     export interface Resolver<

@@ -7,7 +7,7 @@ import { sleep_for } from "tstl/thread/global";
 
 async function test_disconnection(factory: ConnectionFactory, index: number): Promise<void>
 {
-    let connector: MutexConnector<IActivation> = await factory();
+    let connector: MutexConnector<IActivation, null> = await factory();
     let mutex: RemoteMutex = await connector.getMutex("test_mutex_disconnection");
 
     if (index % 2 === 0)
