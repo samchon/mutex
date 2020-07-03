@@ -146,7 +146,7 @@
 								<p>In same reason, if you don&#39;t call the <a href="std.base-1.itimedlockable.html#unlock">unlock</a> function after your business, the
 									others who want to <a href="std.base-1.itimedlockable.html#lock">monopoly</a> the mutex would be fall into the forever sleep.
 									Therefore, never forget to calling the <a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the
-								{@link UniqueLock.lock} function instead to ensure the safety.</p>
+								<a href="../classes/std.uniquelock.html#lock">UniqueLock.lock</a> function instead to ensure the safety.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
@@ -177,7 +177,7 @@
 								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
 									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function after your business, the others who want to <a href="std.base-1.itimedlockable.html#lock">monopoly</a>
 									the mutex would be fall into the forever sleep. Therefore, never forget to calling the
-									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the {@link UniqueLock.try_lock} function instead to
+									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the <a href="../classes/std.uniquelock.html#try_lock">UniqueLock.try_lock</a> function instead to
 								ensure the safety.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -211,7 +211,7 @@
 								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
 									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function after your business, the others who want to <a href="std.base-1.itimedlockable.html#lock">monopoly</a>
 									the mutex would be fall into the forever sleep. Therefore, never forget to calling the
-									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the {@link UniqueLock.try_lock_for} function instead to
+									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the <a href="../classes/std.uniquelock.html#try_lock_for">UniqueLock.try_lock_for</a> function instead to
 								ensure the safety.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -254,7 +254,7 @@
 								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
 									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function after your business, the others who want to <a href="std.base-1.itimedlockable.html#lock">monopoly</a>
 									the mutex would be fall into the forever sleep. Therefore, never forget to calling the
-									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the {@link UniqueLock.try_lock_until} function instead
+									<a href="std.base-1.itimedlockable.html#unlock">unlock</a> function or utilize the <a href="../classes/std.uniquelock.html#try_lock_until">UniqueLock.try_lock_until</a> function instead
 								to ensure the safety.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -298,10 +298,10 @@
 									<p>As you know, when you succeeded to acquire the <code>lock</code>, you don&#39;t have to forget to
 										calling this <a href="std.base-1.itimedlockable.html#unlock">unlock</a> method after your business. If you forget it, it would be a
 									terrible situation for the others who&#39;re attempting to lock this mutex.</p>
-									<p>However, if you utilize the {@link UniqueLock}, you don&#39;t need to consider about this
+									<p>However, if you utilize the <a href="../classes/std.uniquelock.html">UniqueLock</a>, you don&#39;t need to consider about this
 										<a href="std.base-1.itimedlockable.html#unlock">unlock</a> method. Just define your business into a callback function as a parameter
-										of methods of the {@link UniqueLock}, then this <a href="std.base-1.itimedlockable.html#unlock">unlock</a> method would be
-									automatically called by the {@link UniqueLock} after the business.</p>
+										of methods of the <a href="../classes/std.uniquelock.html">UniqueLock</a>, then this <a href="std.base-1.itimedlockable.html#unlock">unlock</a> method would be
+									automatically called by the <a href="../classes/std.uniquelock.html">UniqueLock</a> after the business.</p>
 								</blockquote>
 								<dl class="tsd-comment-tags">
 									<dt>throw</dt>

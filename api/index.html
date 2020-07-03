@@ -89,12 +89,12 @@
 				<ul>
 					<li><a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexServer</code></a></li>
 					<li><a href="https://mutex.dev/api/classes/msv.mutexacceptor.html"><code>MutexAcceptor</code></a></li>
-					<li><a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexConnector</code></a></li>
+					<li><a href="https://mutex.dev/api/classes/msv.mutexconnector.html"><code>MutexConnector</code></a></li>
 				</ul>
 				<a href="#22-critical-section-components" id="22-critical-section-components" style="color: inherit; text-decoration: none;">
 					<h3>2.2. Critical Section Components</h3>
 				</a>
-				<p>If you succeeded to connect to a <code>mutex-server</code>, as a client through the <a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexConnector</code></a> class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.</p>
+				<p>If you succeeded to connect to a <code>mutex-server</code>, as a client through the <a href="https://mutex.dev/api/classes/msv.mutexconnector.html"><code>MutexConnector</code></a> class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.</p>
 				<p>Also, <a href="https://mutex.dev/api/modules/std.uniquelock.html"><code>std.UniqueLock</code></a> and <a href="https://mutex.dev/api/modules/std.sharedlock.html"><code>std.SharedLock</code></a> can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.</p>
 				<ul>
 					<li>Solid Components<ul>
@@ -233,9 +233,6 @@ main();</code></pre>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/std.html">std</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/tstl_src_thread.html">tstl\src\thread</a>
 					</li>
 				</ul>
 			</nav>

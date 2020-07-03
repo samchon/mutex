@@ -182,7 +182,7 @@
 								<p>In same reason, if you don&#39;t call the <a href="std.semaphore.html#release">release</a> function after you business, the
 									others who want to <a href="std.semaphore.html#acquire">acquire</a> a section from the semaphore would be fall into the
 									forever sleep. Therefore, never forget to calling the <a href="std.semaphore.html#release">release</a> function or utilize
-									the {@link UniqueLock.lock} function instead with {@link Semaphore.get_lockable} to ensure
+									the <a href="std.uniquelock.html#lock">UniqueLock.lock</a> function instead with {@link Semaphore.get_lockable} to ensure
 								the safety.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -239,10 +239,10 @@
 										to calling this <a href="std.semaphore.html#release">release</a> method after your business. If you forget it, it would
 										be a terrible situation for the others who&#39;re attempting to <a href="std.semaphore.html#acquire">acquire</a> a section
 									from this semaphore.</p>
-									<p>However, if you utilize the {@link UniqueLock} with {@link Semaphore.get_lockable}, you
+									<p>However, if you utilize the <a href="std.uniquelock.html">UniqueLock</a> with {@link Semaphore.get_lockable}, you
 										don&#39;t need to consider about this <a href="std.semaphore.html#release">release</a> method. Just define your business into
-										a callback function as a parameter of methods of the {@link UniqueLock}, then this
-										<a href="std.semaphore.html#release">release</a> method would be automatically called by the {@link UniqueLock} after the
+										a callback function as a parameter of methods of the <a href="std.uniquelock.html">UniqueLock</a>, then this
+										<a href="std.semaphore.html#release">release</a> method would be automatically called by the <a href="std.uniquelock.html">UniqueLock</a> after the
 									business.</p>
 								</blockquote>
 								<dl class="tsd-comment-tags">
@@ -289,7 +289,7 @@
 									not call the <a href="std.semaphore.html#release">release</a> function after your business, the others who want to
 									<a href="std.semaphore.html#acquire">acquire</a> a section from the semaphore would be fall into the forever sleep.
 									Therefore, never forget to calling the <a href="std.semaphore.html#release">release</a> function or utilize the
-									{@link UniqueLock.try_lock} function instead with {@link Semaphore.get_lockable} to ensure
+									<a href="std.uniquelock.html#try_lock">UniqueLock.try_lock</a> function instead with {@link Semaphore.get_lockable} to ensure
 								the safety.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -398,9 +398,6 @@
 					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/std.html">std</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="../modules/tstl_src_thread.html">tstl\src\thread</a>
 					</li>
 				</ul>
 			</nav>
