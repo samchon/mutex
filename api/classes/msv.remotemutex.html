@@ -1,0 +1,599 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>RemoteMutex | mutex-server</title>
+	<meta name="description" content="Documentation for mutex-server">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">mutex-server</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/msv.html">msv</a>
+				</li>
+				<li>
+					<a href="msv.remotemutex.html">RemoteMutex</a>
+				</li>
+			</ul>
+			<h1>Class RemoteMutex</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Remote Mutex.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>author</dt>
+						<dd><p>Jeongho Nam - <a href="https://github.com/samchon">https://github.com/samchon</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">RemoteMutex</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#lock" class="tsd-kind-icon">lock</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#lock_shared" class="tsd-kind-icon">lock_<wbr>shared</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock" class="tsd-kind-icon">try_<wbr>lock</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock_for" class="tsd-kind-icon">try_<wbr>lock_<wbr>for</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock_shared" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock_shared_for" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>for</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock_shared_until" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>until</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#try_lock_until" class="tsd-kind-icon">try_<wbr>lock_<wbr>until</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#unlock" class="tsd-kind-icon">unlock</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.remotemutex.html#unlock_shared" class="tsd-kind-icon">unlock_<wbr>shared</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="lock" class="tsd-anchor"></a>
+					<h3>lock</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">lock<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L72">mutex-server/src/client/RemoteMutex.ts:72</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Write locks the mutex.</p>
+								</div>
+								<p>Monopolies a mutex until be <a href="msv.remotemutex.html#unlock">unlocked</a>. If there&#39;re someone who have already
+									<a href="msv.remotemutex.html#lock">monopolied</a> or <a href="msv.remotemutex.html#lock_shared">shared</a> the mutex, the function call would
+									be blocked until all of them to return their acquistions by calling <a href="msv.remotemutex.html#unlock">unlock</a> or
+								<a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> methods.</p>
+								<p>In same reason, if you don&#39;t call the <a href="msv.remotemutex.html#unlock">unlock</a> function after your business, the
+									others who want to <a href="msv.remotemutex.html#lock">monopoly</a> or <a href="msv.remotemutex.html#lock_shared">share</a> the mutex would be
+									fall into the forever sleep. Therefore, never forget to calling the <a href="msv.remotemutex.html#unlock">unlock</a> function
+								or utilize the {@link UniqueLock.lock} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="lock_shared" class="tsd-anchor"></a>
+					<h3>lock_<wbr>shared</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">lock_<wbr>shared<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L190">mutex-server/src/client/RemoteMutex.ts:190</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Read locks the mutex.</p>
+								</div>
+								<p>Shares a mutex until be <a href="msv.remotemutex.html#unlock_shared">unlocked</a>. If there&#39;re someone who have
+									already <a href="msv.remotemutex.html#lock">monopolied</a> the mutex, the function call would be blocked until all of
+								them to <a href="msv.remotemutex.html#unlock">return</a> their acquisitions.</p>
+								<p>In same reason, if you don&#39;t call the <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function after your business,
+									the others who want to <a href="msv.remotemutex.html#lock">monopoly</a> the mutex would be fall into the forever
+									sleep. Therefore, never forget to calling the <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> or utilize the
+								{@link SharedLock.lock} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L93">mutex-server/src/client/RemoteMutex.ts:93</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to write lock the mutex.</p>
+								</div>
+								<p>Attempts to monopoly a mutex without blocking. If succeeded to monopoly the mutex
+									immediately, it returns <code>true</code> directly. Otherwise there&#39;s someone who has already
+									<a href="msv.remotemutex.html#lock">monopolied</a> or <a href="msv.remotemutex.html#lock_shared">shared</a> the mutex, the function gives up the
+								trial immediately and returns <code>false</code> directly.</p>
+								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock">unlock</a> function after your business, the others who want to <a href="msv.remotemutex.html#lock">monopoly</a>
+									or <a href="msv.remotemutex.html#lock_shared">share</a> the mutex would be fall into the forever sleep. Therefore,
+									never forget to calling the <a href="msv.remotemutex.html#unlock">unlock</a> function or utilize the
+								{@link UniqueLock.try_lock} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to monopoly the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock_for" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock_<wbr>for</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock_<wbr>for<span class="tsd-signature-symbol">(</span>ms<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L118">mutex-server/src/client/RemoteMutex.ts:118</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to write lock the mutex until timeout.</p>
+								</div>
+								<p>Attempts to monopoly a mutex until timeout. If succeeded to monopoly the mutex until the
+									timeout, it returns <code>true</code>. Otherwise failed to acquiring the lock in the given time, the
+								function gives up the trial and returns <code>false</code>.</p>
+								<p>Failed to acquiring the lock in the given time (returns <code>false</code>), it means that there&#39;s
+									someone who has already <a href="msv.remotemutex.html#lock">monopolied</a> or <a href="msv.remotemutex.html#lock_shared">shared</a> the mutex and
+								does not return it over the timeout.</p>
+								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock">unlock</a> function after your business, the others who want to <a href="msv.remotemutex.html#lock">monopoly</a>
+									or <a href="msv.remotemutex.html#lock_shared">share</a> the mutex would be fall into the forever sleep. Therefore,
+									never forget to calling the <a href="msv.remotemutex.html#unlock">unlock</a> function or utilize the
+								{@link UniqueLock.try_lock_for} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ms: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum miliseconds for waiting.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to monopoly the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock_shared" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock_<wbr>shared</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock_<wbr>shared<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L210">mutex-server/src/client/RemoteMutex.ts:210</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to read lock the mutex.</p>
+								</div>
+								<p>Attemps to share a mutex without blocking. If succeeded to share the mutex immediately, it
+									returns <code>true</code> directly. Otherwise there&#39;s someone who has already <a href="msv.remotemutex.html#lock">monopolied</a>
+								the mutex, the function gives up the trial immediately and returns <code>false</code> directly.</p>
+								<p>Note that, if you succeeded to share the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function after your buinsess, the others who want to
+									<a href="msv.remotemutex.html#lock">monopoly</a> the mutex would be fall into the forever sleep. Therefore, never
+									forget to calling the <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function or utilize the
+								{@link SharedLock.try_lock} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to share the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock_shared_for" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock_<wbr>shared_<wbr>for</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>for<span class="tsd-signature-symbol">(</span>ms<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L235">mutex-server/src/client/RemoteMutex.ts:235</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to read lock the mutex until timeout.</p>
+								</div>
+								<p>Attemps to share a mutex until timeout. If succeeded to share the mutex until timeout, it
+									returns <code>true</code>. Otherwise failed to acquiring the shared lock in the given time, the
+								function gives up the trial and returns <code>false</code>.</p>
+								<p>Failed to acquring the shared lock in the given time (returns <code>false</code>), it means that
+									there&#39;s someone who has already <a href="msv.remotemutex.html#lock">monopolied</a> the mutex and does not return it
+								over the timeout.</p>
+								<p>Note that, if you succeeded to share the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function after your buinsess, the others who want to
+									<a href="msv.remotemutex.html#lock">monopoly</a> the mutex would be fall into the forever sleep. Therefore, never
+									forget to calling the <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function or utilize the
+								{@link SharedLock.try_lock_for} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ms: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum miliseconds for waiting.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to share the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock_shared_until" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock_<wbr>shared_<wbr>until</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>until<span class="tsd-signature-symbol">(</span>at<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L260">mutex-server/src/client/RemoteMutex.ts:260</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to read lock the mutex until time expiration.</p>
+								</div>
+								<p>Attemps to share a mutex until time expiration. If succeeded to share the mutex until time
+									expiration, it returns <code>true</code>. Otherwise failed to acquiring the shared lock in the given
+								time, the function gives up the trial and returns <code>false</code>.</p>
+								<p>Failed to acquring the shared lock in the given time (returns <code>false</code>), it means that
+									there&#39;s someone who has already <a href="msv.remotemutex.html#lock">monopolied</a> the mutex and does not return it
+								over the time expiration.</p>
+								<p>Note that, if you succeeded to share the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function after your buinsess, the others who want to
+									<a href="msv.remotemutex.html#lock">monopoly</a> the mutex would be fall into the forever sleep. Therefore, never
+									forget to calling the <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> function or utilize the
+								{@link SharedLock.try_lock_until} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>at: <span class="tsd-signature-type">Date</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum time point to wait.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to share the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="try_lock_until" class="tsd-anchor"></a>
+					<h3>try_<wbr>lock_<wbr>until</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">try_<wbr>lock_<wbr>until<span class="tsd-signature-symbol">(</span>at<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L143">mutex-server/src/client/RemoteMutex.ts:143</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Tries to write lock the mutex until time expiration.</p>
+								</div>
+								<p>Attemps to monopoly a mutex until time expiration. If succeeded to monopoly the mutex
+									until the time expiration, it returns <code>true</code>. Otherwise failed to acquiring the lock in the
+								given time, the function gives up the trial and returns <code>false</code>.</p>
+								<p>Failed to acquiring the lock in the given time (returns <code>false</code>), it means that there&#39;s
+									someone who has already <a href="msv.remotemutex.html#lock">monopolied</a> or <a href="msv.remotemutex.html#lock_shared">shared</a> the mutex and
+								does not return it over the time expiration.</p>
+								<p>Note that, if you succeeded to monopoly the mutex (returns <code>true</code>) but do not call the
+									<a href="msv.remotemutex.html#unlock">unlock</a> function after your business, the others who want to <a href="msv.remotemutex.html#lock">monopoly</a>
+									or <a href="msv.remotemutex.html#lock_shared">share</a> the mutex would be fall into the forever sleep. Therefore,
+									never forget to calling the <a href="msv.remotemutex.html#unlock">unlock</a> function or utilize the
+								{@link UniqueLock.try_lock_until} function instead to ensure the safety.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>at: <span class="tsd-signature-type">Date</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum time point to wait.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to monopoly the mutex or not.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="unlock" class="tsd-anchor"></a>
+					<h3>unlock</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">unlock<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L170">mutex-server/src/client/RemoteMutex.ts:170</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Write unlocks the mutex.</p>
+								</div>
+								<p>When you call this <a href="msv.remotemutex.html#unlock">unlock</a> method and there&#39;re someone who are currently blocked by
+									attempting to <a href="msv.remotemutex.html#lock">write</a> or <a href="msv.remotemutex.html#lock_shared">read</a> lock this mutex, one of them
+								(FIFO; first-in-first-out) would acquire the lock and continues its execution.</p>
+								<p>Otherwise, there&#39;s not anyone who is acquiring the <a href="msv.remotemutex.html#lock">write lock</a> of this mutex,
+								the <a href="std.domainerror.html">DomainError</a> exception would be thrown.</p>
+								<blockquote>
+									<p>As you know, when you succeeded to acquire the <code>write lock</code>, you don&#39;t have to forget to
+										calling this <a href="msv.remotemutex.html#unlock">unlock</a> method after your business. If you forget it, it would be a
+									terrible situation for the others who&#39;re attempting to lock this mutex.</p>
+									<p>However, if you utilize the {@link UniqueLock}, you don&#39;t need to consider about this
+										<a href="msv.remotemutex.html#unlock">unlock</a> method. Just define your business into a callback function as a parameter
+										of methods of the {@link UniqueLock}, then this <a href="msv.remotemutex.html#unlock">unlock</a> method would be
+									automatically called by the {@link UniqueLock} after the business.</p>
+								</blockquote>
+								<dl class="tsd-comment-tags">
+									<dt>throw</dt>
+									<dd><p><a href="std.domainerror.html">DomainError</a> when no one is acquiring the <a href="msv.remotemutex.html#lock">write lock</a>.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="unlock_shared" class="tsd-anchor"></a>
+					<h3>unlock_<wbr>shared</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">unlock_<wbr>shared<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/samchon/mutex-server/blob/cce3c80/src/client/RemoteMutex.ts#L285">mutex-server/src/client/RemoteMutex.ts:285</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Read unlocks the mutex.</p>
+								</div>
+								<p>When you call this <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> method and there&#39;re someone who are currently
+									blocked by attempting to <a href="msv.remotemutex.html#lock">monopoly</a> this mutex, one of them
+								(FIFO; first-in-first-out) would acquire the lock and continues its execution.</p>
+								<p>Otherwise, there&#39;s not anyone who is acquiring the <a href="msv.remotemutex.html#lock_shared">read lock</a> of this
+								mutex, the <a href="std.domainerror.html">DomainError</a> exception would be thrown.</p>
+								<blockquote>
+									<p>As you know, when you succeeded to acquire the <code>read lock</code>, you don&#39;t have to forget to
+										calling this <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> method after your business. If you forget it, it would
+									be a terrible situation for the others who&#39;re attempting to lock this mutex.</p>
+									<p>However, if you utilize the {@link SharedLock}, you don&#39;t need to consider about this
+										<a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> method. Just define your business into a callback function as a
+										parameter of methods of the {@link SharedLock}, then this <a href="msv.remotemutex.html#unlock_shared">unlock_shared</a> method
+									would be automatically called by the {@link SharedLock} after the business.</p>
+								</blockquote>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/msv.html">msv</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/std.html">std</a>
+					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="../modules/tstl_src_thread.html">tstl\src\thread</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexacceptor.html" class="tsd-kind-icon">Mutex<wbr>Acceptor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexconnector.html" class="tsd-kind-icon">Mutex<wbr>Connector</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexserver.html" class="tsd-kind-icon">Mutex<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotebarrier.html" class="tsd-kind-icon">Remote<wbr>Barrier</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remoteconditionvariable.html" class="tsd-kind-icon">Remote<wbr>Condition<wbr>Variable</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotelatch.html" class="tsd-kind-icon">Remote<wbr>Latch</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotemutex.html" class="tsd-kind-icon">Remote<wbr>Mutex</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#lock" class="tsd-kind-icon">lock</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#lock_shared" class="tsd-kind-icon">lock_<wbr>shared</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock" class="tsd-kind-icon">try_<wbr>lock</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock_for" class="tsd-kind-icon">try_<wbr>lock_<wbr>for</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock_shared" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock_shared_for" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>for</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock_shared_until" class="tsd-kind-icon">try_<wbr>lock_<wbr>shared_<wbr>until</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#try_lock_until" class="tsd-kind-icon">try_<wbr>lock_<wbr>until</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#unlock" class="tsd-kind-icon">unlock</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.remotemutex.html#unlock_shared" class="tsd-kind-icon">unlock_<wbr>shared</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotesemaphore.html" class="tsd-kind-icon">Remote<wbr>Semaphore</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>MutexAcceptor | mutex-server</title>
+	<meta name="description" content="Documentation for mutex-server">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">mutex-server</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/msv.html">msv</a>
+				</li>
+				<li>
+					<a href="msv.mutexacceptor.html">MutexAcceptor</a>
+				</li>
+			</ul>
+			<h1>Class MutexAcceptor&lt;Header, Provider&gt;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Acceptor of the <code>mutex-server</code>.</p>
+					</div>
+					<p>The <a href="msv.mutexacceptor.html">MutexAcceptor</a> is a communicator class interacting with the remote client, through
+						websocket and <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a> protocol, in the
+						<code>mutex-server</code>. The <a href="msv.mutexacceptor.html">MutexAcceptor</a> objects are always created by the <a href="msv.mutexserver.html">MutexServer</a>
+					class, whenever a remote client connects to the <code>mutex-server</code>.</p>
+					<p>You can accept or reject the client&#39;s connection by calling <a href="msv.mutexacceptor.html#accept">accept</a> or <a href="msv.mutexacceptor.html#reject">reject</a>
+						method. If you <a href="msv.mutexacceptor.html#accept">accept</a> the connection, the interaction would be started and the client
+					can access to critical component sections of this <code>mutex-server</code>.</p>
+					<p>Also, when declaring this <a href="msv.mutexacceptor.html">MutexAcceptor</a> type, you&#39;ve to define two template arguments,
+						<em>Header</em> and <em>Provider*. The *Header</em> type repersents an initial data gotten from the remote
+						client after the connection. I hope you and client not to omit it and utilize it as an
+					activation tool to enhance security.</p>
+					<p>The second template argument <em>Provider</em> represents the additional features provided for the
+						remote client. If you don&#39;t have any plan to provide additional feature to the remote client,
+					just declare it as <code>null</code></p>
+					<dl class="tsd-comment-tags">
+						<dt>author</dt>
+						<dd><p>Jeongho Nam - <a href="https://github.com/samchon">https://github.com/samchon</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>Header</h4>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Type of the <em>header</em> containing initial data.</p>
+							</div>
+						</div>
+					</li>
+					<li>
+						<h4>Provider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Type of additional features provided for the remote client.</p>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">MutexAcceptor</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="msv.mutexacceptor.html#state" class="tsd-kind-icon">State</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="msv.mutexacceptor.html#header" class="tsd-kind-icon">header</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="msv.mutexacceptor.html#ip" class="tsd-kind-icon">ip</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="msv.mutexacceptor.html#path" class="tsd-kind-icon">path</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="msv.mutexacceptor.html#state-1" class="tsd-kind-icon">state</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.mutexacceptor.html#accept" class="tsd-kind-icon">accept</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.mutexacceptor.html#close" class="tsd-kind-icon">close</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="msv.mutexacceptor.html#getdriver" class="tsd-kind-icon">get<wbr>Driver</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.mutexacceptor.html#join" class="tsd-kind-icon">join</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="msv.mutexacceptor.html#reject" class="tsd-kind-icon">reject</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
+					<a name="state" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> State</h3>
+					<div class="tsd-signature tsd-kind-icon">State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">State</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in mutex-server/src/MutexAcceptor.ts:233</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Current state of the <a href="msv.mutexacceptor.html">MutexAcceptor</a></p>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="header" class="tsd-anchor"></a>
+					<h3>header</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> header<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Header</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:147</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Header containing initialization data like activation.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Header</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="ip" class="tsd-anchor"></a>
+					<h3>ip</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> ip<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:131</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>IP Address of client.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="path" class="tsd-anchor"></a>
+					<h3>path</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> path<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:139</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Path of client has connected.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="state-1" class="tsd-anchor"></a>
+					<h3>state</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> state<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="msv.mutexacceptor.html#state" class="tsd-signature-type">State</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:165</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get state.</p>
+								</div>
+								<p>Get current state of connection state with the remote client. List of values are such
+								like below:</p>
+								<ul>
+									<li><code>REJECTING</code>: The {@link MutexConnector.reject} method is on running.</li>
+									<li><code>NONE</code>: The <a href="msv.mutexacceptor.html">MutexAcceptor</a> instance is newly created, but did nothing yet.</li>
+									<li><code>ACCEPTING</code>: The <a href="msv.mutexconnector.html#connect">MutexConnector.connect</a> method is on running.</li>
+									<li><code>OPEN</code>: The connection is online.</li>
+									<li><code>CLOSING</code>: The <a href="msv.mutexconnector.html#close">MutexConnector.close</a> method is on running.</li>
+									<li><code>CLOSED</code>: The connection is offline.</li>
+								</ul>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="msv.mutexacceptor.html#state" class="tsd-signature-type">State</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="accept" class="tsd-anchor"></a>
+					<h3>accept</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">accept<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Provider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:205</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Accept connection.</p>
+								</div>
+								<p>Accepts, permits the client&#39;s connection to this <code>mutex-server</code> and starts interaction.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>provider: <span class="tsd-signature-type">Provider</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An object providing additional features for the remote client. If you don&#39;t have plan to proivde any additional feature, assign <code>null</code>.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="close" class="tsd-anchor"></a>
+					<h3>close</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">close<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, reason<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:88</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Close connection.</p>
+								</div>
+								<p>Close connection with the remote client.</p>
+								<p>When connection with the remote client has been closed, all of the locks the client had
+									acquired and tried would be automatically unlocked and cancelled by this <code>mutex-server</code>.
+								Also, remote critical section components had assigned to the client would be returned, too.</p>
+								<p>In addition, the disconnection destories all <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a>s
+									between the remote client. Therefore, if the remote client is providing custom features to
+									your <code>mutex-server</code> and there&#39;re uncompleted method calls to the <code>Provider</code> through
+								<code>Driver&lt;Controller&gt;</code>, <a href="std.runtimeerror.html">RuntimeError</a> exceptions would be thrown.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throw</dt>
+									<dd><p>DomainError when the connection is not online.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> code: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Closing code.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> reason: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Reason why.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="getdriver" class="tsd-anchor"></a>
+					<h3>get<wbr>Driver</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Driver&lt;Controller, UseParametric&gt;<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Driver</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Controller</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">UseParametric</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:190</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get Driver for <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a>.</p>
+								</div>
+								<p>If remote client provides custom features for this <code>mutex-server</code>, you can utilize
+									those features thorugh returned <code>Driver</code> object by this method. To use this method, you
+									should define the <code>Controller</code> template argument, a type of interface who is defining
+								additionla features provided from the remote client.</p>
+								<p>The returned object <code>Driver</code> makes to call remote functions, defined in the <code>Controller</code>
+									and provided by <code>Provider</code> in the remote client, possible. In other words, callling a
+									function in the <code>Driver&lt;Controller&gt;</code>, it means to call a matched function in the remote
+								client&#39;s <code>Provider</code> object.</p>
+								<ul>
+									<li><code>Controller</code>: Definition only</li>
+									<li><code>Driver</code>: <a href="https://github.com/samchon/tgrid#13-remote-function-call">Remote Function Call</a></li>
+								</ul>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Controller<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+									<div class="tsd-comment tsd-typography">
+										<p>An interface for provided features (functions &amp; objects) from the remote client (<code>Provider</code>).</p>
+									</div>
+								</li>
+								<li>
+									<h4>UseParametric<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h4>
+									<div class="tsd-comment tsd-typography">
+										<p>Whether to convert type of function parameters to be compatible with their pritimive.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Driver</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Controller</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">UseParametric</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A <code>Driver</code> for the <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a>.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="join" class="tsd-anchor"></a>
+					<h3>join</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">join<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">join<span class="tsd-signature-symbol">(</span>ms<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">join<span class="tsd-signature-symbol">(</span>at<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:98</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Join connection.</p>
+								</div>
+								<p>Wait until connection with the server to be closed.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:108</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Join connection until timeout.</p>
+								</div>
+								<p>Wait until connection with the server to be clsoed until timeout.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ms: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum miliseconds for waiting.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to waiting in the given time.</p>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:118</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Join connection until time expiration.</p>
+								</div>
+								<p>Wait until connection with the server to be closed until time expiration.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>at: <span class="tsd-signature-type">Date</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The maximum time point to wait.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Whether succeeded to waiting in the given time.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="reject" class="tsd-anchor"></a>
+					<h3>reject</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">reject<span class="tsd-signature-symbol">(</span>status<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, reason<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in mutex-server/src/MutexAcceptor.ts:219</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Reject connection.</p>
+								</div>
+								<p>Reject without acceptance, any interaction. The connection would be closed immediately.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> status: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> reason: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Reason why.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/msv.html">msv</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/std.html">std</a>
+					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="../modules/tstl_src_thread.html">tstl\src\thread</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexacceptor.html" class="tsd-kind-icon">Mutex<wbr>Acceptor</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
+								<a href="msv.mutexacceptor.html#state" class="tsd-kind-icon">State</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#header" class="tsd-kind-icon">header</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#ip" class="tsd-kind-icon">ip</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#path" class="tsd-kind-icon">path</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#state-1" class="tsd-kind-icon">state</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#accept" class="tsd-kind-icon">accept</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#close" class="tsd-kind-icon">close</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="msv.mutexacceptor.html#getdriver" class="tsd-kind-icon">get<wbr>Driver</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#join" class="tsd-kind-icon">join</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="msv.mutexacceptor.html#reject" class="tsd-kind-icon">reject</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexconnector.html" class="tsd-kind-icon">Mutex<wbr>Connector</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="msv.mutexserver.html" class="tsd-kind-icon">Mutex<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotebarrier.html" class="tsd-kind-icon">Remote<wbr>Barrier</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remoteconditionvariable.html" class="tsd-kind-icon">Remote<wbr>Condition<wbr>Variable</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotelatch.html" class="tsd-kind-icon">Remote<wbr>Latch</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotemutex.html" class="tsd-kind-icon">Remote<wbr>Mutex</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="msv.remotesemaphore.html" class="tsd-kind-icon">Remote<wbr>Semaphore</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>mutex-server</title>
+	<meta name="description" content="Documentation for mutex-server">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">mutex-server</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>mutex-server</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#mutex-server" id="mutex-server" style="color: inherit; text-decoration: none;">
+					<h1>Mutex Server</h1>
+				</a>
+				<a href="#1-outline" id="1-outline" style="color: inherit; text-decoration: none;">
+					<h2>1. Outline</h2>
+				</a>
+				<pre><code class="language-bash">npm install --save mutex-server</code></pre>
+				<p><a href="https://github.com/samchon/mutex-server/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="GitHub license"></a>
+					<a href="https://www.npmjs.com/package/mutex-server"><img src="https://badge.fury.io/js/mutex-server.svg" alt="npm version"></a>
+					<a href="https://www.npmjs.com/package/mutex-server"><img src="https://img.shields.io/npm/dm/mutex-server.svg" alt="Downloads"></a>
+				<a href="https://github.com/samchon/mutex-server/actions?query=workflow%3Abuild"><img src="https://github.com/samchon/mutex-server/workflows/build/badge.svg" alt="Build Status"></a></p>
+				<p>Critical sections in the network level.</p>
+				<p>The <code>mutex-server</code> is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using the network communications, this <code>mutex-server</code> can be a good solution.</p>
+				<p>Installs and opens a <code>mutex-server</code> and let clients to connect to the server. The clients who&#39;re connecting to the <code>mutex-server</code> can utilize remote critical section components like <a href="https://mutex.dev/api/classes/msv.remotemutex.html">mutex</a> or <a href="https://mutex.dev/api/classes/msv.remotesemaphore.html">semaphore</a>.</p>
+				<p>Also, <code>mutex-server</code> has a safety device for network disconnections. When a client has been suddenly disconnected, all of the locks had acquired or tried by the client would be automatically unlocked or cancelled. Therefore, you don&#39;t worry about any network disconnection accident and just enjoy the <code>mutex-server</code> with confidence.</p>
+				<a href="#2-features" id="2-features" style="color: inherit; text-decoration: none;">
+					<h2>2. Features</h2>
+				</a>
+				<a href="#21-network-level" id="21-network-level" style="color: inherit; text-decoration: none;">
+					<h3>2.1. Network Level</h3>
+				</a>
+				<p>When you want to open a <code>mutex-server</code>, utilize the <a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexServer</code></a> class and accept or reject connections from the remote clients by using the <a href="https://mutex.dev/api/classes/msv.mutexacceptor.html"><code>MutexAcceptor</code></a> class. Otherwise, you want to connect to a remote <code>mutex-server</code> as a client, utilize the <a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexConnector</code></a> class.</p>
+				<ul>
+					<li><a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexServer</code></a></li>
+					<li><a href="https://mutex.dev/api/classes/msv.mutexacceptor.html"><code>MutexAcceptor</code></a></li>
+					<li><a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexConnector</code></a></li>
+				</ul>
+				<a href="#22-critical-section-components" id="22-critical-section-components" style="color: inherit; text-decoration: none;">
+					<h3>2.2. Critical Section Components</h3>
+				</a>
+				<p>If you succeeded to connect to a <code>mutex-server</code>, as a client through the <a href="https://mutex.dev/api/classes/msv.mutexserver.html"><code>MutexConnector</code></a> class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.</p>
+				<p>Also, <a href="https://mutex.dev/api/modules/std.uniquelock.html"><code>std.UniqueLock</code></a> and <a href="https://mutex.dev/api/modules/std.sharedlock.html"><code>std.SharedLock</code></a> can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.</p>
+				<ul>
+					<li>Solid Components<ul>
+							<li><a href="https://mutex.dev/api/classes/msv.remoteconditionvariable.html"><code>RemoteConditionVariable</code></a></li>
+							<li><a href="https://mutex.dev/api/classes/msv.remotemutex.html"><code>RemoteMutex</code></a></li>
+							<li><a href="https://mutex.dev/api/classes/msv.remotesemaphore.html"><code>RemoteSemaphore</code></a></li>
+						</ul>
+					</li>
+					<li>Adaptor Components<ul>
+							<li><a href="https://mutex.dev/api/classes/msv.remotebarrier.html"><code>RemoteBarrier</code></a></li>
+							<li><a href="https://mutex.dev/api/classes/msv.remotelatch.html"><code>RemoteLatch</code></a></li>
+						</ul>
+					</li>
+					<li>Safety Helpers<ul>
+							<li><a href="https://mutex.dev/api/modules/std.uniquelock.html"><code>std.UniqueLock</code></a></li>
+							<li><a href="https://mutex.dev/api/modules/std.sharedlock.html"><code>std.SharedLock</code></a></li>
+						</ul>
+					</li>
+				</ul>
+				<a href="#3-usage" id="3-usage" style="color: inherit; text-decoration: none;">
+					<h2>3. Usage</h2>
+				</a>
+				<p><img src="https://user-images.githubusercontent.com/13158709/86332593-b285b200-bc85-11ea-8a2e-cbe30284d053.gif" alt="mutex-server"></p>
+				<p>Let&#39;s learn how to use the <code>mutex-server</code> through a sample project. I&#39;ll <a href="https://mutex.dev/api/classes/msv.mutexserver.html#open">open a server</a> and let
+				4 clients to <a href="https://mutex.dev/api/classes/msv.mutexconnector.html#connect">connect to the server</a>. After those 4 clients&#39; connections, they&#39;ll monopoly a critical section through <a href="https://mutex.dev/api/classes/msv.remotemutex.html#lock"><code>RemoteMutex.lock()</code></a> method and start printing a line very slowly.</p>
+				<p>After printing has been completed, each client will act one of them randomly: <a href="https://mutex.dev/api/classes/msv.remotemutex.html#unlock">unlock the mutex</a> or <a href="https://mutex.dev/api/classes/msv.mutexconnector.html#close">close the connection</a> without the unlock. As you know and as I&#39;ve mentioned, if a client has been disconnected without returning locks that it had been acquired, the <code>mutex-server</code> will automatically release them. </p>
+				<p>Therefore, two random actions would be confirmed to the same result: <a href="https://mutex.dev/api/classes/msv.remotemutex.html#unlock"><code>RemoteMutex.unlock()</code></a>.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> msv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mutex-server&quot;</span>;
+<span class="hljs-keyword">import</span> std <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;tstl&quot;</span>;
+
+<span class="hljs-keyword">const</span> PASSWORD = <span class="hljs-string">&quot;qweqwe123!&quot;</span>;
+<span class="hljs-keyword">const</span> PORT = <span class="hljs-number">37119</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">client</span>(<span class="hljs-params">index: <span class="hljs-built_in">number</span>, character: <span class="hljs-built_in">string</span></span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">void</span>&gt;
+</span>{
+    <span class="hljs-comment">// CONNECT TO THE SERVER</span>
+    <span class="hljs-keyword">let</span> connector: msv.MutexConnector&lt;<span class="hljs-built_in">string</span>, <span class="hljs-literal">null</span>&gt; = <span class="hljs-keyword">new</span> msv.MutexConnector(PASSWORD, <span class="hljs-literal">null</span>);
+    <span class="hljs-keyword">await</span> connector.connect(<span class="hljs-string">`ws://127.0.0.1:<span class="hljs-subst">${PORT}</span>`</span>);
+
+    <span class="hljs-comment">// GET LOCK</span>
+    <span class="hljs-keyword">let</span> mutex: msv.RemoteMutex = <span class="hljs-keyword">await</span> connector.getMutex(<span class="hljs-string">&quot;printer&quot;</span>);
+    <span class="hljs-keyword">await</span> mutex.lock();
+
+    <span class="hljs-comment">// PRINTS A LINE VERY SLOWLY MONOPOLYING THE MUTEX</span>
+    process.stdout.write(<span class="hljs-string">`Connector #<span class="hljs-subst">${index}</span> is monopolying a mutex: `</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i: <span class="hljs-built_in">number</span> = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">20</span>; ++i)
+    {
+        process.stdout.write(character);
+        <span class="hljs-keyword">await</span> std.sleep_for(<span class="hljs-number">50</span>);
+    }
+    process.stdout.write(<span class="hljs-string">&quot;\n&quot;</span>);
+
+    <span class="hljs-comment">// ALTHOUGH THE CLIENT DOES NOT RELEASE THE LOCK</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.random() &lt; <span class="hljs-number">0.5</span>)
+        <span class="hljs-keyword">await</span> mutex.unlock();
+    <span class="hljs-keyword">else</span> <span class="hljs-comment">// SERVER WILL UNLOCK IT AUTOMATICALLY AFTER THE DISCONNECTION</span>
+        <span class="hljs-keyword">await</span> connector.close();
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">main</span>(<span class="hljs-params"></span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">void</span>&gt;
+</span>{
+    <span class="hljs-comment">// OPEN SERVER</span>
+    <span class="hljs-keyword">let</span> server: msv.MutexServer&lt;<span class="hljs-built_in">string</span>, <span class="hljs-literal">null</span>&gt; = <span class="hljs-keyword">new</span> msv.MutexServer();
+    <span class="hljs-keyword">await</span> server.open(PORT, <span class="hljs-keyword">async</span> acceptor =&gt;
+    {
+        <span class="hljs-keyword">if</span> (acceptor.header === PASSWORD)
+            <span class="hljs-keyword">await</span> acceptor.accept(<span class="hljs-literal">null</span>);
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">await</span> acceptor.reject();
+    });
+
+    <span class="hljs-comment">// CREATE 10 CLIENTS LOCKING MUTEX</span>
+    <span class="hljs-keyword">let</span> promises: <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;[] = [];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i: <span class="hljs-built_in">number</span> = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">4</span>; ++i)
+    {
+        <span class="hljs-keyword">let</span> character: <span class="hljs-built_in">string</span> = std.randint(<span class="hljs-number">0</span>, <span class="hljs-number">9</span>).toString();
+        promises.push( client(i + <span class="hljs-number">1</span>, character) );
+    }
+
+    <span class="hljs-comment">// WAIT THE CLIENTS TO BE DISCONNCTED AND CLOSE SERVER</span>
+    <span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(promises);
+    <span class="hljs-keyword">await</span> server.close();
+}
+main();</code></pre>
+				<a href="#4-appendix" id="4-appendix" style="color: inherit; text-decoration: none;">
+					<h2>4. Appendix</h2>
+				</a>
+				<a href="#41-repositories" id="41-repositories" style="color: inherit; text-decoration: none;">
+					<h3>4.1. Repositories</h3>
+				</a>
+				<p><code>mutex-server</code> is an open source project following the <a href="https://github.com/samchon/mutex-server/blob/master/LICENSE">MIT license</a>.</p>
+				<ul>
+					<li>Github: <a href="https://github.com/samchon/mutex-server">https://github.com/samchon/mutex-server</a></li>
+					<li>NPM: <a href="https://www.npmjs.com/package/mutex-server">https://www.npmjs.com/package/mutex-server</a></li>
+				</ul>
+				<a href="#42-documents" id="42-documents" style="color: inherit; text-decoration: none;">
+					<h3>4.2. Documents</h3>
+				</a>
+				<p>Someone who wants to know more about this <code>mutex-server</code>, I&#39;ve prepared the <a href="https://mutex.dev/api">API documents</a>. Through the <a href="https://mutex.dev/api">API documents</a>, you can travel all of the <a href="#2-features">features</a> defined in this <code>mutex-server</code>.</p>
+				<p>Also, I&#39;m planning to write the guide documents providing detailed learning course and lots of example projects handling network level critical sections. When the guide documents has been published, its URL address would be <a href="https://mutex.dev">https://mutex.dev</a> and it would form like the <a href="https://tgrid.com">TGrid&#39;s</a>.</p>
+				<ul>
+					<li>API Documents: <a href="https://mutex.dev/api">https://mutex.dev/api</a></li>
+					<li>Guide Documents: not yet, but soon.</li>
+				</ul>
+				<a href="#43-dependencies" id="43-dependencies" style="color: inherit; text-decoration: none;">
+					<h3>4.3. Dependencies</h3>
+				</a>
+				<a href="#431-typescript" id="431-typescript" style="color: inherit; text-decoration: none;">
+					<h4>4.3.1. <a href="https://github.com/microsoft/typescript">TypeScript</a></h4>
+				</a>
+				<p>I&#39;ve developed this <code>mutex-server</code> with the <a href="https://github.com/microsoft/typescript">TypeScript</a>.</p>
+				<p>Also, I hope all users of this <code>mutex-server</code> to use the <a href="https://github.com/microsoft/typescript">TypeScript</a> too, for the safe development. As this <code>mutex-server</code> is designed to handling critical section in the network level, a tiny mistake like mis-typing can be a critical damage on the entire network system. </p>
+				<p>It&#39;s the reason why I recommend you to use the <a href="https://github.com/microsoft/typescript">TypeScript</a> when using this <code>mutex-server</code>.</p>
+				<a href="#432-tstl" id="432-tstl" style="color: inherit; text-decoration: none;">
+					<h4>4.3.2. <a href="https://github.com/samchon/tstl">TSTL</a></h4>
+				</a>
+				<p>This <code>mutex-server</code> is an extension module of the <a href="https://github.com/samchon/tstl">TSTL</a>.</p>
+				<p><a href="https://github.com/samchon/tstl">TSTL</a> is an open source project migrating C++ STL (Standrad Template Library) to the TypeScript. Therefore, <a href="https://github.com/samchon/tstl">TSTL</a> is following designs from the C++ standard committee and providing many modules like <em>containers</em>, <em>iterators</em>, <em>algorithms</em> and <em>functors</em> following the standard.</p>
+				<p>However, TypeScript is not C++ and it&#39;s development environment is different with the C++, either. Therefore, there&#39;re some STL features that are not suitable for the TypeScript development. Also, there can be a feature not supported by STL, but it&#39;s an important one in the TypeScript development environment, too.</p>
+				<p>To resolve such problems, <a href="https://github.com/samchon/tstl">TSTL</a> is providing extension modules. This <code>mutex-server</code> is one of those extension module from the <a href="https://github.com/samchon/tstl">TSTL</a>, designed to support the network level critical sections: <a href="https://github.com/samchon/tstl/issues/74">tstl#74</a>.</p>
+				<a href="#433-tgrid" id="433-tgrid" style="color: inherit; text-decoration: none;">
+					<h4>4.3.3. <a href="https://github.com/samchon/tgrid">TGrid</a></h4>
+				</a>
+				<p><a href="https://github.com/samchon/tgrid">TGrid</a> is also an extension module of the <a href="https://github.com/samchon/tstl">TSTL</a>, designed to support the thread and network, too.</p>
+				<p>The TGrid has implemented thread and network by inventing a new concept; <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a> (Remote Function Call). Also, this <code>mutex-server</code> has realized its remote, network level critical section, components by utilizing the <a href="https://github.com/samchon/tgrid#13-remote-function-call">RFC</a> concepts invented by the <a href="https://github.com/samchon/tgrid">TGrid</a>.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/msv.html">msv</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/std.html">std</a>
+					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/tstl_src_thread.html">tstl\src\thread</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
