@@ -56,10 +56,15 @@ export class RemoteSemaphore
         return new RemoteSemaphore(controller, name, max);
     }
 
+    public destructor(): Promise<void>
+    {
+        return this.controller_.erase(this.name_);
+    }
+
     /**
      * Number of maximum sections lockable.
      */
-    public async max(): Promise<number>
+    public max(): number
     {
         return this.max_;
     }

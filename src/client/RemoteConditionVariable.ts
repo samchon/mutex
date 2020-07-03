@@ -9,6 +9,8 @@ import { ConditionVariablesProvider } from "../server/providers/ConditionVariabl
 /**
  * Remote ConditionVariable.
  * 
+ * The `RemoteConditionVariable` class blocks critical sections until be notified.
+ * 
  * @author Jeongho Nam - https://github.com/samchon
  */
 export class RemoteConditionVariable
@@ -46,6 +48,11 @@ export class RemoteConditionVariable
     {
         await controller.emplace(name, undefined);
         return new RemoteConditionVariable(controller, name);
+    }
+
+    public destructor(): Promise<void>
+    {
+        return this.controller_.erase(this.name_);
     }
 
     /* -----------------------------------------------------------

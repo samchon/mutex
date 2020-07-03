@@ -53,6 +53,11 @@ export class RemoteLatch
         return new RemoteLatch(controller, name);
     }
 
+    public destructor(): Promise<void>
+    {
+        return this.controller_.erase(this.name_);
+    }
+
     /* -----------------------------------------------------------
         ARRIVALS
     ----------------------------------------------------------- */

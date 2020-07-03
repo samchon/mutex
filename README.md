@@ -1,5 +1,9 @@
 # Mutex Server
 ## 1. Outline
+```bash
+npm install --save mutex-server
+```
+
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/samchon/mutex-server/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Downloads](https://img.shields.io/npm/dm/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
@@ -9,23 +13,25 @@ Critical sections in the network level.
 
 The `mutex-server` is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using the network communications, this `mutex-server` can be a good solution.
 
-Opens a `mutex-server` and let clients to connect to the `mutex-server`. When sharing network level critical sections through the `mutex-server`, you don't need to worry about any accident like sudden network disconnection by power outage. If a client has been disconnected, all of the locks had been acquired by the client would be automatically cancelled.
+Installs and opens a `mutex-server` and let clients to connect to the server. The clients who're connecting to the `mutex-server` can utilize remote critical section components like [mutex](https://mutex.dev/api/classes/msv.remotemutex.html) or [semaphore](https://mutex.dev/api/classes/msv.remotesemaphore.html).
+
+Also, `mutex-server` has a safety device for network disconnections. When a client has been suddenly disconnected, all of the locks had acquired or tried by the client would be automatically unlocked or cancelled. Therefore, you don't worry about any network disconnection accident and just enjoy the `mutex-server` with confidence.
 
 
 
 
 ## 2. Features
-### 2.1. Network
-To open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexServer.Acceptor`](https://mutex.dev/api/classes/msv.mutexserver.acceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class.
+### 2.1. Network Level
+When you want to open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class.
 
   - [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html)
-  - [`MutexServer.Acceptor`](https://mutex.dev/api/classes/msv.mutexserver.acceptor.html)
-  - [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html)
+  - [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html)
+  - [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html)
 
 ### 2.2. Critical Section Components
-If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
+If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
 
-Also, [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html) can be a good solution for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
+Also, [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html) can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
 
   - Solid Components
     - [`RemoteConditionVariable`](https://mutex.dev/api/classes/msv.remoteconditionvariable.html)
@@ -35,8 +41,8 @@ Also, [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html) and 
     - [`RemoteBarrier`](https://mutex.dev/api/classes/msv.remotebarrier.html)
     - [`RemoteLatch`](https://mutex.dev/api/classes/msv.remotelatch.html)
   - Safety Helpers
-    - [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html)
-    - [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html)
+    - [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html)
+    - [`std.SharedLock`](https://mutex.dev/api/classes/std.sharedlock.html)
 
 
 
@@ -58,7 +64,7 @@ import std from "tstl";
 const PASSWORD = "qweqwe123!";
 const PORT = 37119;
 
-async function client(character: string): Promise<void>
+async function client(index: number, character: string): Promise<void>
 {
     // CONNECT TO THE SERVER
     let connector: msv.MutexConnector<string, null> = new msv.MutexConnector(PASSWORD, null);
@@ -69,6 +75,7 @@ async function client(character: string): Promise<void>
     await mutex.lock();
 
     // PRINTS A LINE VERY SLOWLY MONOPOLYING THE MUTEX
+    process.stdout.write(`Connector #${index} is monopolying a mutex: `);
     for (let i: number = 0; i < 20; ++i)
     {
         process.stdout.write(character);
@@ -100,7 +107,7 @@ async function main(): Promise<void>
     for (let i: number = 0; i < 4; ++i)
     {
         let character: string = std.randint(0, 9).toString();
-        promises.push( client(character) );
+        promises.push( client(i + 1, character) );
     }
 
     // WAIT THE CLIENTS TO BE DISCONNCTED AND CLOSE SERVER
@@ -115,21 +122,37 @@ main();
 
 ## 4. Appendix
 ### 4.1. Repositories
+`mutex-server` is an open source project following the [MIT license](https://github.com/samchon/mutex-server/blob/master/LICENSE).
+
   - Github: https://github.com/samchon/mutex-server
   - NPM: https://www.npmjs.com/package/mutex-server
 
 ### 4.2. Documents
-  - API Docs: https://mutex.dev/api
-  - Guide Documents: *not yet, but would come in someday >o<*
+Someone who wants to know more about this `mutex-server`, I've prepared the [API documents](https://mutex.dev/api). Through the [API documents](https://mutex.dev/api), you can travel all of the [features](#2-features) defined in this `mutex-server`.
+
+Also, I'm planning to write the guide documents providing detailed learning course and lots of example projects handling network level critical sections. When the guide documents has been published, its URL address would be https://mutex.dev and it would form like the [TGrid's](https://tgrid.com).
+
+  - API Documents: https://mutex.dev/api
+  - Guide Documents: not yet, but soon.
 
 ### 4.3. Dependencies
 #### 4.3.1. [TypeScript](https://github.com/microsoft/typescript)
 I've developed this `mutex-server` with the [TypeScript](https://github.com/microsoft/typescript).
 
-Also, I want all users of this `mutex-server` to use the [TypeScript](https://github.com/microsoft/typescript) too, for the safe development. As this `mutex-server` is designed to handling critical section in the network level, a tiny mistake like mis-typing can be a critical damage on the entire network system. It's the reason why I recommend you to use the [TypeScript](https://github.com/microsoft/typescript) when utilizing this `mutex-server`.
+Also, I hope all users of this `mutex-server` to use the [TypeScript](https://github.com/microsoft/typescript) too, for the safe development. As this `mutex-server` is designed to handling critical section in the network level, a tiny mistake like mis-typing can be a critical damage on the entire network system. 
+
+It's the reason why I recommend you to use the [TypeScript](https://github.com/microsoft/typescript) when using this `mutex-server`.
 
 #### 4.3.2. [TSTL](https://github.com/samchon/tstl)
-This `mutex-server` is an extension module for the [TSTL](https://github.com/samchon/tstl).
+This `mutex-server` is an extension module of the [TSTL](https://github.com/samchon/tstl).
+
+[TSTL](https://github.com/samchon/tstl) is an open source project migrating C++ STL (Standrad Template Library) to the TypeScript. Therefore, [TSTL](https://github.com/samchon/tstl) is following designs from the C++ standard committee and providing many modules like *containers*, *iterators*, *algorithms* and *functors* following the standard.
+
+However, TypeScript is not C++ and it's development environment is different with the C++, either. Therefore, there're some STL features that are not suitable for the TypeScript development. Also, there can be a feature not supported by STL, but it's an important one in the TypeScript development environment, too.
+
+To resolve such problems, [TSTL](https://github.com/samchon/tstl) is providing extension modules. This `mutex-server` is one of those extension module from the [TSTL](https://github.com/samchon/tstl), designed to support the network level critical sections: [tstl#74](https://github.com/samchon/tstl/issues/74).
 
 #### 4.3.3. [TGrid](https://github.com/samchon/tgrid)
-The `mutex-server` has realized its remote, network level critical section, components by utilizing [RFC](https://github.com/samchon/tgrid#13-remote-function-call) (Remote Function Call) concepts invented by the [TGrid](https://github.com/samchon/tgrid).
+[TGrid](https://github.com/samchon/tgrid) is also an extension module of the [TSTL](https://github.com/samchon/tstl), designed to support the thread and network, too.
+
+The TGrid has implemented thread and network by inventing a new concept; [RFC](https://github.com/samchon/tgrid#13-remote-function-call) (Remote Function Call). Also, this `mutex-server` has realized its remote, network level critical section, components by utilizing the [RFC](https://github.com/samchon/tgrid#13-remote-function-call) concepts invented by the [TGrid](https://github.com/samchon/tgrid).

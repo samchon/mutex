@@ -4,8 +4,7 @@
  */
 //-----------------------------------------------------------
 import { WebServer } from "tgrid/protocols/web/WebServer";
-import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
-import { Driver } from "tgrid/components/Driver";
+import { MutexAcceptor } from "./MutexAcceptor";
 
 import { ProviderCapsule } from "./server/ProviderCapsule";
 import { ProviderGroup } from "./server/ProviderGroup";
@@ -14,7 +13,25 @@ import { GlobalGroup } from "./server/GlobalGroup";
 /**
  * The Mutex Server.
  * 
- * @template Header Type of the *header* who is containing the activation info.
+ * The {@link MutexServer} is a class who can open an `mutex-server`. Clients connecting to the
+ * `mutex-server` would communicate with this server through {@link MutexAcceptor} objects using
+ * websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call) protocol.
+ * 
+ * To open the `mutex-server`, call the {@link open} method with your custom callback function 
+ * which would be called whenever a {@link MutexAcceptor} has been newly created by a client's
+ * connection.
+ * 
+ * Also, when declaring this {@link MutexServer} type, you've to define two template arguments,
+ * *Header* and *Provider*. The *Header* type repersents an initial data gotten from the remote
+ * client after the connection. I hope you and client not to omit it and utilize it as an 
+ * activation tool to enhance security. 
+ * 
+ * The second template argument *Provider* represents the additional features provided for the 
+ * remote client. If you don't have any plan to provide additional feature to the remote client, 
+ * just declare it as `null`.
+ * 
+ * @template Header Type of the *header* containing initial data.
+ * @template Provider Type of additional features provided for the remote client.
  * @author Jeongho Nam - https://github.com/samchon
  */
 export class MutexServer<Header, Provider extends object | null>
@@ -71,17 +88,17 @@ export class MutexServer<Header, Provider extends object | null>
      * level. If you define the *predicator* function to accept every client's connection, some 
      * bad guy can spoil your own `mutex-server` by monopolying those critical sections. 
      * Therefore, don't implement the *predicator* function to returns only `true`, but filter
-     * clients' connections by considering their {@link MutexServer.ConnectionInfo} data.
+     * clients' connections by considering their {@link MutexAcceptor.header} data.
      * 
      * @param port Port number to listen.
      * @param handler A handler function determining whether to accept the client's connection or not.
      */
-    public open(port: number, handler: (acceptor: MutexServer.Acceptor<Header, Provider>) => Promise<void>): Promise<void>
+    public open(port: number, handler: (acceptor: MutexAcceptor<Header, Provider>) => Promise<void>): Promise<void>
     {
         return this.server_.open(port, async base => 
         {
             let group: ProviderGroup = new ProviderGroup(this.components_, base);
-            let acceptor: MutexServer.Acceptor<Header, Provider> = MutexServer.Acceptor.create(base, group);
+            let acceptor: MutexAcceptor<Header, Provider> = MutexAcceptor.create(base, group);
 
             await handler(acceptor);
         });
@@ -94,9 +111,9 @@ export class MutexServer<Header, Provider extends object | null>
      * Therefore, clients who are using the {@link MutexConnector} class, they can't use the 
      * remote-thread-components more. 
      * 
-     * If there're some clients who are waiting for monopolying some critical sections through 
-     * remote-thread-components like {@link RemoteMutex.lock} or {@link RemoteSemaphore.acquire}, 
-     * those clients would get `exception` when the `mutex-server` has been closed.
+     * Also, closing the server means that all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
+     * between the server and had connected clients would be destroied. Therefore, all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
+     * that are not returned (completed) yet would ge {@link RuntimeError} exception.
      */
     public close(): Promise<void>
     {
@@ -111,11 +128,11 @@ export class MutexServer<Header, Provider extends object | null>
      * 
      * Get current state of the `mutex-server`. List of values are such like below:
      * 
-     *   - NONE: A `{@link MutexServer} instance is newly created, but did nothing yet.
-     *   - OPENING: The {@link MutexServer.open} method is on running.
-     *   - OPEN: The `mutex-server` is online.
-     *   - CLOSING: The {@link MutexServer.close} method is on running.
-     *   - CLOSED: The `mutex-server` is offline.
+     *   - `NONE`: The `{@link MutexServer} instance is newly created, but did nothing yet.
+     *   - `OPENING`: The {@link MutexServer.open} method is on running.
+     *   - `OPEN`: The `mutex-server` is online.
+     *   - `CLOSING`: The {@link MutexServer.close} method is on running.
+     *   - `CLOSED`: The `mutex-server` is offline.
      */
     public get state(): MutexServer.State
     {
@@ -132,155 +149,4 @@ export namespace MutexServer
      * Current state of the {@link MutexServer}
      */
     export import State = WebServer.State;
-
-    /**
-     * MutexServer Acceptor.
-     * 
-     * @template Header Type of the *header* containing initial data.
-     * @template Provider Type of additional features provided for the remote client.
-     * @author Jeongho Nam - https://github.com/samchon
-     */
-    export class Acceptor<Header, Provider extends object | null>
-        implements Pick<WebAcceptor<Header, Provider>, "getDriver">
-    {
-        /**
-         * @hidden
-         */
-        private base_: WebAcceptor<Header, ProviderCapsule<Provider>>;
-
-        /**
-         * @hidden
-         */
-        private group_: ProviderGroup;
-
-        /* ----------------------------------------------------------------
-            CONSTRUCTORS
-        ---------------------------------------------------------------- */
-        /**
-         * @hidden
-         */
-        private constructor(base: WebAcceptor<Header, ProviderCapsule<Provider>>, group: ProviderGroup)
-        {
-            this.base_ = base;
-            this.group_ = group;
-        }
-
-        /**
-         * @internal
-         */
-        public static create<Header, Provider extends object | null>
-            (base: WebAcceptor<Header, ProviderCapsule<Provider>>, group: ProviderGroup)
-        {
-            return new Acceptor(base, group);
-        }
-
-        /**
-         * 
-         * @param code 
-         * @param reason 
-         */
-        public close(code?: number, reason?: string): Promise<void>
-        {
-            return this.base_.close(code, reason);
-        }
-
-        /**
-         * Join connection.
-         */
-        public join(): Promise<void>;
-
-        /**
-         * Join connection until timeout.
-         * 
-         * @param ms The maximum miliseconds for waiting.
-         * @return Whether succeeded to waiting in the given time.
-         */
-        public join(ms: number): Promise<boolean>;
-
-        /**
-         * Join connection until time expiration.
-         * 
-         * @param at The maximum time point to wait.
-         * @return Whether succeeded to waiting in the given time.
-         */
-        public join(at: Date): Promise<boolean>;
-
-        public join(param?: number | Date): Promise<void | boolean>
-        {
-            return this.base_.join(param! as Date);
-        }
-
-        /* ----------------------------------------------------------------
-            ACCESSORS
-        ---------------------------------------------------------------- */
-        /**
-         * 
-         */
-        public get ip(): string
-        {
-            return this.base_.ip;
-        }
-
-        /**
-         * 
-         */
-        public get path(): string
-        {
-            return this.base_.path;
-        }
-
-        /**
-         * 
-         */
-        public get header(): Header
-        {
-            return this.base_.header;
-        }
-
-        /**
-         * 
-         */
-        public get state()
-        {
-            return this.base_.state;
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public getDriver<Controller extends object, UseParametric extends boolean = false>(): Driver<Controller, UseParametric>
-        {
-            return this.base_.getDriver();
-        }
-
-        /* ----------------------------------------------------------------
-            HANDSHAKES
-        ---------------------------------------------------------------- */
-        /**
-         * 
-         * @param provider 
-         */
-        public async accept(provider: Provider): Promise<void>
-        {
-            await this.base_.accept({ group: this.group_, provider: provider });
-            this.base_.join().then(() => this.group_.destructor());
-        }
-
-        /**
-         * 
-         * @param status 
-         * @param reason 
-         */
-        public reject(status?: number, reason?: string): Promise<void>
-        {
-            return this.base_.reject(status, reason);
-        }
-    }
-    export namespace Acceptor
-    {
-        /**
-         * Current state of the {@link MutexServer.Acceptor}
-         */
-        export import State = WebAcceptor.State;
-    }
 }

@@ -1,11 +1,11 @@
 {
   "name": "mutex-server",
-  "version": "0.2.0-dev.20200703",
+  "version": "0.2.0",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "api": "typedoc src ../tstl/src --exclude \"**/+(test|benchmark)/**\" --excludeNotDocumented --plugin typedoc-plugin-external-module-name --plugin typedoc-plugin-exclude-references --out ../mutex-server@gh-pages/api",
+    "api": "typedoc src ../tstl/src --exclude \"**/+(test|benchmark)/**\" --excludeNotDocumented --plugin typedoc-plugin-external-module-name --plugin typedoc-plugin-exclude-references --out ../mutex.dev/api",
     "build": "npm run compile",
     "compile": "rm -rf lib && tsc",
     "dev": "rm -rf lib && tsc --watch",
