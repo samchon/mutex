@@ -13,6 +13,8 @@ import { GlobalGroup } from "./server/GlobalGroup";
 /**
  * The Mutex Server.
  * 
+ *  - available only in NodeJS.
+ * 
  * The {@link MutexServer} is a class who can open an `mutex-server`. Clients connecting to the
  * `mutex-server` would communicate with this server through {@link MutexAcceptor} objects using
  * websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call) protocol.
@@ -75,20 +77,22 @@ export class MutexServer<Header, Provider extends object | null>
     /**
      * Open a `mutex-server`.
      * 
-     * Open a `mutex-server` through web-socket protocol, with its *port* number and *predicator* 
+     * Open a `mutex-server` through web-socket protocol, with its *port* number and *handler* 
      * function determining whether to accept the client's connection or not. After the 
      * `mutex-server` has been opened, clients can connect to that `mutex-server` by using the 
      * {@link MutexConnector} class.
      * 
-     * When implementing the *predicator* function, returns `true` if you want to accept a new 
-     * client's connection. Otherwise you dont't want to accept the client and reject its 
-     * connection, returns `false` instead.
+     * When implementing the *handler* function with the {@link MutexAcceptor} instance, calls the 
+     * {@link MutexAcceptor.accept} method if you want to accept the new client's connection. 
+     * Otherwise you dont't want to accept the client and reject its connection, just calls the 
+     * {@link MutexAcceptor.reject} instead.
      * 
      * Note that, this `mutex-server` handles the global critical sections on the entire network 
      * level. If you define the *predicator* function to accept every client's connection, some 
      * bad guy can spoil your own `mutex-server` by monopolying those critical sections. 
-     * Therefore, don't implement the *predicator* function to returns only `true`, but filter
-     * clients' connections by considering their {@link MutexAcceptor.header} data.
+     * Therefore, don't implement the *handler* function to call only {@link MutexAcceptor.accept}
+     * method, but filter their connections by considering their {@link MutexAcceptor.header} 
+     * data.
      * 
      * @param port Port number to listen.
      * @param handler A handler function determining whether to accept the client's connection or not.
@@ -109,7 +113,7 @@ export class MutexServer<Header, Provider extends object | null>
      * 
      * Close the `mutex-server` and disconnect all the remote connections between its clients.
      * Therefore, clients who are using the {@link MutexConnector} class, they can't use the 
-     * remote-thread-components more. 
+     * remote critical section components more. 
      * 
      * Also, closing the server means that all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
      * between the server and had connected clients would be destroied. Therefore, all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
@@ -126,7 +130,9 @@ export class MutexServer<Header, Provider extends object | null>
     /**
      * Get server state.
      * 
-     * Get current state of the `mutex-server`. List of values are such like below:
+     * Get current state of the `mutex-server`. 
+     * 
+     * List of values are such like below:
      * 
      *   - `NONE`: The `{@link MutexServer} instance is newly created, but did nothing yet.
      *   - `OPENING`: The {@link MutexServer.open} method is on running.

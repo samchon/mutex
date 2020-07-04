@@ -53,48 +53,8 @@ export class RemoteLatch
         return new RemoteLatch(controller, name);
     }
 
-    public destructor(): Promise<void>
-    {
-        return this.controller_.erase(this.name_);
-    }
-
     /* -----------------------------------------------------------
-        ARRIVALS
-    ----------------------------------------------------------- */
-    /**
-     * Derecements the counter.
-     * 
-     * Decrements the counter by *n* without blocking. 
-     * 
-     * If the parametric value *n* is equal to or greater than internal counter, so that the 
-     * internal counter be equal to or less than zero, everyone who are {@link wait waiting} for
-     * the {@link RemoteLatch} would continue their execution.
-     * 
-     * @param n Value of the decrement. Default is 1.
-     */
-    public count_down(n: number = 1): Promise<void>
-    {
-        return this.controller_.count_down(this.name_, n);
-    }
-    
-    /**
-     * Decrements the counter and waits until the counter to be zero.
-     * 
-     * Decrements the counter by *n* and blocks the section until internal counter to be zero. 
-     * 
-     * If the parametric value *n* is equal to or greater than internal counter, so that the 
-     * internal counter be equal to or less than zero, everyone who are {@link wait waiting} for
-     * the {@link RemoteLatch} would continue their execution including this one.
-     * 
-     * @param n Value of the decrement. Default is 1.
-     */
-    public arrive_and_wait(): Promise<void>
-    {
-        return this.controller_.arrive_and_wait(this.name_);
-    }
-
-    /* -----------------------------------------------------------
-        WAITORS
+        WAIT FUNCTIONS
     ----------------------------------------------------------- */
     /**
      * Waits until the counter to be zero.
@@ -159,5 +119,40 @@ export class RemoteLatch
     {
         let ms: number = at.getTime() - Date.now();
         return await this.wait_for(ms);
+    }
+
+    /* -----------------------------------------------------------
+        ARRIVALS
+    ----------------------------------------------------------- */
+    /**
+     * Derecements the counter.
+     * 
+     * Decrements the counter by *n* without blocking. 
+     * 
+     * If the parametric value *n* is equal to or greater than internal counter, so that the 
+     * internal counter be equal to or less than zero, everyone who are {@link wait waiting} for
+     * the {@link RemoteLatch} would continue their execution.
+     * 
+     * @param n Value of the decrement. Default is 1.
+     */
+    public count_down(n: number = 1): Promise<void>
+    {
+        return this.controller_.count_down(this.name_, n);
+    }
+    
+    /**
+     * Decrements the counter and waits until the counter to be zero.
+     * 
+     * Decrements the counter by *n* and blocks the section until internal counter to be zero. 
+     * 
+     * If the parametric value *n* is equal to or greater than internal counter, so that the 
+     * internal counter be equal to or less than zero, everyone who are {@link wait waiting} for
+     * the {@link RemoteLatch} would continue their execution including this one.
+     * 
+     * @param n Value of the decrement. Default is 1.
+     */
+    public arrive_and_wait(): Promise<void>
+    {
+        return this.controller_.arrive_and_wait(this.name_);
     }
 }

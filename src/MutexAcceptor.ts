@@ -12,6 +12,8 @@ import { ProviderGroup } from "./server/ProviderGroup";
 /**
  * Acceptor of the `mutex-server`.
  * 
+ *  - available only in NodeJS.
+ * 
  * The {@link MutexAcceptor} is a communicator class interacting with the remote client, through 
  * websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call) protocol, in the 
  * `mutex-server`. The {@link MutexAcceptor} objects are always created by the {@link MutexServer}
@@ -30,7 +32,7 @@ import { ProviderGroup } from "./server/ProviderGroup";
  * remote client. If you don't have any plan to provide additional feature to the remote client, 
  * just declare it as `null`
  * 
- * @template Header Type of the *header* containing initial data.
+ * @template Header Type of the header containing initial data.
  * @template Provider Type of additional features provided for the remote client.
  * @author Jeongho Nam - https://github.com/samchon
  */
@@ -152,14 +154,14 @@ export class MutexAcceptor<Header, Provider extends object | null>
     /**
      * Get state.
      * 
-     * Get current state of connection state with the remote client. List of values are such 
-     * like below:
+     * Get current state of connection state with the remote client. List of values are such like 
+     * below:
      * 
-     *   - `REJECTING`: The {@link MutexConnector.reject} method is on running.
+     *   - `REJECTING`: The {@link MutexAcceptor.reject} method is on running.
      *   - `NONE`: The {@link MutexAcceptor} instance is newly created, but did nothing yet.
-     *   - `ACCEPTING`: The {@link MutexConnector.connect} method is on running.
+     *   - `ACCEPTING`: The {@link MutexAcceptor.accept} method is on running.
      *   - `OPEN`: The connection is online.
-     *   - `CLOSING`: The {@link MutexConnector.close} method is on running.
+     *   - `CLOSING`: The {@link MutexAcceptor.close} method is on running.
      *   - `CLOSED`: The connection is offline.
      */
     public get state(): MutexAcceptor.State

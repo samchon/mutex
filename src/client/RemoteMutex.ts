@@ -48,11 +48,6 @@ export class RemoteMutex
         return new RemoteMutex(controller, name);
     }
 
-    public destructor(): Promise<void>
-    {
-        return this.controller_.erase(this.name_);
-    }
-
     /* -----------------------------------------------------------
         WRITE LOCK
     ----------------------------------------------------------- */

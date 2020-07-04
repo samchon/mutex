@@ -50,13 +50,8 @@ export class RemoteConditionVariable
         return new RemoteConditionVariable(controller, name);
     }
 
-    public destructor(): Promise<void>
-    {
-        return this.controller_.erase(this.name_);
-    }
-
     /* -----------------------------------------------------------
-        WAITORS
+        WAIT FUNCTIONS
     ----------------------------------------------------------- */
     /**
      * Wait until notified.
@@ -75,9 +70,9 @@ export class RemoteConditionVariable
      * 
      * @param predicator A predicator function determines completion.
      */
-    public wait(predicator: Predicator): Promise<void>;
+    public wait(predicator: RemoteConditionVariable.Predicator): Promise<void>;
 
-    public async wait(predicator?: Predicator): Promise<void>
+    public async wait(predicator?: RemoteConditionVariable.Predicator): Promise<void>
     {
         if (!predicator)
             return await this._Wait();
@@ -112,9 +107,9 @@ export class RemoteConditionVariable
      * @param predicator A predicator function determines the completion.
      * @return Returned value of the *predicator*.
      */
-    public wait_for(ms: number, predicator: Predicator): Promise<boolean>;
+    public wait_for(ms: number, predicator: RemoteConditionVariable.Predicator): Promise<boolean>;
 
-    public async wait_for(ms: number, predicator?: Predicator): Promise<boolean>
+    public async wait_for(ms: number, predicator?: RemoteConditionVariable.Predicator): Promise<boolean>
     {
         let at: Date = new Date(Date.now() + ms);
         return this.wait_until(at, predicator!);
@@ -145,9 +140,9 @@ export class RemoteConditionVariable
      * @param predicator A predicator function determines the completion.
      * @return Returned value of the *predicator*.
      */
-    public wait_until(at: Date, predicator: Predicator): Promise<boolean>;
+    public wait_until(at: Date, predicator: RemoteConditionVariable.Predicator): Promise<boolean>;
 
-    public async wait_until(at: Date, predicator?: Predicator): Promise<boolean>
+    public async wait_until(at: Date, predicator?: RemoteConditionVariable.Predicator): Promise<boolean>
     {
         if (!predicator)
             return await this._Wait_until(at);
@@ -196,4 +191,13 @@ export class RemoteConditionVariable
     }
 }
 
-type Predicator = () => boolean | Promise<boolean>;
+/**
+ * 
+ */
+export namespace RemoteConditionVariable
+{
+    /**
+     * Type of predicator function who determines the completion.
+     */
+    export type Predicator = () => boolean | Promise<boolean>;
+}

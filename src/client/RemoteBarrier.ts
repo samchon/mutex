@@ -127,8 +127,6 @@ export class RemoteBarrier
      * If the the remained counter be zero by this decrement, everyone who are 
      * {@link wait waiting} for the {@link RemoteBarrier} would continue their executions 
      * including this one.
-     * 
-     * @param n Value of the decrement. Default is 1.
      */
     public arrive_and_drop(): Promise<void>
     {
