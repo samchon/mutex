@@ -22,7 +22,7 @@ Also, `mutex-server` has a safety device for network disconnections. When a clie
 
 ## 2. Features
 ### 2.1. Network Level
-When you want to open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexserver.html) class.
+When you want to open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html) class.
 
   - [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html)
   - [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html)
@@ -31,7 +31,7 @@ When you want to open a `mutex-server`, utilize the [`MutexServer`](https://mute
 ### 2.2. Critical Section Components
 If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
 
-Also, [`std.UniqueLock`](https://mutex.dev/api/modules/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/modules/std.sharedlock.html) can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
+Also, [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/classes/std.sharedlock.html) can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
 
   - Solid Components
     - [`RemoteConditionVariable`](https://mutex.dev/api/classes/msv.remoteconditionvariable.html)
