@@ -1,6 +1,6 @@
 {
   "name": "mutex-server",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -46,7 +46,7 @@
   "bugs": {
     "url": "https://github.com/samchon/mutex-server/issues"
   },
-  "homepage": "https://github.com/samchon/mutex-server",
+  "homepage": "https://mutex.dev",
   "devDependencies": {
     "@types/cli": "^0.11.19",
     "@types/node": "^13.11.1",
