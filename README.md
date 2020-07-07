@@ -8,6 +8,7 @@ npm install --save mutex-server
 [![npm version](https://badge.fury.io/js/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Downloads](https://img.shields.io/npm/dm/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Build Status](https://github.com/samchon/mutex-server/workflows/build/badge.svg)](https://github.com/samchon/mutex-server/actions?query=workflow%3Abuild)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server?ref=badge_shield)
 
 Critical sections in the network level.
 
