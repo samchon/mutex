@@ -49,6 +49,7 @@ Also, [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html) and 
 
 ## 3. Usage
 ![mutex-server](https://user-images.githubusercontent.com/13158709/86332593-b285b200-bc85-11ea-8a2e-cbe30284d053.gif)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server?ref=badge_shield)
 
 Let's learn how to use the `mutex-server` through a sample project. I'll [open a server](https://mutex.dev/api/classes/msv.mutexserver.html#open) and let
 4 clients to [connect to the server](https://mutex.dev/api/classes/msv.mutexconnector.html#connect). After those 4 clients' connections, they'll monopoly a critical section through [`RemoteMutex.lock()`](https://mutex.dev/api/classes/msv.remotemutex.html#lock) method and start printing a line very slowly.
@@ -156,3 +157,6 @@ To resolve such problems, [TSTL](https://github.com/samchon/tstl) is providing e
 [TGrid](https://github.com/samchon/tgrid) is also an extension module of the [TSTL](https://github.com/samchon/tstl), designed to support the thread and network, too.
 
 The TGrid has implemented thread and network by inventing a new concept; [RFC](https://github.com/samchon/tgrid#13-remote-function-call) (Remote Function Call). Also, this `mutex-server` has realized its remote, network level critical section, components by utilizing the [RFC](https://github.com/samchon/tgrid#13-remote-function-call) concepts invented by the [TGrid](https://github.com/samchon/tgrid).
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server?ref=badge_large)
