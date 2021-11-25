@@ -3,7 +3,8 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { Driver } from "tgrid/components/Driver";
+import { Promisive } from "tgrid/typings/Promisive";
+
 import { MutexesProvider } from "../server/providers/MutexesProvider";
 
 /**
@@ -16,7 +17,7 @@ export class RemoteMutex
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<MutexesProvider>;
+    private controller_: Promisive<MutexesProvider>;
 
     /**
      * @hidden
@@ -29,7 +30,7 @@ export class RemoteMutex
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<MutexesProvider>, name: string)
+    private constructor(controller: Promisive<MutexesProvider>, name: string)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -40,7 +41,7 @@ export class RemoteMutex
      */
     public static async create
         (
-            controller: Driver.Promisive<MutexesProvider>, 
+            controller: Promisive<MutexesProvider>, 
             name: string
         ): Promise<RemoteMutex>
     {

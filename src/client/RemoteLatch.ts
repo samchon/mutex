@@ -3,7 +3,8 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { Driver } from "tgrid/components/Driver";
+import { Promisive } from "tgrid/typings/Promisive";
+
 import { LatchesProvider } from "../server/providers/LatchesProvider";
 
 /**
@@ -20,7 +21,7 @@ export class RemoteLatch
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<LatchesProvider>;
+    private controller_: Promisive<LatchesProvider>;
 
     /**
      * @hidden
@@ -33,7 +34,7 @@ export class RemoteLatch
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<LatchesProvider>, name: string)
+    private constructor(controller: Promisive<LatchesProvider>, name: string)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -44,7 +45,7 @@ export class RemoteLatch
      */
     public static async create
         (
-            controller: Driver.Promisive<LatchesProvider>, 
+            controller: Promisive<LatchesProvider>, 
             name: string,
             count: number
         ): Promise<RemoteLatch>

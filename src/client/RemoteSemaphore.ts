@@ -3,9 +3,10 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { Driver } from "tgrid/components/Driver";
-import { SemaphoresProvider } from "../server/providers/SemaphoresProvider";
+import { Promisive } from "tgrid/typings/Promisive";
 import { Semaphore } from "tstl/thread/Semaphore";
+
+import { SemaphoresProvider } from "../server/providers/SemaphoresProvider";
 
 /**
  * Remote Semaphore.
@@ -17,7 +18,7 @@ export class RemoteSemaphore
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<SemaphoresProvider>;
+    private controller_: Promisive<SemaphoresProvider>;
 
     /**
      * @hidden
@@ -35,7 +36,7 @@ export class RemoteSemaphore
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<SemaphoresProvider>, name: string, max: number)
+    private constructor(controller: Promisive<SemaphoresProvider>, name: string, max: number)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -47,7 +48,7 @@ export class RemoteSemaphore
      */
     public static async create
         (
-            controller: Driver.Promisive<SemaphoresProvider>, 
+            controller: Promisive<SemaphoresProvider>, 
             name: string,
             count: number
         ): Promise<RemoteSemaphore>

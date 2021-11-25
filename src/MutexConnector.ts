@@ -5,6 +5,7 @@
 //-----------------------------------------------------------
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
+import { Promisive } from "tgrid/typings/Promisive";
 import { ProviderCapsule } from "./server/ProviderCapsule";
 
 import { RemoteBarrier } from "./client/RemoteBarrier";
@@ -93,7 +94,7 @@ export class MutexConnector<Header, Provider extends object | null>
      */
     public connect(url: string, timeout?: number): Promise<void>
     {
-        return this.base_.connect(url, timeout);
+        return this.base_.connect(url, { timeout });
     }
 
     /**
@@ -206,7 +207,7 @@ export class MutexConnector<Header, Provider extends object | null>
      * @template UseParametric Whether to convert type of function parameters to be compatible with their pritimive.
      * @return A `Driver` for the [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
      */
-    public getDriver<Controller extends object, UseParametric extends boolean = false>(): Driver.Promisive<Controller, UseParametric>
+    public getDriver<Controller extends object, UseParametric extends boolean = false>(): Promisive<Controller, UseParametric>
     {
         return this.controller_.provider as any;
     }

@@ -3,7 +3,8 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { Driver } from "tgrid/components/Driver";
+import { Promisive } from "tgrid/typings/Promisive";
+
 import { ConditionVariablesProvider } from "../server/providers/ConditionVariablesProvider";
 
 /**
@@ -18,7 +19,7 @@ export class RemoteConditionVariable
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<ConditionVariablesProvider>;
+    private controller_: Promisive<ConditionVariablesProvider>;
 
     /**
      * @hidden
@@ -31,7 +32,7 @@ export class RemoteConditionVariable
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<ConditionVariablesProvider>, name: string)
+    private constructor(controller: Promisive<ConditionVariablesProvider>, name: string)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -42,7 +43,7 @@ export class RemoteConditionVariable
      */
     public static async create
         (
-            controller: Driver.Promisive<ConditionVariablesProvider>, 
+            controller: Promisive<ConditionVariablesProvider>, 
             name: string
         ): Promise<RemoteConditionVariable>
     {

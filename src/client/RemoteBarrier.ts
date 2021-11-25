@@ -3,7 +3,8 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { Driver } from "tgrid/components/Driver";
+import { Promisive } from "tgrid/typings/Promisive";
+
 import { BarriersProvider } from "../server/providers/BarriersProvider";
 
 /**
@@ -21,7 +22,7 @@ export class RemoteBarrier
     /**
      * @hidden
      */
-    private controller_: Driver.Promisive<BarriersProvider>;
+    private controller_: Promisive<BarriersProvider>;
 
     /**
      * @hidden
@@ -34,7 +35,7 @@ export class RemoteBarrier
     /**
      * @hidden
      */
-    private constructor(controller: Driver.Promisive<BarriersProvider>, name: string)
+    private constructor(controller: Promisive<BarriersProvider>, name: string)
     {
         this.controller_ = controller;
         this.name_ = name;
@@ -45,7 +46,7 @@ export class RemoteBarrier
      */
     public static async create
         (
-            controller: Driver.Promisive<BarriersProvider>, 
+            controller: Promisive<BarriersProvider>, 
             name: string,
             count: number
         ): Promise<RemoteBarrier>

@@ -1,14 +1,14 @@
 {
   "name": "mutex-server",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "api": "typedoc src ../tstl/src --exclude \"**/+(test|benchmark)/**\" --excludeNotDocumented --plugin typedoc-plugin-external-module-name --plugin typedoc-plugin-exclude-references --out ../mutex.dev/api",
     "build": "npm run compile",
-    "compile": "rm -rf lib && tsc",
-    "dev": "rm -rf lib && tsc --watch",
+    "compile": "rimraf lib && tsc",
+    "dev": "rimraf lib && tsc --watch",
     "test": "node lib/test",
     "test:ts": "ts-node src/test"
   },
@@ -51,15 +51,14 @@
     "@types/cli": "^0.11.19",
     "@types/node": "^13.11.1",
     "cli": "^1.0.1",
+    "rimraf": "^3.0.2",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.8.2",
-    "typedoc": "^0.17.7",
-    "typedoc-plugin-exclude-references": "^1.0.0",
-    "typedoc-plugin-external-module-name": "^4.0.3",
-    "typescript": "^3.8.3"
+    "typedoc": "^0.22.10",
+    "typescript": "^4.5.2"
   },
   "dependencies": {
-    "tgrid": "^0.6.3",
-    "tstl": "^2.4.11"
+    "tgrid": "^0.8.4",
+    "tstl": "^2.5.0"
   }
 }
