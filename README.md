@@ -4,17 +4,17 @@
 npm install --save mutex-server
 ```
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/samchon/mutex-server/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/samchon/mutex/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
 [![Downloads](https://img.shields.io/npm/dm/mutex-server.svg)](https://www.npmjs.com/package/mutex-server)
-[![Build Status](https://github.com/samchon/mutex-server/workflows/build/badge.svg)](https://github.com/samchon/mutex-server/actions?query=workflow%3Abuild)
+[![Build Status](https://github.com/samchon/mutex/workflows/build/badge.svg)](https://github.com/samchon/mutex/actions?query=workflow%3Abuild)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsamchon%2Fmutex-server?ref=badge_shield)
 
 Critical sections in the network level.
 
 The `mutex-server` is an npm module that can be used for building a mutex server. When you need to control a critical section on the entire system level, like distributed processing system using the network communications, this `mutex-server` can be a good solution.
 
-Installs and opens a `mutex-server` and let clients to connect to the server. The clients who're connecting to the `mutex-server` can utilize remote critical section components like [mutex](https://mutex.dev/api/classes/msv.remotemutex.html) or [semaphore](https://mutex.dev/api/classes/msv.remotesemaphore.html).
+Installs and opens a `mutex-server` and let clients to connect to the server. The clients who're connecting to the `mutex-server` can utilize remote critical section components like [mutex](https://samchon.github.io/mutex/api/classes/msv.remotemutex.html) or [semaphore](https://samchon.github.io/mutex/api/classes/msv.remotesemaphore.html).
 
 Also, `mutex-server` has a safety device for network disconnections. When a client has been suddenly disconnected, all of the locks had acquired or tried by the client would be automatically unlocked or cancelled. Therefore, you don't worry about any network disconnection accident and just enjoy the `mutex-server` with confidence.
 
@@ -23,27 +23,27 @@ Also, `mutex-server` has a safety device for network disconnections. When a clie
 
 ## 2. Features
 ### 2.1. Network Level
-When you want to open a `mutex-server`, utilize the [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html) class.
+When you want to open a `mutex-server`, utilize the [`MutexServer`](https://samchon.github.io/mutex/api/classes/msv.mutexserver.html) class and accept or reject connections from the remote clients by using the [`MutexAcceptor`](https://samchon.github.io/mutex/api/classes/msv.mutexacceptor.html) class. Otherwise, you want to connect to a remote `mutex-server` as a client, utilize the [`MutexConnector`](https://samchon.github.io/mutex/api/classes/msv.mutexconnector.html) class.
 
-  - [`MutexServer`](https://mutex.dev/api/classes/msv.mutexserver.html)
-  - [`MutexAcceptor`](https://mutex.dev/api/classes/msv.mutexacceptor.html)
-  - [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html)
+  - [`MutexServer`](https://samchon.github.io/mutex/api/classes/msv.mutexserver.html)
+  - [`MutexAcceptor`](https://samchon.github.io/mutex/api/classes/msv.mutexacceptor.html)
+  - [`MutexConnector`](https://samchon.github.io/mutex/api/classes/msv.mutexconnector.html)
 
 ### 2.2. Critical Section Components
-If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://mutex.dev/api/classes/msv.mutexconnector.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
+If you succeeded to connect to a `mutex-server`, as a client through the [`MutexConnector`](https://samchon.github.io/mutex/api/classes/msv.mutexconnector.html) class, you can utilize lots of remote critical section components like below. For reference, all of those critical section components are following the STL (Standard Template Library) design.
 
-Also, [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html) and [`std.SharedLock`](https://mutex.dev/api/classes/std.sharedlock.html) can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
+Also, [`std.UniqueLock`](https://samchon.github.io/mutex/api/classes/std.uniquelock.html) and [`std.SharedLock`](https://samchon.github.io/mutex/api/classes/std.sharedlock.html) can be a good choice for safe development. They always ensure that acquired lock to be automatically unlocked, in any circumstance, even if an error occurs in your business code.
 
   - Solid Components
-    - [`RemoteConditionVariable`](https://mutex.dev/api/classes/msv.remoteconditionvariable.html)
-    - [`RemoteMutex`](https://mutex.dev/api/classes/msv.remotemutex.html)
-    - [`RemoteSemaphore`](https://mutex.dev/api/classes/msv.remotesemaphore.html)
+    - [`RemoteConditionVariable`](https://samchon.github.io/mutex/api/classes/msv.remoteconditionvariable.html)
+    - [`RemoteMutex`](https://samchon.github.io/mutex/api/classes/msv.remotemutex.html)
+    - [`RemoteSemaphore`](https://samchon.github.io/mutex/api/classes/msv.remotesemaphore.html)
   - Adaptor Components
-    - [`RemoteBarrier`](https://mutex.dev/api/classes/msv.remotebarrier.html)
-    - [`RemoteLatch`](https://mutex.dev/api/classes/msv.remotelatch.html)
+    - [`RemoteBarrier`](https://samchon.github.io/mutex/api/classes/msv.remotebarrier.html)
+    - [`RemoteLatch`](https://samchon.github.io/mutex/api/classes/msv.remotelatch.html)
   - Safety Helpers
-    - [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html)
-    - [`std.SharedLock`](https://mutex.dev/api/classes/std.sharedlock.html)
+    - [`std.UniqueLock`](https://samchon.github.io/mutex/api/classes/std.uniquelock.html)
+    - [`std.SharedLock`](https://samchon.github.io/mutex/api/classes/std.sharedlock.html)
 
 
 
@@ -51,12 +51,12 @@ Also, [`std.UniqueLock`](https://mutex.dev/api/classes/std.uniquelock.html) and 
 ## 3. Usage
 ![mutex-server](https://user-images.githubusercontent.com/13158709/86332593-b285b200-bc85-11ea-8a2e-cbe30284d053.gif)
 
-Let's learn how to use the `mutex-server` through a sample project. I'll [open a server](https://mutex.dev/api/classes/msv.mutexserver.html#open) and let
-4 clients to [connect to the server](https://mutex.dev/api/classes/msv.mutexconnector.html#connect). After those 4 clients' connections, they'll monopoly a critical section through [`RemoteMutex.lock()`](https://mutex.dev/api/classes/msv.remotemutex.html#lock) method and start printing a line very slowly.
+Let's learn how to use the `mutex-server` through a sample project. I'll [open a server](https://samchon.github.io/mutex/api/classes/msv.mutexserver.html#open) and let
+4 clients to [connect to the server](https://samchon.github.io/mutex/api/classes/msv.mutexconnector.html#connect). After those 4 clients' connections, they'll monopoly a critical section through [`RemoteMutex.lock()`](https://samchon.github.io/mutex/api/classes/msv.remotemutex.html#lock) method and start printing a line very slowly.
 
-After printing has been completed, each client will act one of them randomly: [unlock the mutex](https://mutex.dev/api/classes/msv.remotemutex.html#unlock) or [close the connection](https://mutex.dev/api/classes/msv.mutexconnector.html#close) without the unlock. As you know and as I've mentioned, if a client has been disconnected without returning locks that it had been acquired, the `mutex-server` will automatically release them. 
+After printing has been completed, each client will act one of them randomly: [unlock the mutex](https://samchon.github.io/mutex/api/classes/msv.remotemutex.html#unlock) or [close the connection](https://samchon.github.io/mutex/api/classes/msv.mutexconnector.html#close) without the unlock. As you know and as I've mentioned, if a client has been disconnected without returning locks that it had been acquired, the `mutex-server` will automatically release them. 
 
-Therefore, two random actions would be confirmed to the same result: [`RemoteMutex.unlock()`](https://mutex.dev/api/classes/msv.remotemutex.html#unlock).
+Therefore, two random actions would be confirmed to the same result: [`RemoteMutex.unlock()`](https://samchon.github.io/mutex/api/classes/msv.remotemutex.html#unlock).
 
 ```typescript
 import msv from "mutex-server";
@@ -123,17 +123,17 @@ main();
 
 ## 4. Appendix
 ### 4.1. Repositories
-`mutex-server` is an open source project following the [MIT license](https://github.com/samchon/mutex-server/blob/master/LICENSE).
+`mutex-server` is an open source project following the [MIT license](https://github.com/samchon/mutex/blob/master/LICENSE).
 
-  - Github: https://github.com/samchon/mutex-server
+  - Github: https://github.com/samchon/mutex
   - NPM: https://www.npmjs.com/package/mutex-server
 
 ### 4.2. Documents
-Someone who wants to know more about this `mutex-server`, I've prepared the [API documents](https://mutex.dev/api). Through the [API documents](https://mutex.dev/api), you can travel all of the [features](#2-features) defined in this `mutex-server`.
+Someone who wants to know more about this `mutex-server`, I've prepared the [API documents](https://samchon.github.io/mutex/api). Through the [API documents](https://samchon.github.io/mutex/api), you can travel all of the [features](#2-features) defined in this `mutex-server`.
 
-Also, I'm planning to write the guide documents providing detailed learning course and lots of example projects handling network level critical sections. When the guide documents has been published, its URL address would be https://mutex.dev and it would form like the [TGrid's](https://tgrid.com).
+Also, I'm planning to write the guide documents providing detailed learning course and lots of example projects handling network level critical sections. When the guide documents has been published, its URL address would be https://samchon.github.io/mutex and it would form like the [TGrid's](https://tgrid.com).
 
-  - API Documents: https://mutex.dev/api
+  - API Documents: https://samchon.github.io/mutex/api
   - Guide Documents: not yet, but soon.
 
 ### 4.3. Dependencies

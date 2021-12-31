@@ -1,6 +1,6 @@
 {
   "name": "mutex-server",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/samchon/mutex-server"
+    "url": "https://github.com/samchon/mutex"
   },
   "keywords": [
     "mutex",
@@ -39,14 +39,14 @@
   ],
   "author": {
     "name": "Jeongho Nam",
-    "email": "samchon@samchon.org",
-    "url": "http://samchon.org"
+    "email": "samchon.github@gmail.com",
+    "url": "https://github.com/samchon"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/samchon/mutex-server/issues"
+    "url": "https://github.com/samchon/mutex/issues"
   },
-  "homepage": "https://mutex.dev",
+  "homepage": "https://github.com/samchon/mutex",
   "devDependencies": {
     "@types/cli": "^0.11.19",
     "@types/node": "^13.11.1",
@@ -58,7 +58,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "tgrid": "^0.8.4",
-    "tstl": "^2.5.0"
+    "tgrid": "^0.8.5",
+    "tstl": "^2.5.2"
   }
 }
