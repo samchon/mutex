@@ -3,36 +3,41 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { ProviderBase } from "./ProviderBase";
 import { GlobalBarriers } from "../global/GlobalBarriers";
+import { ProviderBase } from "./ProviderBase";
 
 /**
  * @internal
  */
-export class BarriersProvider extends ProviderBase<GlobalBarriers, number, void>
-{
-    public wait(name: string): Promise<void>
-    {
+export class BarriersProvider extends ProviderBase<
+    GlobalBarriers,
+    number,
+    void
+> {
+    public wait(name: string): Promise<void> {
         return this.get(name).wait(this.acceptor_, this.createDisolver());
     }
 
-    public wait_for(name: string, ms: number): Promise<boolean>
-    {
-        return this.get(name).wait_for(ms, this.acceptor_, this.createDisolver());
+    public wait_for(name: string, ms: number): Promise<boolean> {
+        return this.get(name).wait_for(
+            ms,
+            this.acceptor_,
+            this.createDisolver(),
+        );
     }
 
-    public arrive(name: string, n: number): Promise<void>
-    {
+    public arrive(name: string, n: number): Promise<void> {
         return this.get(name).arrive(n);
     }
 
-    public arrive_and_drop(name: string): Promise<void>
-    {
+    public arrive_and_drop(name: string): Promise<void> {
         return this.get(name).arrive_and_drop();
     }
 
-    public arrive_and_wait(name: string): Promise<void>
-    {
-        return this.get(name).arrive_and_wait(this.acceptor_, this.createDisolver());
+    public arrive_and_wait(name: string): Promise<void> {
+        return this.get(name).arrive_and_wait(
+            this.acceptor_,
+            this.createDisolver(),
+        );
     }
 }

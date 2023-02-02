@@ -1,6 +1,6 @@
 {
   "name": "mutex-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -9,6 +9,7 @@
     "build": "npm run compile",
     "compile": "rimraf lib && tsc",
     "dev": "rimraf lib && tsc --watch",
+    "prettier": "prettier  --write ./src/**/*.ts",
     "test": "node lib/test",
     "test:ts": "ts-node src/test"
   },
@@ -48,17 +49,21 @@
   },
   "homepage": "https://github.com/samchon/mutex",
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/cli": "^0.11.19",
     "@types/node": "^13.11.1",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
     "cli": "^1.0.1",
+    "prettier": "^2.8.3",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.16",
-    "ts-node": "^8.8.2",
-    "typedoc": "^0.22.10",
-    "typescript": "^4.5.2"
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.23.24",
+    "typescript": "^4.9.5"
   },
   "dependencies": {
-    "tgrid": "^0.8.5",
-    "tstl": "^2.5.2"
+    "tgrid": "^0.8.7",
+    "tstl": "^2.5.12"
   }
 }

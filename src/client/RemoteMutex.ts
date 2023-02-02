@@ -9,11 +9,10 @@ import { MutexesProvider } from "../server/providers/MutexesProvider";
 
 /**
  * Remote Mutex.
- * 
+ *
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class RemoteMutex
-{
+export class RemoteMutex {
     /**
      * @hidden
      */
@@ -30,8 +29,7 @@ export class RemoteMutex
     /**
      * @hidden
      */
-    private constructor(controller: Promisive<MutexesProvider>, name: string)
-    {
+    private constructor(controller: Promisive<MutexesProvider>, name: string) {
         this.controller_ = controller;
         this.name_ = name;
     }
@@ -39,12 +37,10 @@ export class RemoteMutex
     /**
      * @internal
      */
-    public static async create
-        (
-            controller: Promisive<MutexesProvider>, 
-            name: string
-        ): Promise<RemoteMutex>
-    {
+    public static async create(
+        controller: Promisive<MutexesProvider>,
+        name: string,
+    ): Promise<RemoteMutex> {
         await controller.emplace(name, undefined);
         return new RemoteMutex(controller, name);
     }
@@ -65,11 +61,10 @@ export class RemoteMutex
      * fall into the forever sleep. Therefore, never forget to calling the {@link unlock} function
      * or utilize the {@link UniqueLock.lock} function instead to ensure the safety.
      */
-    public lock(): Promise<void>
-    {
+    public lock(): Promise<void> {
         return this.controller_.lock(this.name_);
     }
- 
+
     /**
      * Tries to write lock the mutex.
      *
@@ -86,8 +81,7 @@ export class RemoteMutex
      *
      * @return Whether succeeded to monopoly the mutex or not.
      */
-    public try_lock(): Promise<boolean>
-    {
+    public try_lock(): Promise<boolean> {
         return this.controller_.try_lock(this.name_);
     }
 
@@ -111,8 +105,7 @@ export class RemoteMutex
      * @param ms The maximum miliseconds for waiting.
      * @return Whether succeeded to monopoly the mutex or not.
      */
-    public try_lock_for(ms: number): Promise<boolean>
-    {
+    public try_lock_for(ms: number): Promise<boolean> {
         return this.controller_.try_lock_for(this.name_, ms);
     }
 
@@ -136,10 +129,9 @@ export class RemoteMutex
      * @param at The maximum time point to wait.
      * @return Whether succeeded to monopoly the mutex or not.
      */
-    public async try_lock_until(at: Date): Promise<boolean>
-    {
-        let ms: number = at.getTime() - Date.now();
-        return await this.try_lock_for(ms);
+    public async try_lock_until(at: Date): Promise<boolean> {
+        const ms: number = at.getTime() - Date.now();
+        return this.try_lock_for(ms);
     }
 
     /**
@@ -163,8 +155,7 @@ export class RemoteMutex
      *
      * @throw {@link DomainError} when no one is acquiring the {@link lock write lock}.
      */
-    public unlock(): Promise<void>
-    {
+    public unlock(): Promise<void> {
         return this.controller_.unlock(this.name_);
     }
 
@@ -183,11 +174,10 @@ export class RemoteMutex
      * sleep. Therefore, never forget to calling the {@link unlock_shared} or utilize the
      * {@link SharedLock.lock} function instead to ensure the safety.
      */
-    public lock_shared(): Promise<void>
-    {
+    public lock_shared(): Promise<void> {
         return this.controller_.lock_shared(this.name_);
     }
-    
+
     /**
      * Tries to read lock the mutex.
      *
@@ -203,8 +193,7 @@ export class RemoteMutex
      *
      * @return Whether succeeded to share the mutex or not.
      */
-    public try_lock_shared(): Promise<boolean>
-    {
+    public try_lock_shared(): Promise<boolean> {
         return this.controller_.try_lock_shared(this.name_);
     }
 
@@ -228,8 +217,7 @@ export class RemoteMutex
      * @param ms The maximum miliseconds for waiting.
      * @return Whether succeeded to share the mutex or not.
      */
-    public try_lock_shared_for(ms: number): Promise<boolean>
-    {
+    public try_lock_shared_for(ms: number): Promise<boolean> {
         return this.controller_.try_lock_shared_for(this.name_, ms);
     }
 
@@ -253,10 +241,9 @@ export class RemoteMutex
      * @param at The maximum time point to wait.
      * @return Whether succeeded to share the mutex or not.
      */
-    public async try_lock_shared_until(at: Date): Promise<boolean>
-    {
-        let ms: number = at.getTime() - Date.now();
-        return await this.try_lock_shared_for(ms);
+    public async try_lock_shared_until(at: Date): Promise<boolean> {
+        const ms: number = at.getTime() - Date.now();
+        return this.try_lock_shared_for(ms);
     }
 
     /**
@@ -278,8 +265,7 @@ export class RemoteMutex
      * > parameter of methods of the {@link SharedLock}, then this {@link unlock_shared} method
      * > would be automatically called by the {@link SharedLock} after the business.
      */
-    public unlock_shared(): Promise<void>
-    {
+    public unlock_shared(): Promise<void> {
         return this.controller_.unlock_shared(this.name_);
     }
 }

@@ -3,20 +3,19 @@
  * @module msv
  */
 //-----------------------------------------------------------
+import { GlobalBarriers } from "./global/GlobalBarriers";
 import { GlobalConditionVariablaes } from "./global/GlobalConditionVariables";
+import { GlobalLatches } from "./global/GlobalLatches";
 import { GlobalMutexes } from "./global/GlobalMutexes";
 import { GlobalSemaphores } from "./global/GlobalSemaphores";
-
-import { GlobalBarriers } from "./global/GlobalBarriers";
-import { GlobalLatches } from "./global/GlobalLatches";
 
 /**
  * @internal
  */
-export class GlobalGroup
-{
+export class GlobalGroup {
     // MAIN COMPONENTS
-    public condition_variables: GlobalConditionVariablaes = new GlobalConditionVariablaes();
+    public condition_variables: GlobalConditionVariablaes =
+        new GlobalConditionVariablaes();
     public mutexes: GlobalMutexes = new GlobalMutexes();
     public semaphores: GlobalSemaphores = new GlobalSemaphores();
 

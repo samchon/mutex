@@ -1,33 +1,42 @@
-import { ConnectionFactory } from "../internal/ConnectionFactory";
-import { sleep_for } from "tstl/thread/global";
 import { IPointer } from "tstl/functional/IPointer";
+import { sleep_for } from "tstl/thread/global";
 
-async function wait_and_disconnect(factory: ConnectionFactory, ptr: IPointer<number>): Promise<void>
-{
-    let connector = await factory();
-    let cv = await connector.getConditionVariable("test_condition_variable_disconnections");
+import { ArrayUtil } from "../internal/ArrayUtil";
+import { ConnectionFactory } from "../internal/ConnectionFactory";
 
-    cv.wait().then(() => ++ptr.value).catch(() => {});
+async function wait_and_disconnect(
+    factory: ConnectionFactory,
+    ptr: IPointer<number>,
+): Promise<void> {
+    const connector = await factory();
+    const cv = await connector.getConditionVariable(
+        "test_condition_variable_disconnections",
+    );
+
+    cv.wait()
+        .then(() => ++ptr.value)
+        .catch(() => {});
     await sleep_for(50);
     await connector.close();
 }
 
-export async function test_condition_variable_disconnections(factory: ConnectionFactory): Promise<void>
-{
-    let connector = await factory();
-    let cv = await connector.getConditionVariable("test_condition_variable_disconnections");
-    let ptr: IPointer<number> = { value: 0 };
+export async function test_condition_variable_disconnections(
+    factory: ConnectionFactory,
+): Promise<void> {
+    const connector = await factory();
+    const cv = await connector.getConditionVariable(
+        "test_condition_variable_disconnections",
+    );
+    const ptr: IPointer<number> = { value: 0 };
 
-    let promises: Promise<void>[] = [];
-    for (let i: number = 0; i < 4; ++i)
-        promises.push( wait_and_disconnect(factory, ptr) );
-    await Promise.all(promises);
+    await ArrayUtil.asyncRepeat(4, () => wait_and_disconnect(factory, ptr));
 
     cv.wait().then(() => ++ptr.value);
     await cv.notify_all();
     await sleep_for(50);
 
     if (ptr.value !== 1)
-        throw new Error("Error on RemoteConditionVariable.wait(): disconnection does not cancel the wait.");
+        throw new Error(
+            "Error on RemoteConditionVariable.wait(): disconnection does not cancel the wait.",
+        );
 }
-
