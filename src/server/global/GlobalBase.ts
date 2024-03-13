@@ -1,47 +1,42 @@
-/**
- * @packageDocumentation
- * @module msv
- */
-//-----------------------------------------------------------
-import { HashMap } from "tstl/container/HashMap";
-import { WebAcceptor } from "tgrid/protocols/web/WebAcceptor";
+import { WebAcceptor } from "tgrid";
+import { HashMap } from "tstl";
 
 import { IComponent } from "../components/IComponent";
 
 /**
  * @internal
  */
-export abstract class GlobalBase<ComponentT extends IComponent, Param, Ret>
-{
-    private dict_: HashMap<string, ComponentT> = new HashMap();
+export abstract class GlobalBase<ComponentT extends IComponent, Param, Ret> {
+  private dict_: HashMap<string, ComponentT> = new HashMap();
 
-    /* ---------------------------------------------------------
+  /* ---------------------------------------------------------
         CONSTRUCTORS
     --------------------------------------------------------- */
-    protected abstract _Create_component(param: Param): ComponentT;
-    protected abstract _Returns(component: ComponentT): Ret;
+  protected abstract _Create_component(param: Param): ComponentT;
+  protected abstract _Returns(component: ComponentT): Ret;
 
-    public emplace(name: string, param: Param, acceptor: WebAcceptor<any, any>): Ret
-    {
-        let it: HashMap.Iterator<string, ComponentT> = this.dict_.find(name);
-        if (it.equals(this.dict_.end()) === true)
-            it = this.dict_.emplace(name, this._Create_component(param)).first;
-        it.second._Insert_acceptor(acceptor);
+  public emplace(
+    name: string,
+    param: Param,
+    acceptor: WebAcceptor<any, any>,
+  ): Ret {
+    let it: HashMap.Iterator<string, ComponentT> = this.dict_.find(name);
+    if (it.equals(this.dict_.end()) === true)
+      it = this.dict_.emplace(name, this._Create_component(param)).first;
+    it.second._Insert_acceptor(acceptor);
 
-        return this._Returns(it.second);
-    }
+    return this._Returns(it.second);
+  }
 
-    public erase(name: string, acceptor: WebAcceptor<any, any>): void
-    {
-        if (this.dict_.get(name)._Erase_acceptor(acceptor) === true)
-            this.dict_.erase(name);
-    }
+  public erase(name: string, acceptor: WebAcceptor<any, any>): void {
+    if (this.dict_.get(name)._Erase_acceptor(acceptor) === true)
+      this.dict_.erase(name);
+  }
 
-    /* ---------------------------------------------------------
+  /* ---------------------------------------------------------
         ACCESSORS
     --------------------------------------------------------- */
-    public get(name: string): ComponentT
-    {
-        return this.dict_.get(name);
-    }
+  public get(name: string): ComponentT {
+    return this.dict_.get(name);
+  }
 }

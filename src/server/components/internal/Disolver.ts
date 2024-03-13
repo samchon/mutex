@@ -1,9 +1,4 @@
-/**
- * @packageDocumentation
- * @module msv
- */
-//-----------------------------------------------------------
-import { List } from "tstl/container/List";
+import { List } from "tstl";
 import { Joiner } from "./Joiner";
 
 /**

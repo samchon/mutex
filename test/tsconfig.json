@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../bin",
+    "paths": {
+      "mutex-server": ["../src"],
+      "mutex-server/lib/*": ["../src/*"],
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+    ],
+  },
+  "include": [
+    "./", 
+    "../src",
+  ],
+}

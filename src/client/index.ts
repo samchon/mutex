@@ -1,6 +1,5 @@
-/**
- * @packageDocumentation
- * @module msv
- */
-//-----------------------------------------------------------
+export * from "./RemoteBarrier";
+export * from "./RemoteConditionVariable";
+export * from "./RemoteLatch";
 export * from "./RemoteMutex";
+export * from "./RemoteSemaphore";
