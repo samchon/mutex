@@ -1,5 +1,5 @@
 import { ConnectionFactory } from "../internal/ConnectionFactory";
-import { sleep_for } from "tstl/thread/global";
+import { sleep_for } from "tstl";
 
 const SLEEP_TIME: number = 100;
 const WAIT_COUNT: number = 10;

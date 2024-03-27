@@ -4,11 +4,10 @@
  */
 //-----------------------------------------------------------
 import { WebAcceptor } from "tgrid";
-import { List, HashSet } from "tstl";
+import { List, HashSet, OutOfRange } from "tstl";
 
 import { GlobalBase } from "../global/GlobalBase";
 import { Joiner } from "../components/internal/Joiner";
-import { OutOfRange } from "tstl/exception/OutOfRange";
 
 /**
  * @internal

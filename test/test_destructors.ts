@@ -1,4 +1,4 @@
-import { sleep_for } from "tstl/thread/global";
+import { sleep_for } from "tstl";
 import { MutexConnector, MutexServer, RemoteMutex } from "mutex-server";
 import { IActivation } from "./internal/IActivation";
 import { ConnectionFactory } from "./internal/ConnectionFactory";
