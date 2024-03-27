@@ -1,6 +1,6 @@
 import { WebAcceptor } from "tgrid";
 import { HashMap, HashSet, List } from "tstl";
-import { LockType } from "tstl/internal/thread/LockType";
+import { LockType } from "tstl/lib/internal/thread/LockType";
 
 import { IComponent } from "./IComponent";
 import { Disolver } from "./internal/Disolver";

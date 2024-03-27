@@ -1,10 +1,10 @@
 import { MutexConnector, RemoteSemaphore } from "mutex-server";
 import { sleep_for } from "tstl";
-import { ITimedLockable } from "tstl/base/thread";
 
 import { ConnectionFactory } from "../internal/ConnectionFactory";
 import { IActivation } from "../internal/IActivation";
 import { Validator } from "../internal/Validator";
+import { ITimedLockable } from "tstl/lib/base/thread/ITimedLockable";
 
 const SIZE = 8;
 

@@ -1,6 +1,5 @@
+import { IPointer, sleep_for } from "tstl";
 import { ConnectionFactory } from "../internal/ConnectionFactory";
-import { sleep_for } from "tstl/thread/global";
-import { IPointer } from "tstl/functional/IPointer";
 
 async function wait_and_disconnect(
   factory: ConnectionFactory,

@@ -1,5 +1,4 @@
 import { WebAcceptor } from "tgrid";
-import { List } from "tstl/container/List";
 import { Joiner } from "./components/internal/Joiner";
 
 import { GlobalGroup } from "./GlobalGroup";
@@ -8,6 +7,7 @@ import { SemaphoresProvider } from "./providers/SemaphoresProvider";
 import { MutexesProvider } from "./providers/MutexesProvider";
 import { BarriersProvider } from "./providers/BarriersProvider";
 import { LatchesProvider } from "./providers/LatchesProvider";
+import { List } from "tstl";
 
 /**
  * @internal

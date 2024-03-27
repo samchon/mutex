@@ -1,8 +1,8 @@
 import { WebAcceptor } from "tgrid";
 import { List, sleep_for } from "tstl";
+import { LockType } from "tstl/lib/internal/thread/LockType";
 
 import { SolidComponent } from "./SolidComponent";
-import { LockType } from "tstl/internal/thread/LockType";
 import { Joiner } from "./internal/Joiner";
 
 /**
