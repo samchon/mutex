@@ -1,6 +1,6 @@
 {
   "name": "mutex-server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Mutex Server using WebSocket",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -70,11 +70,11 @@
     "ts-patch": "^3.1.2",
     "tslib": "^2.6.2",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2",
+    "typescript": "5.4.5",
     "typescript-transform-paths": "^3.4.7"
   },
   "dependencies": {
-    "tgrid": "^0.10.0",
+    "tgrid": "^1.0.1",
     "tstl": "^3.0.0"
   },
   "files": [

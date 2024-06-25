@@ -48,7 +48,7 @@ export class RemoteSemaphore {
     name: string,
     count: number,
   ): Promise<RemoteSemaphore> {
-    let max: number = await controller.emplace(name, count);
+    const max: number = await controller.emplace(name, count);
     return new RemoteSemaphore(controller, name, max);
   }
 
@@ -149,7 +149,7 @@ export class RemoteSemaphore {
    * @return Whether succeded to acquire or not.
    */
   public async try_acquire_until(at: Date): Promise<boolean> {
-    let ms: number = at.getTime() - Date.now();
+    const ms: number = at.getTime() - Date.now();
     return await this.try_acquire_for(ms);
   }
 

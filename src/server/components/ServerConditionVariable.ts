@@ -1,9 +1,10 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List, sleep_for } from "tstl";
 import { LockType } from "tstl/lib/internal/thread/LockType";
 
 import { SolidComponent } from "./SolidComponent";
 import { Joiner } from "./internal/Joiner";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -13,12 +14,12 @@ export class ServerConditionVariable extends SolidComponent<Resolver, {}> {
     WAITORS
   --------------------------------------------------------- */
   public wait(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     return new Promise((resolve) => {
       // ENROLL TO THE RESOLVERS
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: resolve,
         lockType: LockType.HOLD,
 
@@ -34,12 +35,12 @@ export class ServerConditionVariable extends SolidComponent<Resolver, {}> {
 
   public wait_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     return new Promise((resolve) => {
       // ENROLL TO THE RESOLVERS
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: resolve,
         lockType: LockType.KNOCK,
 
@@ -74,7 +75,7 @@ export class ServerConditionVariable extends SolidComponent<Resolver, {}> {
     if (this.queue_.empty()) return;
 
     // POP THE FIRST ITEM
-    let it: List.Iterator<Resolver> = this.queue_.begin();
+    const it: List.Iterator<Resolver> = this.queue_.begin();
     this.queue_.erase(it);
 
     // DO RESOLVE
@@ -85,22 +86,22 @@ export class ServerConditionVariable extends SolidComponent<Resolver, {}> {
     if (this.queue_.empty()) return;
 
     // COPY RESOLVERS
-    let ordinaryResolvers: Resolver[] = [...this.queue_];
-    let copiedResolvers: Resolver[] = ordinaryResolvers.map((resolver) => ({
+    const ordinaryResolvers: Resolver[] = [...this.queue_];
+    const copiedResolvers: Resolver[] = ordinaryResolvers.map((resolver) => ({
       ...resolver,
     }));
 
     // CLEAR OLD ITEMS
     this.queue_.clear();
-    for (let resolver of ordinaryResolvers) resolver.destructor!();
+    for (const resolver of ordinaryResolvers) resolver.destructor!();
 
     // DO NOTIFY
-    for (let resolver of copiedResolvers) this._Notify(resolver, false);
+    for (const resolver of copiedResolvers) this._Notify(resolver, false);
   }
 
   private _Notify(resolver: Resolver, discard: boolean): void {
     // RESERVE HANDLER
-    let handler = resolver.handler!;
+    const handler = resolver.handler!;
 
     // DISCARD FOR SEQUENCE
     if (discard === true) resolver.destructor!();

@@ -105,7 +105,7 @@ export class RemoteLatch {
    * @return Whether succeeded to waiting in the given time.
    */
   public async wait_until(at: Date): Promise<boolean> {
-    let ms: number = at.getTime() - Date.now();
+    const ms: number = at.getTime() - Date.now();
     return await this.wait_for(ms);
   }
 

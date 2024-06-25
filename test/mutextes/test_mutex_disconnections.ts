@@ -8,7 +8,7 @@ async function test_disconnection(
   factory: ConnectionFactory,
   index: number,
 ): Promise<void> {
-  const connector: MutexConnector<IActivation, null> = await factory();
+  const connector: MutexConnector<IActivation> = await factory();
   const mutex: RemoteMutex = await connector.getMutex(
     "test_mutex_disconnection",
   );

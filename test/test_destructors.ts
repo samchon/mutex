@@ -4,7 +4,7 @@ import { IActivation } from "./internal/IActivation";
 import { ConnectionFactory } from "./internal/ConnectionFactory";
 
 async function test(factory: ConnectionFactory): Promise<void> {
-  let connector: MutexConnector<IActivation, null> = await factory();
+  let connector: MutexConnector<IActivation> = await factory();
   let mutex: RemoteMutex = await connector.getMutex("test_destructors");
 
   await mutex.lock_shared();

@@ -1,4 +1,4 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List, sleep_for, OutOfRange, Pair } from "tstl";
 import { AccessType } from "tstl/lib/internal/thread/AccessType";
 import { LockType } from "tstl/lib/internal/thread/LockType";
@@ -6,6 +6,7 @@ import { LockType } from "tstl/lib/internal/thread/LockType";
 import { SolidComponent } from "./SolidComponent";
 import { Disolver } from "./internal/Disolver";
 import { Joiner } from "./internal/Joiner";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -25,7 +26,7 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
   }
 
   protected _Insert_resolver(resolver: Resolver): List.Iterator<Resolver> {
-    let it: List.Iterator<Resolver> = super._Insert_resolver(resolver);
+    const it: List.Iterator<Resolver> = super._Insert_resolver(resolver);
     resolver.iterator = it;
 
     return it;
@@ -35,12 +36,12 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     WRITE LOCK
   --------------------------------------------------------- */
   public lock(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     return new Promise((resolve) => {
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: this.writing_++ === 0 && this.reading_ === 0 ? null : resolve,
         accessType: AccessType.WRITE,
         lockType: LockType.HOLD,
@@ -59,14 +60,14 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
   }
 
   public async try_lock(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     // LOCKABLE ?
     if (this.writing_ !== 0 || this.reading_ !== 0) return false;
 
     // CONSTRUCT RESOLVER
-    let it: List.Iterator<Resolver> = this._Insert_resolver({
+    const it: List.Iterator<Resolver> = this._Insert_resolver({
       handler: null,
       accessType: AccessType.WRITE,
       lockType: LockType.KNOCK,
@@ -86,12 +87,12 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
 
   public try_lock_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: this.writing_++ === 0 && this.reading_ === 0 ? null : resolve,
         accessType: AccessType.WRITE,
         lockType: LockType.KNOCK,
@@ -118,7 +119,9 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     });
   }
 
-  public async unlock(acceptor: WebAcceptor<any, any>): Promise<void> {
+  public async unlock(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): Promise<void> {
     //----
     // VALIDATION
     //----
@@ -132,7 +135,7 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
       );
 
     // IN LOCAL AREA
-    let local: SolidComponent.LocalArea<Resolver, {}> | null =
+    const local: SolidComponent.LocalArea<Resolver, {}> | null =
       this._Get_local_area(acceptor);
     if (
       local === null ||
@@ -147,7 +150,7 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     // RELEASE
     //----
     // DESTRUCT TOP RESOLVER
-    let top: Resolver = local.queue.front();
+    const top: Resolver = local.queue.front();
 
     this.queue_.erase(top.iterator!);
     top.destructor!();
@@ -161,12 +164,12 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     READ LOCK
   --------------------------------------------------------- */
   public lock_shared(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     return new Promise<void>((resolve) => {
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: this.writing_ === 0 ? null : resolve,
         accessType: AccessType.READ,
         lockType: LockType.HOLD,
@@ -186,13 +189,13 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
   }
 
   public async try_lock_shared(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     if (this.writing_ !== 0) return false;
 
     // CONSTRUCT RESOLVER
-    let it = this._Insert_resolver({
+    const it = this._Insert_resolver({
       handler: null,
       accessType: AccessType.READ,
       lockType: LockType.KNOCK,
@@ -212,12 +215,12 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
 
   public try_lock_shared_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: this.writing_ === 0 ? null : resolve,
         accessType: AccessType.READ,
         lockType: LockType.KNOCK,
@@ -243,7 +246,9 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     });
   }
 
-  public async unlock_shared(acceptor: WebAcceptor<any, any>): Promise<void> {
+  public async unlock_shared(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): Promise<void> {
     //----
     // VALIDATION
     //----
@@ -257,7 +262,7 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
       );
 
     // IN LOCAL AREA
-    let local: SolidComponent.LocalArea<Resolver, {}> | null =
+    const local: SolidComponent.LocalArea<Resolver, {}> | null =
       this._Get_local_area(acceptor);
     if (
       local === null ||
@@ -272,7 +277,7 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     // RELEASE
     //----
     // DESTRUCT THE RESOLVER
-    let top: Resolver = local.queue.front();
+    const top: Resolver = local.queue.front();
 
     this.queue_.erase(top.iterator!);
     top.destructor!();
@@ -289,10 +294,10 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     if (this.queue_.empty() === true) return;
 
     // GATHER THE NEXT STEPS
-    let currentType: AccessType = this.queue_.front().accessType;
-    let pairList: Pair<Function, LockType>[] = [];
+    const currentType: AccessType = this.queue_.front().accessType;
+    const pairList: Pair<Function, LockType>[] = [];
 
-    for (let resolver of this.queue_) {
+    for (const resolver of this.queue_) {
       // STOP WHEN DIFFERENT ACCESS TYPE COMES
       if (resolver.accessType !== currentType) break;
       // RESERVE HANDLER
@@ -306,20 +311,20 @@ export class ServerMutex extends SolidComponent<Resolver, {}> {
     }
 
     // CALL THE HANDLERS
-    for (let pair of pairList)
+    for (const pair of pairList)
       if (pair.second === LockType.HOLD) pair.first();
       else pair.first(true);
   }
 
   private _Cancel(it: List.Iterator<Resolver>): void {
     // POP HANDLER & DESTRUCT
-    let handler: Function = it.value.handler!;
+    const handler: Function = it.value.handler!;
 
     this.queue_.erase(it);
     it.value.destructor!();
 
     // CHECK THE PREVIOUS HANDLER
-    let prev: List.Iterator<Resolver> = it.prev();
+    const prev: List.Iterator<Resolver> = it.prev();
     if (prev.equals(this.queue_.end()) === false && prev.value.handler === null)
       this._Release();
 

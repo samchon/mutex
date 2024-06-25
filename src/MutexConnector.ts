@@ -1,11 +1,11 @@
-import { Driver, Promisive, WebConnector } from "tgrid";
+import { Driver, WebSocketConnector } from "tgrid";
 
 import { RemoteBarrier } from "./client/RemoteBarrier";
 import { RemoteConditionVariable } from "./client/RemoteConditionVariable";
 import { RemoteLatch } from "./client/RemoteLatch";
 import { RemoteMutex } from "./client/RemoteMutex";
 import { RemoteSemaphore } from "./client/RemoteSemaphore";
-import { ProviderCapsule } from "./server/ProviderCapsule";
+import { ProviderGroup } from "./server/ProviderGroup";
 
 /**
  * Mutex server connector for client.
@@ -41,16 +41,16 @@ import { ProviderCapsule } from "./server/ProviderCapsule";
  * @template Provider Type of additional features provided for the remote server. If no plan to provide anything, declare `null`.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexConnector<Header, Provider extends object | null> {
+export class MutexConnector<Header> {
   /**
    * @hidden
    */
-  private base_: WebConnector<Header, Provider>;
+  private connector_: WebSocketConnector<Header, null, ProviderGroup>;
 
   /**
    * @hidden
    */
-  private controller_: Driver<ProviderCapsule<any>>;
+  private driver_: Driver<ProviderGroup>;
 
   /* -----------------------------------------------------------
         CONSTRUCTORS
@@ -61,9 +61,9 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @param header Initial data sending to the remote server after connection. Hope to use it as an activation tool.
    * @param provider Additional feature provided for the remote server. If don't plan to provide anything to the remote server, assign `null`.
    */
-  public constructor(header: Header, provider: Provider) {
-    this.base_ = new WebConnector(header, provider);
-    this.controller_ = this.base_.getDriver();
+  public constructor(header: Header) {
+    this.connector_ = new WebSocketConnector(header, null);
+    this.driver_ = this.connector_.getDriver();
   }
 
   /**
@@ -84,7 +84,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @throw WebError when server does not accept your connection until timeout.
    */
   public connect(url: string, timeout?: number): Promise<void> {
-    return this.base_.connect(url, { timeout });
+    return this.connector_.connect(url, { timeout });
   }
 
   /**
@@ -105,7 +105,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @throw DomainError when the connection is not online.
    */
   public async close(): Promise<void> {
-    await this.base_.close();
+    await this.connector_.close();
   }
 
   /**
@@ -136,7 +136,7 @@ export class MutexConnector<Header, Provider extends object | null> {
   public join(at: Date): Promise<boolean>;
 
   public join(param?: number | Date): Promise<void | boolean> {
-    return this.base_.join(param! as Date);
+    return this.connector_.join(param! as Date);
   }
 
   /* -----------------------------------------------------------
@@ -146,7 +146,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * Get connection url.
    */
   public get url(): string | undefined {
-    return this.base_.url;
+    return this.connector_.url;
   }
 
   /**
@@ -162,14 +162,14 @@ export class MutexConnector<Header, Provider extends object | null> {
    *   - `CLOSED`: The connection is offline.
    */
   public get state(): MutexConnector.State {
-    return this.base_.state;
+    return this.connector_.state;
   }
 
   /**
    * Get header.
    */
   public get header(): Header {
-    return this.base_.header;
+    return this.connector_.header;
   }
 
   /**
@@ -192,11 +192,8 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @template UseParametric Whether to convert type of function parameters to be compatible with their pritimive.
    * @return A `Driver` for the [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
    */
-  public getDriver<
-    Controller extends object,
-    UseParametric extends boolean = false,
-  >(): Promisive<Controller, UseParametric> {
-    return this.controller_.provider as any;
+  public getDriver(): Driver<ProviderGroup> {
+    return this.driver_;
   }
 
   /* -----------------------------------------------------------
@@ -216,7 +213,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    */
   public getConditionVariable(key: string): Promise<RemoteConditionVariable> {
     return RemoteConditionVariable.create(
-      this.controller_.group.condition_variables,
+      this.driver_.condition_variables,
       key,
     );
   }
@@ -234,7 +231,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @return A {@link RemoteMutex} object.
    */
   public getMutex(key: string): Promise<RemoteMutex> {
-    return RemoteMutex.create(this.controller_.group.mutexes, key);
+    return RemoteMutex.create(this.driver_.mutexes, key);
   }
 
   /**
@@ -254,11 +251,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @return A {@link RemoteSemaphore} object.
    */
   public getSemaphore(key: string, count: number): Promise<RemoteSemaphore> {
-    return RemoteSemaphore.create(
-      this.controller_.group.semaphores,
-      key,
-      count,
-    );
+    return RemoteSemaphore.create(this.driver_.semaphores, key, count);
   }
 
   /**
@@ -278,7 +271,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @return A {@link RemoteBarrier} object.
    */
   public getBarrier(key: string, count: number): Promise<RemoteBarrier> {
-    return RemoteBarrier.create(this.controller_.group.barriers, key, count);
+    return RemoteBarrier.create(this.driver_.barriers, key, count);
   }
 
   /**
@@ -298,11 +291,7 @@ export class MutexConnector<Header, Provider extends object | null> {
    * @return A {@link RemoteLatch} object.
    */
   public getLatch(identifier: string, count: number): Promise<RemoteLatch> {
-    return RemoteLatch.create(
-      this.controller_.group.latches,
-      identifier,
-      count,
-    );
+    return RemoteLatch.create(this.driver_.latches, identifier, count);
   }
 }
 
@@ -313,5 +302,5 @@ export namespace MutexConnector {
   /**
    * Current state of the {@link MutexConnector}
    */
-  export import State = WebConnector.State;
+  export import State = WebSocketConnector.State;
 }

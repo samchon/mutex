@@ -1,9 +1,10 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List, sleep_for, OutOfRange, Pair } from "tstl";
 import { LockType } from "tstl/lib/internal/thread/LockType";
 
 import { SolidComponent } from "./SolidComponent";
 import { Disolver } from "./internal/Disolver";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -30,14 +31,14 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
     ACQUIRANCES
   --------------------------------------------------------- */
   public acquire(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: Disolver,
   ): Promise<void> {
     return new Promise<void>((resolve) => {
-      let success: boolean = this.acquiring_ < this.max_;
+      const success: boolean = this.acquiring_ < this.max_;
 
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: success ? null : resolve,
         lockType: LockType.HOLD,
         acceptor: acceptor,
@@ -59,14 +60,14 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
   }
 
   public async try_acquire(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: Disolver,
   ): Promise<boolean> {
     // ACQUIRABLE ?
     if (this.acquiring_ >= this.max_) return false;
 
     // CONSTRUCT RESOLVER
-    let it: List.Iterator<Resolver> = this._Insert_resolver({
+    const it: List.Iterator<Resolver> = this._Insert_resolver({
       handler: null,
       lockType: LockType.HOLD,
       acceptor: acceptor,
@@ -84,14 +85,14 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
 
   public async try_acquire_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: Disolver,
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      let success: boolean = this.acquiring_ < this.max_;
+      const success: boolean = this.acquiring_ < this.max_;
 
       // CONSTRUCT RESOLVER
-      let it: List.Iterator<Resolver> = this._Insert_resolver({
+      const it: List.Iterator<Resolver> = this._Insert_resolver({
         handler: success ? null : resolve,
         lockType: LockType.KNOCK,
         acceptor: acceptor,
@@ -110,7 +111,7 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
         resolve(true);
       } else
         sleep_for(ms).then(() => {
-          let success: boolean = it.value.handler === null;
+          const success: boolean = it.value.handler === null;
           if (success === false) this._Cancel(it);
 
           resolve(success);
@@ -120,7 +121,7 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
 
   private _Cancel(it: List.Iterator<Resolver>): void {
     // POP THE LISTENER
-    let handler: Function = it.value.handler!;
+    const handler: Function = it.value.handler!;
 
     this.queue_.erase(it);
     it.value.destructor!();
@@ -134,7 +135,7 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
   --------------------------------------------------------- */
   public async release(
     n: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
   ): Promise<void> {
     //----
     // VALIDATION
@@ -154,7 +155,7 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
       );
 
     // IN LOCAL AREA
-    let local: SolidComponent.LocalArea<Resolver, Aggregate> | null =
+    const local: SolidComponent.LocalArea<Resolver, Aggregate> | null =
       this._Get_local_area(acceptor);
     if (local === null || local.queue.empty() === true)
       throw new OutOfRange(
@@ -172,8 +173,10 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
     this.acquiring_ -= n;
     local.aggregate.acquring -= n;
 
+    // eslint-disable-next-line
     let count: number = 0;
     for (
+      // eslint-disable-next-line
       let it = local.queue.begin();
       it.equals(local.queue.end()) === false;
 
@@ -185,9 +188,9 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
     }
 
     // RESERVE HANDLERS
-    let pairList: Pair<Function, LockType>[] = [];
+    const pairList: Pair<Function, LockType>[] = [];
 
-    for (let resolver of this.queue_)
+    for (const resolver of this.queue_)
       if (resolver.handler !== null) {
         pairList.push(new Pair(resolver.handler!, resolver.lockType));
         resolver.handler = null;
@@ -197,7 +200,7 @@ export class ServerSemaphore extends SolidComponent<Resolver, Aggregate> {
       }
 
     // CALL HANDLERS
-    for (let pair of pairList)
+    for (const pair of pairList)
       if (pair.second === LockType.HOLD) pair.first();
       else pair.first(true);
   }

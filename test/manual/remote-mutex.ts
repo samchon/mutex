@@ -6,9 +6,8 @@ const PORT = 37119;
 
 async function client(index: number, character: string): Promise<void> {
   // CONNECT TO THE SERVER
-  const connector: msv.MutexConnector<string, null> = new msv.MutexConnector(
+  const connector: msv.MutexConnector<string> = new msv.MutexConnector(
     PASSWORD,
-    null,
   );
   await connector.connect(`ws://127.0.0.1:${PORT}`);
 
@@ -34,7 +33,7 @@ async function main(): Promise<void> {
   // OPEN SERVER
   const server: MutexServer<string, null> = new MutexServer();
   await server.open(PORT, async (acceptor) => {
-    if (acceptor.header === PASSWORD) await acceptor.accept(null);
+    if (acceptor.header === PASSWORD) await acceptor.accept();
     else await acceptor.reject();
   });
 

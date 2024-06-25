@@ -14,7 +14,7 @@ export async function test_semaphore_acquires(
   //----
   // TEST MUTEX FEATURES
   //----
-  const connector: MutexConnector<IActivation, null> = await factory();
+  const connector: MutexConnector<IActivation> = await factory();
   const mutex: RemoteSemaphore = await connector.getSemaphore(
     "test_semaphore_acquires_binary",
     1,

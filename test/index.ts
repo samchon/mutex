@@ -29,10 +29,10 @@ async function iterate(
   server: MutexServer<IActivation, null>,
   path: string,
 ): Promise<void> {
-  let fileList: string[] = await fs.promises.readdir(path);
+  const fileList: string[] = await fs.promises.readdir(path);
   for (let file of fileList) {
-    let currentPath: string = `${path}/${file}`;
-    let stats: fs.Stats = await fs.promises.lstat(currentPath);
+    const currentPath: string = `${path}/${file}`;
+    const stats: fs.Stats = await fs.promises.lstat(currentPath);
 
     if (
       stats.isDirectory() === true &&
@@ -47,7 +47,7 @@ async function iterate(
     )
       continue;
 
-    let external: IModule = await import(
+    const external: IModule = await import(
       currentPath.substr(0, currentPath.length - 3)
     );
     for (let key in external) {
@@ -73,23 +73,19 @@ async function main(): Promise<void> {
   // OPEN SERVER
   let server: MutexServer<IActivation, null> = new MutexServer();
   await server.open(PORT, async (acceptor) => {
-    if (acceptor.header.password === HEADER.password)
-      await acceptor.accept(null);
+    if (acceptor.header.password === HEADER.password) await acceptor.accept();
     else await acceptor.reject();
   });
 
   // CONNECTION-FACTORY TO THE SERVER
   let sequence: number = 0;
-  let connectorList: MutexConnector<IActivation, null>[] = [];
+  const connectorList: MutexConnector<IActivation>[] = [];
 
-  let factory: ConnectionFactory = async () => {
-    let connector: MutexConnector<IActivation, null> = new MutexConnector(
-      {
-        uid: ++sequence,
-        ...HEADER,
-      },
-      null,
-    );
+  const factory: ConnectionFactory = async () => {
+    const connector: MutexConnector<IActivation> = new MutexConnector({
+      uid: ++sequence,
+      ...HEADER,
+    });
     await connector.connect(URL);
 
     connectorList.push(connector);

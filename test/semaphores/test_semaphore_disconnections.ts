@@ -10,7 +10,7 @@ async function acquire_and_disconnect(
   factory: ConnectionFactory,
   ms: number,
 ): Promise<void> {
-  const connector: MutexConnector<IActivation, null> = await factory();
+  const connector: MutexConnector<IActivation> = await factory();
   const semaphore: RemoteSemaphore = await connector.getSemaphore(
     "test_semaphore_disconnections",
     0,
@@ -29,7 +29,7 @@ async function acquire_and_disconnect(
 export async function test_semaphore_disconnections(
   factory: ConnectionFactory,
 ): Promise<void> {
-  const connector: MutexConnector<IActivation, null> = await factory();
+  const connector: MutexConnector<IActivation> = await factory();
   const semaphore: RemoteSemaphore = await connector.getSemaphore(
     "test_semaphore_disconnections",
     MAX,

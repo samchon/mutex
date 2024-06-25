@@ -3,10 +3,9 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { WebServer } from "tgrid";
+import { WebSocketServer } from "tgrid";
 import { MutexAcceptor } from "./MutexAcceptor";
 
-import { ProviderCapsule } from "./server/ProviderCapsule";
 import { ProviderGroup } from "./server/ProviderGroup";
 import { GlobalGroup } from "./server/GlobalGroup";
 
@@ -40,7 +39,7 @@ export class MutexServer<Header, Provider extends object | null> {
   /**
    * @hidden
    */
-  private server_: WebServer<Header, ProviderCapsule<Provider>>;
+  private server_: WebSocketServer<Header, ProviderGroup, null>;
 
   /**
    * @hidden
@@ -68,7 +67,7 @@ export class MutexServer<Header, Provider extends object | null> {
   public constructor(key: string, cert: string);
 
   public constructor(key?: string, cert?: string) {
-    this.server_ = new WebServer(key!, cert!);
+    this.server_ = new WebSocketServer(key!, cert!);
     this.components_ = new GlobalGroup();
   }
 
@@ -97,15 +96,11 @@ export class MutexServer<Header, Provider extends object | null> {
    */
   public open(
     port: number,
-    handler: (acceptor: MutexAcceptor<Header, Provider>) => Promise<void>,
+    handler: (acceptor: MutexAcceptor<Header>) => Promise<void>,
   ): Promise<void> {
     return this.server_.open(port, async (base) => {
-      let group: ProviderGroup = new ProviderGroup(this.components_, base);
-      let acceptor: MutexAcceptor<Header, Provider> = MutexAcceptor.create(
-        base,
-        group,
-      );
-
+      const group: ProviderGroup = new ProviderGroup(this.components_, base);
+      const acceptor: MutexAcceptor<Header> = MutexAcceptor.create(base, group);
       await handler(acceptor);
     });
   }
@@ -153,5 +148,5 @@ export namespace MutexServer {
   /**
    * Current state of the {@link MutexServer}
    */
-  export import State = WebServer.State;
+  export import State = WebSocketServer.State;
 }

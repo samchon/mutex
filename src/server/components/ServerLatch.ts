@@ -1,9 +1,10 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List } from "tstl";
 
 import { IComponent } from "./IComponent";
 import { ServerConditionVariable } from "./ServerConditionVariable";
 import { Joiner } from "./internal/Joiner";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -20,11 +21,15 @@ export class ServerLatch implements IComponent {
     this.count_ = size;
   }
 
-  public _Insert_acceptor(acceptor: WebAcceptor<any, any>): void {
+  public _Insert_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): void {
     this.cv_._Insert_acceptor(acceptor);
   }
 
-  public _Erase_acceptor(acceptor: WebAcceptor<any, any>): boolean {
+  public _Erase_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): boolean {
     return this.cv_._Erase_acceptor(acceptor);
   }
 
@@ -32,7 +37,7 @@ export class ServerLatch implements IComponent {
     WAITORS
   --------------------------------------------------------- */
   public async wait(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     if (this._Try_wait() === false) return this.cv_.wait(acceptor, disolver);
@@ -44,7 +49,7 @@ export class ServerLatch implements IComponent {
 
   public async wait_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     if (this._Try_wait() === true) return true;
@@ -64,7 +69,7 @@ export class ServerLatch implements IComponent {
   }
 
   public async arrive_and_wait(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     await this.count_down(1);

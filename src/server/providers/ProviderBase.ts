@@ -3,11 +3,12 @@
  * @module msv
  */
 //-----------------------------------------------------------
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List, HashSet, OutOfRange } from "tstl";
 
 import { GlobalBase } from "../global/GlobalBase";
 import { Joiner } from "../components/internal/Joiner";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -18,7 +19,7 @@ export abstract class ProviderBase<
   Ret,
 > {
   protected readonly global_: GlobalT;
-  protected readonly acceptor_: WebAcceptor<any, any>;
+  protected readonly acceptor_: WebSocketAcceptor<any, ProviderGroup, null>;
   private readonly disolvers_: List<Joiner>;
 
   private readonly names_: HashSet<string>;
@@ -29,7 +30,7 @@ export abstract class ProviderBase<
   --------------------------------------------------------- */
   public constructor(
     global: GlobalT,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolvers: List<Joiner>,
     remoteName: string,
   ) {
@@ -42,7 +43,7 @@ export abstract class ProviderBase<
   }
 
   public destructor(): void {
-    for (let name of this.names_) this.erase(name);
+    for (const name of this.names_) this.erase(name);
   }
 
   protected createDisolver(): List.Iterator<Joiner> {
