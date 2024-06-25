@@ -14,7 +14,7 @@ const HEADER = { password: "some_password" };
 interface IModule {
   [key: string]: (
     factory: ConnectionFactory,
-    server: MutexServer<IActivation, null>,
+    server: MutexServer<IActivation>,
   ) => Promise<void>;
 }
 
@@ -26,7 +26,7 @@ async function measure(job: () => Promise<void>): Promise<number> {
 
 async function iterate(
   factory: ConnectionFactory,
-  server: MutexServer<IActivation, null>,
+  server: MutexServer<IActivation>,
   path: string,
 ): Promise<void> {
   const fileList: string[] = await fs.promises.readdir(path);
@@ -71,7 +71,7 @@ async function main(): Promise<void> {
   console.log("==========================================================");
 
   // OPEN SERVER
-  let server: MutexServer<IActivation, null> = new MutexServer();
+  const server: MutexServer<IActivation> = new MutexServer();
   await server.open(PORT, async (acceptor) => {
     if (acceptor.header.password === HEADER.password) await acceptor.accept();
     else await acceptor.reject();
@@ -104,9 +104,10 @@ async function main(): Promise<void> {
   console.log(`  - elapsed time: ${time} ms`);
 
   // MEMORY USAGE
-  let memory: NodeJS.MemoryUsage = process.memoryUsage();
-  for (let property in memory) {
-    let amount: number = memory[property as keyof NodeJS.MemoryUsage] / 10 ** 6;
+  const memory: NodeJS.MemoryUsage = process.memoryUsage();
+  for (const property in memory) {
+    const amount: number =
+      memory[property as keyof NodeJS.MemoryUsage] / 10 ** 6;
     console.log(`  - ${property}: ${amount} MB`);
   }
   console.log("----------------------------------------------------------\n");
@@ -114,7 +115,7 @@ async function main(): Promise<void> {
   //----
   // TERMINATE
   //----
-  for (let connector of connectorList)
+  for (const connector of connectorList)
     if (connector.state === MutexConnector.State.OPEN) await connector.close();
 
   await server.close();

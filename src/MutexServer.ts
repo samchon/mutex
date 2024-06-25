@@ -16,26 +16,21 @@ import { GlobalGroup } from "./server/GlobalGroup";
  *
  * The {@link MutexServer} is a class who can open an `mutex-server`. Clients connecting to the
  * `mutex-server` would communicate with this server through {@link MutexAcceptor} objects using
- * websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call) protocol.
+ * websocket and [RPC](https://tgrid.com/docs/remote-procedure-call/) protocol.
  *
  * To open the `mutex-server`, call the {@link open} method with your custom callback function
  * which would be called whenever a {@link MutexAcceptor} has been newly created by a client's
  * connection.
  *
- * Also, when declaring this {@link MutexServer} type, you've to define two template arguments,
- * *Header* and *Provider*. The *Header* type repersents an initial data gotten from the remote
- * client after the connection. I hope you and client not to omit it and utilize it as an
- * activation tool to enhance security.
- *
- * The second template argument *Provider* represents the additional features provided for the
- * remote client. If you don't have any plan to provide additional feature to the remote client,
- * just declare it as `null`.
+ * Also, when declaring this {@link MutexServer} type, you've to define one template argument,
+ * *Header*. The *Header* type repersents an initial data gotten from the remote client after
+ * the connection. I hope you and client not to omit it and utilize it as an activation tool
+ * to enhance security.
  *
  * @template Header Type of the *header* containing initial data.
- * @template Provider Type of additional features provided for the remote client.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexServer<Header, Provider extends object | null> {
+export class MutexServer<Header> {
   /**
    * @hidden
    */
@@ -112,8 +107,8 @@ export class MutexServer<Header, Provider extends object | null> {
    * Therefore, clients who are using the {@link MutexConnector} class, they can't use the
    * remote critical section components more.
    *
-   * Also, closing the server means that all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
-   * between the server and had connected clients would be destroied. Therefore, all of the [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
+   * Also, closing the server means that all of the [RPC](https://tgrid.com/docs/remote-procedure-call/)s
+   * between the server and had connected clients would be destroied. Therefore, all of the [RPC](https://tgrid.com/docs/remote-procedure-call/)s
    * that are not returned (completed) yet would ge {@link RuntimeError} exception.
    */
   public close(): Promise<void> {

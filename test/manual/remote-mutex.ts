@@ -31,7 +31,7 @@ async function client(index: number, character: string): Promise<void> {
 
 async function main(): Promise<void> {
   // OPEN SERVER
-  const server: MutexServer<string, null> = new MutexServer();
+  const server: MutexServer<string> = new MutexServer();
   await server.open(PORT, async (acceptor) => {
     if (acceptor.header === PASSWORD) await acceptor.accept();
     else await acceptor.reject();

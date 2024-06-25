@@ -1,4 +1,4 @@
-import { Driver, WebSocketConnector } from "tgrid";
+import { WebSocketConnector } from "tgrid";
 
 import { RemoteBarrier } from "./client/RemoteBarrier";
 import { RemoteConditionVariable } from "./client/RemoteConditionVariable";
@@ -11,7 +11,7 @@ import { ProviderGroup } from "./server/ProviderGroup";
  * Mutex server connector for client.
  *
  * The {@link MutexConnector} is a communicator class who can connect to a remote `mutex-server`
- * and interact with it through websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call)
+ * and interact with it through websocket and [RPC](https://tgrid.com/docs/remote-procedure-call/)
  * protocol.
  *
  * You can connect to the websocket `mutex-server` using {@link connect} method. After the
@@ -28,17 +28,12 @@ import { ProviderGroup } from "./server/ProviderGroup";
  *     - {@link getBarrier}
  *     - {@link getLatch}
  *
- * Also, when declaring this {@link MutexConnector} type, you've to define two template arguments,
- * *Header* and *Provider*. The *Header* type repersents an initial data sending to the remote
- * `mutex-server` after connection. I hope you not to omit it and utilize it as an activation tool
- * to enhance security.
- *
- * The second template argument *Provider* represents the custom features provided for the remote
- * `mutex-server`. If you don't have any plan to provide any feature to the `mutex-server`, just
- * declare it as `null`.
+ * Also, when declaring this {@link MutexConnector} type, you've to define one template argument,
+ * *Header*. The *Header* type repersents an initial data sending to the remote `mutex-server`
+ * after connection. I hope you not to omit it and utilize it as an activation tool to
+ * enhance security.
  *
  * @template Header Type of the *header* containing initial data.
- * @template Provider Type of additional features provided for the remote server. If no plan to provide anything, declare `null`.
  * @author Jeongho Nam - https://github.com/samchon
  */
 export class MutexConnector<Header> {
@@ -47,11 +42,6 @@ export class MutexConnector<Header> {
    */
   private connector_: WebSocketConnector<Header, null, ProviderGroup>;
 
-  /**
-   * @hidden
-   */
-  private driver_: Driver<ProviderGroup>;
-
   /* -----------------------------------------------------------
         CONSTRUCTORS
     ----------------------------------------------------------- */
@@ -59,11 +49,9 @@ export class MutexConnector<Header> {
    * Initializer Constructor.
    *
    * @param header Initial data sending to the remote server after connection. Hope to use it as an activation tool.
-   * @param provider Additional feature provided for the remote server. If don't plan to provide anything to the remote server, assign `null`.
    */
   public constructor(header: Header) {
     this.connector_ = new WebSocketConnector(header, null);
-    this.driver_ = this.connector_.getDriver();
   }
 
   /**
@@ -96,11 +84,6 @@ export class MutexConnector<Header> {
    * and tried would be automatically unlocked and cancelled by the server. Therefore, if you've
    * tried to get locks through the remote critical section components by calling their methods,
    * those methods would throw {@link RuntimeError} exceptions.
-   *
-   * Also, the disconnection destories all [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
-   * between the remote server. Therefore, if you or server has an additional `Provider` and
-   * there're uncompleted method calls to the `Provideer` through the `Driver<Controller>`,
-   * {@link RuntimeError} exceptions would be thrown.
    *
    * @throw DomainError when the connection is not online.
    */
@@ -172,33 +155,9 @@ export class MutexConnector<Header> {
     return this.connector_.header;
   }
 
-  /**
-   * Get Driver for [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
-   *
-   * If your target {@link MutexServer} provides additional features, you can utilize those
-   * features through returned `Driver` object by this method. To use this method, you should
-   * define the `Controller` template argument, a type of interface who is defining additional
-   * features provided from the remote server.
-   *
-   * The returned object `Driver` makes to call remote functions, defined in the `Controller`
-   * and provided by `Provider` in the remote server, possible. In other words, callling a
-   * function in the `Driver<Controller>`, it means to call a matched function in the remote
-   * server's `Provider` object.
-   *
-   *   - `Controller`: Definition only
-   *   - `Driver`: [Remote Function Call](https://github.com/samchon/tgrid#13-remote-function-call)
-   *
-   * @template Controller An interface for provided features (functions & objects) from the remote system (`Provider`).
-   * @template UseParametric Whether to convert type of function parameters to be compatible with their pritimive.
-   * @return A `Driver` for the [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
-   */
-  public getDriver(): Driver<ProviderGroup> {
-    return this.driver_;
-  }
-
   /* -----------------------------------------------------------
-        THREAD COMPONENTS
-    ----------------------------------------------------------- */
+    THREAD COMPONENTS
+  ----------------------------------------------------------- */
   /**
    * Get remote condition variable.
    *
@@ -213,7 +172,7 @@ export class MutexConnector<Header> {
    */
   public getConditionVariable(key: string): Promise<RemoteConditionVariable> {
     return RemoteConditionVariable.create(
-      this.driver_.condition_variables,
+      this.connector_.getDriver().condition_variables,
       key,
     );
   }
@@ -231,7 +190,7 @@ export class MutexConnector<Header> {
    * @return A {@link RemoteMutex} object.
    */
   public getMutex(key: string): Promise<RemoteMutex> {
-    return RemoteMutex.create(this.driver_.mutexes, key);
+    return RemoteMutex.create(this.connector_.getDriver().mutexes, key);
   }
 
   /**
@@ -251,7 +210,11 @@ export class MutexConnector<Header> {
    * @return A {@link RemoteSemaphore} object.
    */
   public getSemaphore(key: string, count: number): Promise<RemoteSemaphore> {
-    return RemoteSemaphore.create(this.driver_.semaphores, key, count);
+    return RemoteSemaphore.create(
+      this.connector_.getDriver().semaphores,
+      key,
+      count,
+    );
   }
 
   /**
@@ -271,7 +234,11 @@ export class MutexConnector<Header> {
    * @return A {@link RemoteBarrier} object.
    */
   public getBarrier(key: string, count: number): Promise<RemoteBarrier> {
-    return RemoteBarrier.create(this.driver_.barriers, key, count);
+    return RemoteBarrier.create(
+      this.connector_.getDriver().barriers,
+      key,
+      count,
+    );
   }
 
   /**
@@ -291,7 +258,11 @@ export class MutexConnector<Header> {
    * @return A {@link RemoteLatch} object.
    */
   public getLatch(identifier: string, count: number): Promise<RemoteLatch> {
-    return RemoteLatch.create(this.driver_.latches, identifier, count);
+    return RemoteLatch.create(
+      this.connector_.getDriver().latches,
+      identifier,
+      count,
+    );
   }
 }
 
