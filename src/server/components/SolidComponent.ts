@@ -1,9 +1,10 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { HashMap, HashSet, List } from "tstl";
 import { LockType } from "tstl/lib/internal/thread/LockType";
 
 import { IComponent } from "./IComponent";
 import { Disolver } from "./internal/Disolver";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -15,11 +16,12 @@ export abstract class SolidComponent<
 {
   protected queue_: List<Resolver>;
   protected local_areas_: HashMap<
-    WebAcceptor<any, any>,
+    WebSocketAcceptor<any, ProviderGroup, null>,
     SolidComponent.LocalArea<Resolver, Aggregate>
   >;
 
-  private acceptors_: HashSet<WebAcceptor<any, any>> = new HashSet();
+  private acceptors_: HashSet<WebSocketAcceptor<any, ProviderGroup, null>> =
+    new HashSet();
 
   /* ---------------------------------------------------------
     CONSTRUCTORS
@@ -29,11 +31,15 @@ export abstract class SolidComponent<
     this.local_areas_ = new HashMap();
   }
 
-  public _Insert_acceptor(acceptor: WebAcceptor<any, any>): void {
+  public _Insert_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): void {
     this.acceptors_.insert(acceptor);
   }
 
-  public _Erase_acceptor(acceptor: WebAcceptor<any, any>): boolean {
+  public _Erase_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): boolean {
     this.acceptors_.erase(acceptor);
     return this.acceptors_.empty();
   }
@@ -46,8 +52,9 @@ export abstract class SolidComponent<
     // LOCAL QUEUE
     //----
     // FIND OR EMPLACE
+    // eslint-disable-next-line
     let mit: HashMap.Iterator<
-      WebAcceptor<any, any>,
+      WebSocketAcceptor<any, ProviderGroup, null>,
       SolidComponent.LocalArea<Resolver, Aggregate>
     > = this.local_areas_.find(resolver.acceptor);
     if (mit.equals(this.local_areas_.end()) === true)
@@ -56,14 +63,14 @@ export abstract class SolidComponent<
         aggregate: resolver.aggregate,
       }).first;
     else {
-      for (let key in resolver.aggregate)
+      for (const key in resolver.aggregate)
         (mit.second.aggregate as Record<string, number>)[key] +=
           resolver.aggregate[key];
       resolver.aggregate = mit.second.aggregate;
     }
 
     // INSERT NEW ITEM
-    let lit: List.Iterator<Resolver> = mit.second.queue.insert(
+    const lit: List.Iterator<Resolver> = mit.second.queue.insert(
       mit.second.queue.end(),
       resolver,
     );
@@ -71,7 +78,7 @@ export abstract class SolidComponent<
     //----
     // GLOBAL QUEUE
     //----
-    let ret: List.Iterator<Resolver> = this.queue_.insert(
+    const ret: List.Iterator<Resolver> = this.queue_.insert(
       this.queue_.end(),
       resolver,
     );
@@ -88,10 +95,10 @@ export abstract class SolidComponent<
   }
 
   protected _Get_local_area(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
   ): SolidComponent.LocalArea<Resolver, Aggregate> | null {
-    let it: HashMap.Iterator<
-      WebAcceptor<any, any>,
+    const it: HashMap.Iterator<
+      WebSocketAcceptor<any, ProviderGroup, null>,
       SolidComponent.LocalArea<Resolver, Aggregate>
     > = this.local_areas_.find(acceptor);
     return it.equals(this.local_areas_.end()) === false ? it.second : null;
@@ -111,7 +118,7 @@ export namespace SolidComponent {
     lockType: LockType;
 
     // ASSET FFOR CLIENT
-    acceptor: WebAcceptor<any, any>;
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>;
     aggregate: AggregateT;
     disolver: Disolver;
 

@@ -1,4 +1,4 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { Joiner } from "./components/internal/Joiner";
 
 import { GlobalGroup } from "./GlobalGroup";
@@ -24,7 +24,10 @@ export class ProviderGroup {
   public readonly barriers: BarriersProvider;
   public readonly latches: LatchesProvider;
 
-  public constructor(group: GlobalGroup, acceptor: WebAcceptor<any, any>) {
+  public constructor(
+    group: GlobalGroup,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ) {
     this.disolvers_ = new List();
 
     this.condition_variables = new ConditionVariablesProvider(
@@ -61,7 +64,7 @@ export class ProviderGroup {
   }
 
   public async destructor(): Promise<void> {
-    for (let joiner of this.disolvers_)
+    for (const joiner of this.disolvers_)
       if (joiner !== undefined) await joiner();
 
     await this.condition_variables.destructor();

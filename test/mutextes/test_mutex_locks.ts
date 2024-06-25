@@ -16,7 +16,7 @@ const MAGNIFIER: number = 3;
 export async function test_mutex_locks(
   factory: ConnectionFactory,
 ): Promise<void> {
-  const connector: MutexConnector<IActivation, null> = await factory();
+  const connector: MutexConnector<IActivation> = await factory();
   const mutex: RemoteMutex = await connector.getMutex("remote_mutex");
 
   // TEST COMMON FEATURES

@@ -4,7 +4,7 @@ import { IActivation } from "./internal/IActivation";
 import { ConnectionFactory } from "./internal/ConnectionFactory";
 
 async function test(factory: ConnectionFactory): Promise<void> {
-  let connector: MutexConnector<IActivation, null> = await factory();
+  let connector: MutexConnector<IActivation> = await factory();
   let mutex: RemoteMutex = await connector.getMutex("test_destructors");
 
   await mutex.lock_shared();
@@ -16,9 +16,9 @@ async function test(factory: ConnectionFactory): Promise<void> {
 
 export async function test_destructors(
   factory: ConnectionFactory,
-  server: MutexServer<IActivation, null>,
+  server: MutexServer<IActivation>,
 ): Promise<void> {
-  let promises: Promise<void>[] = [];
+  const promises: Promise<void>[] = [];
   for (let i: number = 0; i < 4; ++i) promises.push(test(factory));
 
   await Promise.all(promises);

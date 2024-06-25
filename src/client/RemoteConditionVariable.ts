@@ -88,11 +88,10 @@ export class RemoteConditionVariable {
      * 
      * This method is equivalent to:
     ```typescript
-    let at: Date = new Date(Date.now() + ms);
-    while (!await predicator())
-    {
-        if (!await this.wait_until(at))
-            return await predicator();
+    const at: Date = new Date(Date.now() + ms);
+    while (!await predicator()) {
+      if (!await this.wait_until(at))
+        return await predicator();
     }
     return true;
     ```
@@ -110,7 +109,7 @@ export class RemoteConditionVariable {
     ms: number,
     predicator?: RemoteConditionVariable.Predicator,
   ): Promise<boolean> {
-    let at: Date = new Date(Date.now() + ms);
+    const at: Date = new Date(Date.now() + ms);
     return this.wait_until(at, predicator!);
   }
 
@@ -127,10 +126,9 @@ export class RemoteConditionVariable {
      * 
      * This method is equivalent to:
     ```typescript
-    while (!await predicator())
-    {
-        if (!await this.wait_until(at))
-            return await predicator();
+    while (!await predicator()) {
+      if (!await this.wait_until(at))
+        return await predicator();
     }
     return true;
     ```
@@ -167,7 +165,7 @@ export class RemoteConditionVariable {
    * @hidden
    */
   private async _Wait_until(at: Date): Promise<boolean> {
-    let ms: number = at.getTime() - Date.now();
+    const ms: number = at.getTime() - Date.now();
     return await this.controller_.wait_for(this.name_, ms);
   }
 

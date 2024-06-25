@@ -1,6 +1,5 @@
-import { Driver, WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 
-import { ProviderCapsule } from "./server/ProviderCapsule";
 import { ProviderGroup } from "./server/ProviderGroup";
 
 /**
@@ -9,7 +8,7 @@ import { ProviderGroup } from "./server/ProviderGroup";
  *  - available only in NodeJS.
  *
  * The {@link MutexAcceptor} is a communicator class interacting with the remote client, through
- * websocket and [RFC](https://github.com/samchon/tgrid#13-remote-function-call) protocol, in the
+ * websocket and [RPC](https://tgrid.com/docs/remote-procedure-call/) protocol, in the
  * `mutex-server`. The {@link MutexAcceptor} objects are always created by the {@link MutexServer}
  * class, whenever a remote client connects to the `mutex-server`.
  *
@@ -17,24 +16,19 @@ import { ProviderGroup } from "./server/ProviderGroup";
  * method. If you {@link accept} the connection, the interaction would be started and the client
  * can access to critical component sections of this `mutex-server`.
  *
- * Also, when declaring this {@link MutexAcceptor} type, you've to define two template arguments,
- * *Header* and *Provider*. The *Header* type repersents an initial data gotten from the remote
- * client after the connection. I hope you and client not to omit it and utilize it as an
- * activation tool to enhance security.
- *
- * The second template argument *Provider* represents the additional features provided for the
- * remote client. If you don't have any plan to provide additional feature to the remote client,
- * just declare it as `null`
+ * Also, when declaring this {@link MutexAcceptor} type, you've to define one template argument,
+ * *Header*. The *Header* type repersents an initial data gotten from the remote client after
+ * the connection. I hope you and client not to omit it and utilize it as an activation tool
+ * to enhance security.
  *
  * @template Header Type of the header containing initial data.
- * @template Provider Type of additional features provided for the remote client.
  * @author Jeongho Nam - https://github.com/samchon
  */
-export class MutexAcceptor<Header, Provider extends object | null> {
+export class MutexAcceptor<Header> {
   /**
    * @hidden
    */
-  private base_: WebAcceptor<Header, ProviderCapsule<Provider>>;
+  private base_: WebSocketAcceptor<Header, ProviderGroup, null>;
 
   /**
    * @hidden
@@ -48,7 +42,7 @@ export class MutexAcceptor<Header, Provider extends object | null> {
    * @hidden
    */
   private constructor(
-    base: WebAcceptor<Header, ProviderCapsule<Provider>>,
+    base: WebSocketAcceptor<Header, ProviderGroup, null>,
     group: ProviderGroup,
   ) {
     this.base_ = base;
@@ -58,10 +52,10 @@ export class MutexAcceptor<Header, Provider extends object | null> {
   /**
    * @internal
    */
-  public static create<Header, Provider extends object | null>(
-    base: WebAcceptor<Header, ProviderCapsule<Provider>>,
+  public static create<Header>(
+    base: WebSocketAcceptor<Header, ProviderGroup, null>,
     group: ProviderGroup,
-  ) {
+  ): MutexAcceptor<Header> {
     return new MutexAcceptor(base, group);
   }
 
@@ -73,11 +67,6 @@ export class MutexAcceptor<Header, Provider extends object | null> {
    * When connection with the remote client has been closed, all of the locks the client had
    * acquired and tried would be automatically unlocked and cancelled by this `mutex-server`.
    * Also, remote critical section components had assigned to the client would be returned, too.
-   *
-   * In addition, the disconnection destories all [RFC](https://github.com/samchon/tgrid#13-remote-function-call)s
-   * between the remote client. Therefore, if the remote client is providing custom features to
-   * your `mutex-server` and there're uncompleted method calls to the `Provider` through
-   * `Driver<Controller>`, {@link RuntimeError} exceptions would be thrown.
    *
    * @param code Closing code.
    * @param reason Reason why.
@@ -159,33 +148,6 @@ export class MutexAcceptor<Header, Provider extends object | null> {
     return this.base_.state;
   }
 
-  /**
-   * Get Driver for [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
-   *
-   * If remote client provides custom features for this `mutex-server`, you can utilize
-   * those features thorugh returned `Driver` object by this method. To use this method, you
-   * should define the `Controller` template argument, a type of interface who is defining
-   * additionla features provided from the remote client.
-   *
-   * The returned object `Driver` makes to call remote functions, defined in the `Controller`
-   * and provided by `Provider` in the remote client, possible. In other words, callling a
-   * function in the `Driver<Controller>`, it means to call a matched function in the remote
-   * client's `Provider` object.
-   *
-   *   - `Controller`: Definition only
-   *   - `Driver`: [Remote Function Call](https://github.com/samchon/tgrid#13-remote-function-call)
-   *
-   * @template Controller An interface for provided features (functions & objects) from the remote client (`Provider`).
-   * @template UseParametric Whether to convert type of function parameters to be compatible with their pritimive.
-   * @return A `Driver` for the [RFC](https://github.com/samchon/tgrid#13-remote-function-call).
-   */
-  public getDriver<
-    Controller extends object,
-    UseParametric extends boolean = false,
-  >(): Driver<Controller, UseParametric> {
-    return this.base_.getDriver();
-  }
-
   /* ----------------------------------------------------------------
         HANDSHAKES
     ---------------------------------------------------------------- */
@@ -196,8 +158,8 @@ export class MutexAcceptor<Header, Provider extends object | null> {
    *
    * @param provider An object providing additional features for the remote client. If you don't have plan to proivde any additional feature, assign `null`.
    */
-  public async accept(provider: Provider): Promise<void> {
-    await this.base_.accept({ group: this.group_, provider: provider });
+  public async accept(): Promise<void> {
+    await this.base_.accept(this.group_);
     this.base_.join().then(() => this.group_.destructor());
   }
 
@@ -221,5 +183,5 @@ export namespace MutexAcceptor {
   /**
    * Current state of the {@link MutexAcceptor}
    */
-  export import State = WebAcceptor.State;
+  export import State = WebSocketAcceptor.State;
 }

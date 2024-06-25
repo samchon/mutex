@@ -125,7 +125,7 @@ export class RemoteMutex {
    * @return Whether succeeded to monopoly the mutex or not.
    */
   public async try_lock_until(at: Date): Promise<boolean> {
-    let ms: number = at.getTime() - Date.now();
+    const ms: number = at.getTime() - Date.now();
     return await this.try_lock_for(ms);
   }
 
@@ -237,7 +237,7 @@ export class RemoteMutex {
    * @return Whether succeeded to share the mutex or not.
    */
   public async try_lock_shared_until(at: Date): Promise<boolean> {
-    let ms: number = at.getTime() - Date.now();
+    const ms: number = at.getTime() - Date.now();
     return await this.try_lock_shared_for(ms);
   }
 

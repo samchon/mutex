@@ -1,9 +1,10 @@
-import { WebAcceptor } from "tgrid";
+import { WebSocketAcceptor } from "tgrid";
 import { List } from "tstl";
 
 import { IComponent } from "./IComponent";
 import { ServerConditionVariable } from "./ServerConditionVariable";
 import { Joiner } from "./internal/Joiner";
+import { ProviderGroup } from "../ProviderGroup";
 
 /**
  * @internal
@@ -24,11 +25,15 @@ export class ServerBarrier implements IComponent {
     this.count_ = size;
   }
 
-  public _Insert_acceptor(acceptor: WebAcceptor<any, any>): void {
+  public _Insert_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): void {
     this.cv_._Insert_acceptor(acceptor);
   }
 
-  public _Erase_acceptor(acceptor: WebAcceptor<any, any>): boolean {
+  public _Erase_acceptor(
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
+  ): boolean {
     return this.cv_._Erase_acceptor(acceptor);
   }
 
@@ -36,7 +41,7 @@ export class ServerBarrier implements IComponent {
     WAITORS
   --------------------------------------------------------- */
   public wait(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     return this.cv_.wait(acceptor, disolver);
@@ -44,7 +49,7 @@ export class ServerBarrier implements IComponent {
 
   public wait_for(
     ms: number,
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<boolean> {
     return this.cv_.wait_for(ms, acceptor, disolver);
@@ -54,7 +59,7 @@ export class ServerBarrier implements IComponent {
     ARRIVERS
   --------------------------------------------------------- */
   public async arrive(n: number): Promise<void> {
-    let completed: boolean = (this.count_ += n) <= this.size_;
+    const completed: boolean = (this.count_ += n) <= this.size_;
     if (completed === false) return;
 
     this.count_ %= this.size_;
@@ -62,7 +67,7 @@ export class ServerBarrier implements IComponent {
   }
 
   public async arrive_and_wait(
-    acceptor: WebAcceptor<any, any>,
+    acceptor: WebSocketAcceptor<any, ProviderGroup, null>,
     disolver: List.Iterator<Joiner>,
   ): Promise<void> {
     await this.arrive(1);
